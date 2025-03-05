@@ -2,15 +2,15 @@ import I18nKeys from "./src/locales/keys";
 import type { Configuration } from "./src/types/config";
 
 const YukinaConfig: Configuration = {
-  title: "Yukina",
-  subTitle: "Yukina Template Demo Site",
-  brandTitle: "Yukina",
+  title: "セミラミスの庭",
+  subTitle: "IT、健康、運動、音楽etc",
+  brandTitle: "semiramisu",
 
-  description: "Demo Site",
+  description: "blog site",
 
-  site: "https://yukina-blog.vercel.app",
+  site: "semiramisu.com",
 
-  locale: "en", // set for website language and date format
+  locale: "ja", // set for website language and date format
 
   navigators: [
     {
@@ -27,25 +27,17 @@ const YukinaConfig: Configuration = {
     },
     {
       nameKey: I18nKeys.nav_bar_github,
-      href: "https://github.com/WhitePaper233/yukina",
+      href: "",
     },
   ],
 
-  username: "WhitePaper 白芷",
+  username: "semiramisu",
   sign: "Ad Astra Per Aspera.",
-  avatarUrl: "https://s2.loli.net/2025/01/25/FPpTrQSezM8ivbl.webp",
+  avatarUrl: "/icon.jpg",
   socialLinks: [
     {
       icon: "line-md:github-loop",
-      link: "https://github.com/WhitePaper233",
-    },
-    {
-      icon: "mingcute:bilibili-line",
-      link: "https://space.bilibili.com/22433608",
-    },
-    {
-      icon: "mingcute:netease-music-line",
-      link: "https://music.163.com/#/user/home?id=125291648",
+      link: "https://github.com/semiramisu",
     },
   ],
   maxSidebarCategoryChip: 6, // It is recommended to set it to a common multiple of 2 and 3
@@ -54,14 +46,11 @@ const YukinaConfig: Configuration = {
   maxFooterTagChip: 24,
 
   banners: [
-    "https://s2.loli.net/2025/01/25/PBvHFjr5yDu6t4a.webp",
-    "https://s2.loli.net/2025/01/25/6bKcwHZigzlM4mJ.webp",
-    "https://s2.loli.net/2025/01/25/H9WgEK6qNTcpFiS.webp",
-    "https://s2.loli.net/2025/01/25/njNVtuUMzxs81RI.webp",
-    "https://s2.loli.net/2025/01/25/tozsJ8QHAjFN3Mm.webp",
-    "https://s2.loli.net/2025/01/25/Pm89OveZq7NWUxF.webp",
-    "https://s2.loli.net/2025/01/25/UCYKvc1ZhgPHB9m.webp",
-    "https://s2.loli.net/2025/01/25/JjpLOW8VSmufzlA.webp",
+    "/IMG_32581.jpg",
+    "/IMG_4018.jpg",
+    "/IMG_4033.JPG",
+    "/IMG_4035.jpg",
+    "/IMG_4345.jpg",
   ],
 
   slugMode: "HASH", // 'RAW' | 'HASH'
