@@ -46,10 +46,10 @@ const YukinaConfig: Configuration = {
   maxFooterTagChip: 24,
 
   banners: [
-    "/IMG_32581.jpg",
+    "/IMG_3258.jpg",
     "/IMG_4018.jpg",
     "/IMG_4033.JPG",
-    "/IMG_4035.jpg",
+    "/IMG_4035.JPG",
     "/IMG_4345.jpg",
   ],
 
