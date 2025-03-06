@@ -1,7 +1,7 @@
 import type { Translation } from "../translation";
 import key from "../keys";
 
-export const en: Translation = {
+export const ja: Translation = {
   [key.copy_right_author]: "著者",
   [key.copy_right_publish_date]: "公開日",
   [key.copy_right_license]: "ライセンス",
@@ -29,5 +29,3 @@ export const en: Translation = {
   [key.pages_categories_title]: "カテゴリー",
 };
 
-
-export { ja };
