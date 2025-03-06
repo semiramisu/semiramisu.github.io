@@ -16,9 +16,12 @@ import YukinaConfig from "./yukina.config";
 
 import pagefind from "astro-pagefind";
 
+import netlify from "@astrojs/netlify";
+
 // https://astro.build/config
 export default defineConfig({
   site: YukinaConfig.site,
+
   integrations: [
     tailwind(),
     svelte(),
@@ -37,6 +40,7 @@ export default defineConfig({
     sitemap(),
     pagefind(),
   ],
+
   markdown: {
     shikiConfig: {
       theme: "github-dark-default",
@@ -53,4 +57,6 @@ export default defineConfig({
       ],
     ],
   },
+
+  adapter: netlify(),
 });

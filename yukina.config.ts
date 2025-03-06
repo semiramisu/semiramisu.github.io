@@ -8,7 +8,7 @@ const YukinaConfig: Configuration = {
 
   description: "blog site",
 
-  site: "semiramisu.com",
+  site: "http://semiramisu.com/",
 
   locale: "ja", // set for website language and date format
 
