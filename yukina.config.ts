@@ -27,7 +27,7 @@ const YukinaConfig: Configuration = {
     },
     {
       nameKey: I18nKeys.nav_bar_github,
-      href: "",
+      href: "https://github.com/semiramisu",
     },
   ],
 
