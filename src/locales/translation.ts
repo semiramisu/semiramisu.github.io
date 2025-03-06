@@ -23,3 +23,4 @@ export function i18n(key: I18nKeys, ...interpolations: string[]): string {
     translation = translation.replace("{{}}", interpolation);
   });
   return translation;
+}
