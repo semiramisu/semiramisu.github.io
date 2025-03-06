@@ -111,11 +111,12 @@ const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
   const carouselImgs = document.getElementById("carousel_imgs");
   const carouselImgsCount = carouselImgs?.children.length ?? 0;
 
+// バナーのアニメーションの定義
   const carouselAnimation = `
   @keyframes carousel-animation {
     0% {
       opacity: 0;
-      transform: scale(1);
+      transform: scale(0.8);
     }
     3% {
       opacity: 1;
@@ -133,7 +134,7 @@ const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
     }
     100% {
       opacity: 0;
-      transform: scale(2);
+      transform: scale(1.5);
     }
   }
   `;
