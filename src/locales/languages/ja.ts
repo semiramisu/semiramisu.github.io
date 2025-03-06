@@ -28,4 +28,3 @@ export const ja: Translation = {
   [key.pages_tags_title]: "タグ",
   [key.pages_categories_title]: "カテゴリー",
 };
-
