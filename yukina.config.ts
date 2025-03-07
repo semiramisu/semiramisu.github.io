@@ -39,6 +39,11 @@ const YukinaConfig: Configuration = {
       icon: "line-md:github-loop",
       link: "https://github.com/semiramisu",
     },
+    {
+      icon: "line-md:twitter-x",
+      link: "https://x.com/semiramisuWeb3",
+    },
+
   ],
   maxSidebarCategoryChip: 6, // It is recommended to set it to a common multiple of 2 and 3
   maxSidebarTagChip: 12,
