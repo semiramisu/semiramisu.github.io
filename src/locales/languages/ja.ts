@@ -8,7 +8,7 @@ export const ja: Translation = {
 
   [key.nav_bar_home]: "ホーム",
   [key.nav_bar_archive]: "アーカイブ",
-  [key.nav_bar_about]: "About",
+  [key.nav_bar_about]: "About Me",
   [key.nav_bar_github]: "GitHub",
   [key.nav_bar_search_placeholder]: "検索",
 
