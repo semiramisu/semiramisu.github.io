@@ -3,7 +3,7 @@ import type { Configuration } from "./src/types/config";
 
 const YukinaConfig: Configuration = {
   title: "セミラミスの庭",
-  subTitle: "IT、健康、運動、音楽etc",
+  subTitle: "毎日成長 毎日更新 IT、健康、運動、音楽etc",
   brandTitle: "semiramisu",
 
   description: "blog site",
