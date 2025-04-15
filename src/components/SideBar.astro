@@ -43,6 +43,12 @@ const tagKeys = [...tags.keys()];
           </div>
         )
       }
+      
+      <!-- X Timeline -->
+      <div class="mt-4 twitter-timeline-container">
+        <a class="twitter-timeline" href="https://twitter.com/semiramisuWeb3?ref_src=twsrc%5Etfw">Tweets by semiramisuWeb3</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      </div>
     </div>
 
     <!-- categories -->
@@ -159,6 +165,11 @@ const tagKeys = [...tags.keys()];
 
   .slogan {
     font-family: var(--title-font);
+  }
+
+  .twitter-timeline-container {
+    @apply w-full overflow-hidden;
+    max-height: 400px;
   }
 
   .title {

@@ -29,6 +29,10 @@ const YukinaConfig: Configuration = {
       nameKey: I18nKeys.nav_bar_github,
       href: "https://github.com/semiramisu",  // GitHub アカウントページに直接リンク
     },
+    {
+      nameKey: I18nKeys.nav_bar_x,
+      href: "https://x.com/semiramisuWeb3?ref_src=twsrc%5Etfw%7Ctwcamp%5Eembeddedtimeline%7Ctwterm%5Escreen-name%3AsemiramisuWeb3%7Ctwcon%5Es1",
+    },
   ],
 
   username: "semiramisu",
