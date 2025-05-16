@@ -1,0 +1,90 @@
+---
+import type { Tag } from "../../utils/content";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  tags: Tag[];
+  maxTags?: number;
+}
+
+const { tags, maxTags = 30 } = Astro.props;
+const displayTags = tags.slice(0, maxTags);
+
+// Calculate font sizes based on post count
+const maxCount = Math.max(...displayTags.map(tag => tag.posts.length));
+const minCount = Math.min(...displayTags.map(tag => tag.posts.length));
+const getFontSize = (count: number) => {
+  // Map post count to font size between 0.8rem and 1.8rem
+  const minSize = 0.8;
+  const maxSize = 1.8;
+  const size = minCount === maxCount 
+    ? (minSize + maxSize) / 2 
+    : minSize + ((count - minCount) / (maxCount - minCount)) * (maxSize - minSize);
+  return `${size}rem`;
+};
+
+// Generate colors from primary color spectrum
+const getTagColor = (index: number) => {
+  const hues = [
+    'var(--primary-color)', 
+    'var(--primary-color-darken)', 
+    'var(--primary-color-lighten)'
+  ];
+  return hues[index % hues.length];
+};
+---
+
+<div class="tag-cloud">
+  {displayTags.map((tag, index) => (
+    <a 
+      href={tag.slug} 
+      class="tag-item"
+      style={`font-size: ${getFontSize(tag.posts.length)}; color: ${getTagColor(index)};`}
+      data-posts={tag.posts.length}
+    >
+      <span class="tag-text">{tag.name}</span>
+      <span class="tag-count">({tag.posts.length})</span>
+    </a>
+  ))}
+</div>
+
+<style>
+  .tag-cloud {
+    @apply flex flex-wrap gap-3 justify-center p-6 rounded-2xl bg-[var(--card-color)];
+    perspective: 400px;
+  }
+
+  .tag-item {
+    @apply inline-flex items-center px-3 py-1.5 rounded-full transition-all duration-300 hover:scale-110;
+    text-decoration: none;
+    transform: translateZ(0);
+  }
+  
+  .tag-item:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateZ(20px);
+  }
+  
+  .tag-count {
+    @apply ml-1 text-sm opacity-70;
+  }
+</style>
+
+<script>
+  // Add random movement animation to tags
+  document.addEventListener('astro:page-load', () => {
+    const tagItems = document.querySelectorAll('.tag-item');
+    
+    tagItems.forEach((tag) => {
+      tag.addEventListener('mouseover', () => {
+        tag.style.zIndex = '10';
+      });
+      
+      tag.addEventListener('mouseout', () => {
+        setTimeout(() => {
+          tag.style.zIndex = '1';
+        }, 300);
+      });
+    });
+  });
+</script> 

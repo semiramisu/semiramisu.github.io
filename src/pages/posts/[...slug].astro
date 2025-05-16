@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 ---
 
 {
@@ -23,6 +23,7 @@ const { Content } = await render(entry);
       subTitle={entry.data.description}
       bannerImage={entry.data.cover}
       published={entry.data.published}
+      headings={headings}
     >
       <div
         class="hidden"
@@ -48,6 +49,7 @@ const { Content } = await render(entry);
       license={{ name: entry.data.licenseName, url: entry.data.licenseUrl }}
       author={entry.data.author}
       sourceLink={entry.data.sourceLink}
+      headings={headings}
     >
       <div
         class="hidden"

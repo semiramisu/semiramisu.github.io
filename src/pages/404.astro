@@ -1,0 +1,130 @@
+---
+import Main from "../layouts/MainLayout.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Main title="404 - ページが見つかりません">
+  <div class="error-container">
+    <div class="error-content">
+      <div class="error-code">
+        <span class="digit">4</span>
+        <div class="planet-container">
+          <div class="planet"></div>
+          <div class="orbit">
+            <div class="meteor"></div>
+          </div>
+        </div>
+        <span class="digit">4</span>
+      </div>
+      
+      <h1 class="error-title">ページが見つかりません</h1>
+      <p class="error-message">
+        お探しのページは削除されたか、移動した可能性があります。
+      </p>
+      
+      <div class="action-buttons">
+        <a href="/" class="home-button">
+          <Icon name="line-md:home" class="button-icon" />
+          ホームに戻る
+        </a>
+        <button class="back-button" onclick="history.back()">
+          <Icon name="line-md:arrow-left" class="button-icon" />
+          前のページに戻る
+        </button>
+      </div>
+    </div>
+  </div>
+</Main>
+
+<style>
+  .error-container {
+    @apply flex flex-col items-center justify-center min-h-[70vh] py-12 px-4;
+  }
+  
+  .error-content {
+    @apply flex flex-col items-center max-w-2xl mx-auto text-center;
+  }
+  
+  .error-code {
+    @apply flex items-center justify-center text-[5rem] md:text-[8rem] font-bold text-[var(--primary-color)];
+    font-family: var(--primary-font);
+  }
+  
+  .digit {
+    @apply inline-block;
+    animation: pulse 4s infinite;
+  }
+  
+  .planet-container {
+    @apply relative inline-flex items-center justify-center w-24 h-24 md:w-32 md:h-32 mx-2;
+  }
+  
+  .planet {
+    @apply absolute rounded-full bg-[var(--primary-color)] w-20 h-20 md:w-28 md:h-28;
+    background: radial-gradient(circle at 30% 30%, var(--primary-color-lighten), var(--primary-color));
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    animation: rotate 20s linear infinite;
+  }
+  
+  .orbit {
+    @apply absolute w-full h-full rounded-full border-2 border-dashed border-[var(--text-color-lighten)];
+    animation: rotate 8s linear infinite;
+  }
+  
+  .meteor {
+    @apply absolute w-3 h-3 rounded-full bg-[var(--text-color)];
+    top: -6px;
+    left: 50%;
+    box-shadow: 0 0 10px 2px var(--primary-color-lighten);
+  }
+  
+  .error-title {
+    @apply text-2xl md:text-3xl font-bold mt-6 mb-3 text-[var(--text-color)];
+    font-family: var(--primary-font);
+  }
+  
+  .error-message {
+    @apply text-[var(--text-color-lighten)] mb-8 max-w-md;
+  }
+  
+  .action-buttons {
+    @apply flex flex-col sm:flex-row gap-4 mt-2;
+  }
+  
+  .home-button, .back-button {
+    @apply flex items-center justify-center gap-2 py-3 px-6 rounded-full transition-all duration-300;
+    @apply font-medium text-sm md:text-base;
+  }
+  
+  .home-button {
+    @apply bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color-darken)];
+    @apply transform hover:scale-105;
+  }
+  
+  .back-button {
+    @apply bg-[var(--card-color)] text-[var(--text-color)] hover:bg-[var(--primary-color-lighten)];
+    @apply transform hover:scale-105;
+  }
+  
+  .button-icon {
+    @apply w-5 h-5;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style> 

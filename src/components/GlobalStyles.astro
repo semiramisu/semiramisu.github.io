@@ -7,50 +7,108 @@ import "overlayscrollbars/overlayscrollbars.css";
 ---
 
 <style is:global>
+  /* テーマの基本設定 */
   :root {
-    --hue: 300;
+    --hue: 240;
 
-    --primary-color: oklch(70% 0.15 var(--hue));
-    --primary-color-lighten: oklch(95% 0.02 var(--hue));
-    --primary-color-hover: oklch(90% 0.025 var(--hue));
-    --primary-color-transparent: oklch(70% 0.15 var(--hue) / 15%);
-    --text-color: oklch(30% 0 0);
-    --text-color-lighten: oklch(50% 0 0);
-    --card-color: oklch(100% 0 0);
-    --card-color-transparent: oklch(100% 0 0 / 85%);
-    --background-color: oklch(97% 0.01 var(--hue));
-
-    --brand-font: "Raleway", "Noto Sans SC", sans-serif;
+    /* ライトモードとダークモードの両方で使う共通変数 */
     --primary-font: "Noto Sans SC", sans-serif;
+    --brand-font: "Raleway", "Noto Sans SC", sans-serif;
     --code-font: "JetBrains Mono", "Fira Code", monospace;
-
     --page-width-lg: 992px;
     --page-width-xl: 1264px;
-
     --banner-height: 55vh;
     --title-font: var(--brand-font);
-    --title-color: oklch(100% 0 0 / 95%);
     --subtitle-font: var(--brand-font);
-    --subtitle-color: oklch(100% 0 0 / 85%);
-
     --onload-animation-delay: 100ms;
     --onload-animation-interval: 100ms;
+    --transition-speed: 0.3s;
+    --transition-timing: ease;
+    
+    /* ライトモード用の色設定 */
+    --light-primary-color: oklch(60% 0.18 var(--hue));
+    --light-primary-color-lighten: oklch(90% 0.05 var(--hue));
+    --light-primary-color-darken: oklch(40% 0.22 var(--hue));
+    --light-primary-color-hover: oklch(85% 0.035 var(--hue));
+    --light-primary-color-transparent: oklch(60% 0.18 var(--hue) / 15%);
+    --light-text-color: oklch(25% 0 0);
+    --light-text-color-lighten: oklch(45% 0 0);
+    --light-card-color: oklch(100% 0 0);
+    --light-card-color-transparent: oklch(100% 0 0 / 85%);
+    --light-background-color: oklch(98% 0.01 var(--hue));
+    --light-border-color: oklch(90% 0.02 var(--hue));
+    --light-title-color: oklch(100% 0 0 / 95%);
+    --light-subtitle-color: oklch(100% 0 0 / 85%);
+    
+    /* ダークモード用の色設定 */
+    --dark-primary-color: oklch(65% 0.15 var(--hue));
+    --dark-primary-color-lighten: oklch(40% 0.06 var(--hue));
+    --dark-primary-color-darken: oklch(50% 0.22 var(--hue));
+    --dark-primary-color-hover: oklch(30% 0.04 var(--hue));
+    --dark-text-color: oklch(95% 0.002 var(--hue));
+    --dark-text-color-lighten: oklch(85% 0.002 var(--hue));
+    --dark-card-color: oklch(20% 0.02 var(--hue));
+    --dark-card-color-lighten: oklch(35% 0.04 var(--hue));
+    --dark-card-color-transparent: oklch(25% 0.025 var(--hue) / 85%);
+    --dark-background-color: oklch(15% 0.015 var(--hue));
+    --dark-border-color: oklch(30% 0.03 var(--hue));
+    --dark-title-color: oklch(100% 0 0 / 95%);
+    --dark-subtitle-color: oklch(100% 0 0 / 85%);
+    
+    /* デフォルトはライトモード */
+    --primary-color: var(--light-primary-color);
+    --primary-color-lighten: var(--light-primary-color-lighten);
+    --primary-color-darken: var(--light-primary-color-darken);
+    --primary-color-hover: var(--light-primary-color-hover);
+    --primary-color-transparent: var(--light-primary-color-transparent);
+    --text-color: var(--light-text-color);
+    --text-color-lighten: var(--light-text-color-lighten);
+    --card-color: var(--light-card-color);
+    --card-color-transparent: var(--light-card-color-transparent);
+    --background-color: var(--light-background-color);
+    --border-color: var(--light-border-color);
+    --title-color: var(--light-title-color);
+    --subtitle-color: var(--light-subtitle-color);
   }
 
+  /* ダークモード設定 */
   :root.dark {
-    --primary-color: oklch(70% 0.125 var(--hue));
-    --primary-color-lighten: oklch(40% 0.04 var(--hue));
-    --primary-color-hover: oklch(20% 0.015 var(--hue));
-    --text-color: oklch(95% 0.002 var(--hue));
-    --text-color-lighten: oklch(90% 0.002 var(--hue));
-    --card-color: oklch(25% 0.02 var(--hue));
-    --card-color-lighten: oklch(40% 0.04 var(--hue));
-    --card-color-transparent: oklch(30% 0.025 var(--hue) / 85%);
-    --background-color: oklch(17.5% 0.015 var(--hue));
+    --primary-color: var(--dark-primary-color);
+    --primary-color-lighten: var(--dark-primary-color-lighten);
+    --primary-color-darken: var(--dark-primary-color-darken);
+    --primary-color-hover: var(--dark-primary-color-hover);
+    --text-color: var(--dark-text-color);
+    --text-color-lighten: var(--dark-text-color-lighten);
+    --card-color: var(--dark-card-color);
+    --card-color-lighten: var(--dark-card-color-lighten);
+    --card-color-transparent: var(--dark-card-color-transparent);
+    --background-color: var(--dark-background-color);
+    --border-color: var(--dark-border-color);
+    --title-color: var(--dark-title-color);
+    --subtitle-color: var(--dark-subtitle-color);
   }
 
+  /* HTML属性でデータテーマを指定した場合の対応 */
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  /* 進捗バー */
   .swup-progress-bar {
     height: 5px;
     background-color: var(--primary-color);
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  *:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
   }
 </style>

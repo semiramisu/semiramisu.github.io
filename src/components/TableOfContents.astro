@@ -1,0 +1,172 @@
+---
+// 渡される見出しの配列の型を定義
+interface Props {
+  headings: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+}
+
+const { headings = [] } = Astro.props;
+---
+
+<div class="toc-container">
+  <div class="toc-header">
+    <h2>目次</h2>
+  </div>
+  {headings.length > 0 ? (
+    <ul class="toc-list">
+      {headings.map((heading) => (
+        <li class={`toc-item depth-${heading.depth}`}>
+          <a href={`#${heading.slug}`} class="toc-link" data-slug={heading.slug}>
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="toc-empty">この記事には目次がありません</p>
+  )}
+</div>
+
+<style>
+  .toc-container {
+    position: sticky;
+    top: 6rem;
+    padding: 0.75rem;
+    background-color: var(--card-color);
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .toc-header h2 {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .toc-list {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .toc-item {
+    list-style: none;
+    font-size: 0.875rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+  
+  .depth-1 { margin-left: 0; }
+  .depth-2 { margin-left: 1rem; }
+  .depth-3 { margin-left: 2rem; }
+  .depth-4 { margin-left: 3rem; }
+  
+  .toc-link {
+    color: var(--primary-text);
+    text-decoration: none;
+    transition: color 0.2s, font-weight 0.2s;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .toc-link:hover {
+    color: var(--primary-color);
+  }
+  
+  .toc-link.active {
+    color: var(--primary-color);
+    font-weight: bold;
+  }
+  
+  .toc-empty {
+    font-size: 0.875rem;
+    color: var(--secondary-text);
+    font-style: italic;
+  }
+</style>
+
+<script>
+  function setupTOC() {
+    // 目次のリンクにスムーズスクロールを追加
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const headingElements = Array.from(tocLinks).map(link => {
+      const slug = link.getAttribute('data-slug');
+      return slug ? document.getElementById(slug) : null;
+    }).filter(el => el !== null);
+    
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const targetId = link.getAttribute('data-slug');
+        if (!targetId) return;
+        
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          e.preventDefault();
+          window.scrollTo({
+            top: targetElement.getBoundingClientRect().top + window.scrollY - 100,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // スクロール位置に基づいて目次をハイライト
+    function updateTOCHighlight() {
+      // スクロール位置から現在見えている見出しを特定
+      let currentHeadingIndex = -1;
+      const scrollPosition = window.scrollY;
+      
+      // 画面の上部から1/3の位置を基準点とする
+      const scrollOffset = 150;
+      
+      for (let i = 0; i < headingElements.length; i++) {
+        const heading = headingElements[i];
+        if (!heading) continue;
+        
+        const headingTop = heading.getBoundingClientRect().top + window.scrollY;
+        
+        if (scrollPosition >= headingTop - scrollOffset) {
+          currentHeadingIndex = i;
+        } else {
+          break;
+        }
+      }
+      
+      // 目次のハイライトを更新
+      tocLinks.forEach((link, index) => {
+        if (index === currentHeadingIndex) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+      
+      // ページの最下部にスクロールした場合、最後の見出しをハイライト
+      const bottomOfPage = window.scrollY + window.innerHeight >= document.body.scrollHeight - 100;
+      if (bottomOfPage && headingElements.length > 0) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        tocLinks[tocLinks.length - 1].classList.add('active');
+      }
+    }
+    
+    // スクロールイベントにハイライト更新関数をバインド
+    // スクロール中に何度も実行されないようにデバウンスする
+    let isScrolling: ReturnType<typeof setTimeout> | undefined;
+    window.addEventListener('scroll', () => {
+      clearTimeout(isScrolling);
+      isScrolling = setTimeout(() => {
+        updateTOCHighlight();
+      }, 50);
+    });
+    
+    // 初回ロード時にもハイライトを設定
+    updateTOCHighlight();
+  }
+
+  // DOMContentLoaded と Astro の ViewTransitions の両方に対応
+  document.addEventListener('DOMContentLoaded', setupTOC);
+  document.addEventListener('astro:page-load', setupTOC);
+</script> 

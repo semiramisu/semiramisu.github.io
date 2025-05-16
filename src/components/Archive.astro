@@ -1,0 +1,211 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { IdToSlug } from '../utils/hash';
+
+interface Props {
+  posts: CollectionEntry<'posts'>[];
+}
+
+const { posts } = Astro.props;
+
+// 記事を年ごとにグループ化
+const postsByYear = posts.reduce((acc, post) => {
+  const year = new Date(post.data.published).getFullYear();
+  if (!acc[year]) {
+    acc[year] = [];
+  }
+  acc[year].push(post);
+  return acc;
+}, {} as Record<number, CollectionEntry<'posts'>[]>);
+
+// 記事を月ごとにグループ化
+const groupPostsByMonth = (posts: CollectionEntry<'posts'>[]) => {
+  const months: Record<string, CollectionEntry<'posts'>[]> = {};
+  
+  posts.forEach(post => {
+    const date = new Date(post.data.published);
+    const monthKey = `${date.getMonth() + 1}月`;
+    
+    if (!months[monthKey]) {
+      months[monthKey] = [];
+    }
+    months[monthKey].push(post);
+  });
+  
+  return months;
+};
+
+// 各月の記事を週ごとにグループ化
+const groupPostsByWeek = (posts: CollectionEntry<'posts'>[]) => {
+  const weeks: Record<string, CollectionEntry<'posts'>[]> = {};
+  
+  posts.forEach(post => {
+    const date = new Date(post.data.published);
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    
+    const weekKey = `${startOfWeek.getMonth() + 1}/${startOfWeek.getDate()} - ${endOfWeek.getMonth() + 1}/${endOfWeek.getDate()}`;
+    
+    if (!weeks[weekKey]) {
+      weeks[weekKey] = [];
+    }
+    weeks[weekKey].push(post);
+  });
+  
+  return weeks;
+};
+
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+---
+
+<div class="archive">
+  <h2 class="section-title mb-6">ARCHIVE</h2>
+  {years.map(year => {
+    const yearPosts = postsByYear[Number(year)];
+    const monthGroups = groupPostsByMonth(yearPosts);
+    const monthKeys = Object.keys(monthGroups).sort();
+    
+    return (
+      <div class="year-group">
+        <button class="year-button" data-year={year}>
+          <span class="toggle-icon">▶</span> {year} ({yearPosts.length})
+        </button>
+        <div class="months hidden" data-year-content={year}>
+          {monthKeys.map(month => {
+            const monthPosts = monthGroups[month];
+            const weekGroups = groupPostsByWeek(monthPosts);
+            const weekKeys = Object.keys(weekGroups);
+            
+            return (
+              <div class="month-group">
+                <button class="month-button" data-month={`${year}-${month}`}>
+                  <span class="toggle-icon">▶</span> {month} ({monthPosts.length})
+                </button>
+                <div class="weeks hidden" data-month-content={`${year}-${month}`}>
+                  {weekKeys.map(week => (
+                    <div class="week-group">
+                      <button class="week-button" data-week={`${year}-${month}-${week}`}>
+                        <span class="toggle-icon">▶</span> {week} ({weekGroups[week].length})
+                      </button>
+                      <ul class="posts hidden" data-week-content={`${year}-${month}-${week}`}>
+                        {weekGroups[week].map(post => (
+                          <li>
+                            <a href={`/posts/${IdToSlug(post.id)}`} class="post-link">
+                              {post.data.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+<style>
+  .archive {
+    margin: 2rem 0;
+  }
+
+  .year-group,
+  .month-group,
+  .week-group {
+    margin: 0.5rem 0;
+  }
+
+  .months,
+  .weeks,
+  .posts {
+    margin-left: 1.5rem;
+    overflow: hidden;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+    padding: 0.25rem 0;
+    color: var(--text-color);
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  button:hover {
+    color: var(--primary-color);
+  }
+
+  .toggle-icon {
+    display: inline-block;
+    width: 1.5rem;
+    transition: transform 0.2s ease;
+  }
+
+  button[aria-expanded="true"] .toggle-icon {
+    transform: rotate(90deg);
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 1.5rem;
+  }
+
+  .post-link {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.25rem 0;
+    display: inline-block;
+  }
+
+  .post-link:hover {
+    color: var(--primary-color);
+  }
+</style>
+
+<script>
+  function setupArchive() {
+    const buttons = document.querySelectorAll('button[data-year], button[data-month], button[data-week]');
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const year = button.getAttribute('data-year');
+        const month = button.getAttribute('data-month');
+        const week = button.getAttribute('data-week');
+        
+        let content;
+        if (year) {
+          content = document.querySelector(`[data-year-content="${year}"]`);
+        } else if (month) {
+          content = document.querySelector(`[data-month-content="${month}"]`);
+        } else if (week) {
+          content = document.querySelector(`[data-week-content="${week}"]`);
+        }
+        
+        if (content) {
+          content.classList.toggle('hidden');
+          button.setAttribute('aria-expanded', content.classList.contains('hidden') ? 'false' : 'true');
+        }
+      });
+    });
+  }
+
+  // Initialize when the document is loaded
+  document.addEventListener('DOMContentLoaded', setupArchive);
+  
+  // Re-initialize when the page is updated through navigation
+  document.addEventListener('astro:page-load', setupArchive);
+</script> 

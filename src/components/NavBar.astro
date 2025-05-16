@@ -59,20 +59,25 @@ const navCount = YukinaConfig.navigators.length;
       <div class="hidden lg:block">
         <SearchBar client:only="svelte" />
       </div>
-      <div class="theme">
-        <button type="button" id="theme-switcher">
+      <div class="theme-switcher">
+        <button type="button" id="theme-switcher" aria-label="ダークモード切り替え" class="theme-toggle">
+          <div class="sun-moon-container">
           <Icon
             id="theme-icon-light"
             name="line-md:moon-alt-to-sunny-outline-loop-transition"
             size={24}
-            class="hidden"
+              class="theme-icon hidden"
           />
           <Icon
             id="theme-icon-dark"
             name="line-md:sunny-outline-to-moon-alt-loop-transition"
             size={24}
-            class="hidden"
+              class="theme-icon hidden"
           />
+          </div>
+          <div class="theme-toggle-track">
+            <div class="theme-toggle-thumb"></div>
+          </div>
         </button>
       </div>
     </div>
@@ -165,16 +170,71 @@ const navCount = YukinaConfig.navigators.length;
   }
 
   .toolbar {
-    @apply flex flex-row items-center justify-end space-x-1 lg:mr-2;
+    @apply flex flex-row items-center justify-end space-x-2 lg:mr-2;
   }
 
   .toolbar button {
-    @apply flex w-11 justify-center rounded-lg py-2 text-[var(--text-color)] transition-all;
-    @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
+    @apply flex justify-center rounded-lg text-[var(--text-color)] transition-all;
+    @apply hover:text-[var(--primary-color)];
   }
 
-  .toolbar .icon {
-    @apply stroke-2 text-xl;
+  .theme-switcher {
+    @apply relative flex items-center;
+  }
+
+  .theme-toggle {
+    @apply relative flex items-center justify-between p-1 rounded-full w-14 h-7 transition-all duration-300;
+    background-color: var(--card-color);
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+  }
+
+  .theme-toggle:hover {
+    @apply border-[var(--primary-color)];
+  }
+
+  .theme-toggle-track {
+    @apply absolute inset-0 rounded-full pointer-events-none transition-colors duration-300;
+  }
+
+  .theme-toggle-thumb {
+    @apply absolute w-5 h-5 rounded-full bg-[var(--primary-color)] transition-transform duration-300 transform top-1 left-1;
+  }
+
+  [data-theme="dark"] .theme-toggle-thumb {
+    transform: translateX(calc(100% + 4px));
+  }
+
+  .sun-moon-container {
+    @apply absolute inset-0 flex items-center justify-between px-1.5 z-10 pointer-events-none;
+  }
+
+  .theme-icon {
+    @apply text-[var(--text-color)] transition-all duration-300;
+  }
+
+  .theme-ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.8s linear;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  @keyframes ripple {
+    to {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+  
+  :global(.theme-transition) {
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+  
+  :global(.theme-transition *) {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
   }
 
   .mobile-menu-nav-closed {
@@ -281,26 +341,80 @@ const navCount = YukinaConfig.navigators.length;
   let themeIconDark = document.getElementById(
     "theme-icon-dark",
   ) as any as SVGElement;
+  const themeToggleThumb = document.querySelector(".theme-toggle-thumb") as HTMLElement;
 
   // Record the current theme
   let currentTheme = localStorage.getItem("theme") || "light";
 
-  // Set theme
+  // Set theme with animation
   const setTheme = (theme: string) => {
+    // Add transition class to body for page-wide transition
+    document.body.classList.add('theme-transition');
+    
+    // Update theme attributes
     document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.dataset.theme = theme;
     localStorage.setItem("theme", theme);
     currentTheme = theme;
 
-    // Show/hide icons for different themes
-    themeIconDark.style.display = theme === "dark" ? "block" : "none";
-    themeIconLight.style.display = theme === "light" ? "block" : "none";
+    // 背景色とテキスト色をすぐに設定
+    if (theme === "dark") {
+      document.documentElement.style.setProperty('--background-color', 'var(--dark-background-color, #121212)');
+      document.documentElement.style.setProperty('--text-color', 'var(--dark-text-color, #e0e0e0)');
+      document.documentElement.style.setProperty('--card-color', 'var(--dark-card-color, #1e1e1e)');
+    } else {
+      document.documentElement.style.setProperty('--background-color', 'var(--light-background-color, #ffffff)');
+      document.documentElement.style.setProperty('--text-color', 'var(--light-text-color, #333333)');
+      document.documentElement.style.setProperty('--card-color', 'var(--light-card-color, #f8f8f8)');
+    }
 
-    // If the theme is dark, update the dark icon; otherwise, update the light icon
-    if (theme === "dark") themeIconDark = reinitializeIcon(themeIconDark);
-    else themeIconLight = reinitializeIcon(themeIconLight);
+    // Show/hide icons for different themes with animation
+    if (theme === "dark") {
+      themeIconDark.style.display = "block";
+      themeIconLight.style.display = "none";
+      themeIconDark = reinitializeIcon(themeIconDark);
+      
+      // Create ripple effect
+      createRippleEffect(themeSwitcher, 'dark');
+    } else {
+      themeIconLight.style.display = "block";
+      themeIconDark.style.display = "none";
+      themeIconLight = reinitializeIcon(themeIconLight);
+      
+      // Create ripple effect
+      createRippleEffect(themeSwitcher, 'light');
+    }
 
     // Toggle dark class
     document.documentElement.classList.toggle("dark", theme === "dark");
+    
+    // Remove transition class after animation completes
+    setTimeout(() => {
+      document.body.classList.remove('theme-transition');
+    }, 1000);
+  };
+  
+  // Create ripple effect when toggling theme
+  const createRippleEffect = (button: HTMLElement, theme: string) => {
+    const ripple = document.createElement('span');
+    ripple.classList.add('theme-ripple');
+    
+    // Set ripple color based on theme
+    ripple.style.backgroundColor = theme === 'dark' 
+      ? 'rgba(30, 41, 59, 0.5)' 
+      : 'rgba(255, 255, 255, 0.5)';
+      
+    // Position the ripple
+    const rect = button.getBoundingClientRect();
+    ripple.style.width = ripple.style.height = `${Math.max(rect.width, rect.height) * 2}px`;
+    
+    // Add the ripple to the button
+    button.appendChild(ripple);
+    
+    // Remove the ripple after animation
+    setTimeout(() => {
+      ripple.remove();
+    }, 1000);
   };
 
   // Click to switch theme
@@ -329,16 +443,4 @@ const navCount = YukinaConfig.navigators.length;
   });
 </script>
 
-<script is:inline>
-  // load pagefind
-  async function loadPagefind() {
-    const pagefind = await import("/pagefind/pagefind.js");
-    await pagefind.options({
-      excerptLength: 20,
-    });
-    pagefind.init();
-    window.pagefind = pagefind;
-    pagefind.search("");
-  }
-  loadPagefind();
-</script>
+<!-- pagefind用スクリプトは削除 - 本番環境でビルド後にページファインドが適用されます -->

@@ -25,6 +25,10 @@ enum I18nKeys {
 
   pages_tags_title = "pages_tags_title",
   pages_categories_title = "pages_categories_title",
+  
+  featured_posts = "featured_posts",
+  recent_posts = "recent_posts",
+  explore_tags = "explore_tags",
 }
 
 export default I18nKeys;

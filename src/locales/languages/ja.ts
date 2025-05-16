@@ -28,4 +28,8 @@ export const ja: Translation = {
 
   [key.pages_tags_title]: "タグ",
   [key.pages_categories_title]: "カテゴリー",
+  
+  [key.featured_posts]: "注目の投稿",
+  [key.recent_posts]: "最近の投稿",
+  [key.explore_tags]: "タグで探す",
 };

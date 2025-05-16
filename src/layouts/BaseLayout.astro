@@ -4,14 +4,61 @@ import BaseHead from "../components/BaseHead.astro";
 ---
 
 <html lang={YukinaConfig.locale}>
-  <BaseHead />
-  <body class="overflow-y-hidden">
+  <head>
+    <!-- テーマを即時適用するためのインラインスクリプト -->
+    <script is:inline>
+      // ローカルストレージからテーマを取得し即座に適用
+      const storedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const defaultDark = storedTheme === 'dark' || (storedTheme === null && prefersDark);
+      
+      // HTMLのdata-theme属性を設定
+      document.documentElement.dataset.theme = defaultDark ? 'dark' : 'light';
+      
+      // 背景色とテキスト色を即座に設定
+      if (defaultDark) {
+        document.documentElement.style.setProperty('--background-color', 'var(--dark-background-color, #121212)');
+        document.documentElement.style.setProperty('--text-color', 'var(--dark-text-color, #e0e0e0)');
+      } else {
+        document.documentElement.style.setProperty('--background-color', 'var(--light-background-color, #ffffff)');
+        document.documentElement.style.setProperty('--text-color', 'var(--light-text-color, #333333)');
+      }
+    </script>
+    
+    <BaseHead />
+    <slot name="head" />
+  </head>
+  <body>
+    <!-- メインコンテンツ -->
     <slot />
   </body>
 </html>
 
 <style>
   body {
-    @apply bg-[var(--background-color)];
+    @apply bg-[var(--background-color)] overflow-x-hidden min-h-screen;
+  }
+  
+  /* テーマ切り替え時のアニメーションを無効化 */
+  :global(*) {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 0.2s;
+  }
+  
+  /* ページロード時のアニメーションを無効化 */
+  :global(html.no-transition *) {
+    transition: none !important;
   }
 </style>
+
+<script>
+  // ページロード完了後にトランジションを有効化
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      document.documentElement.classList.remove('no-transition');
+    }, 100);
+  });
+  
+  // 初期ロード時はトランジションを無効化
+  document.documentElement.classList.add('no-transition');
+</script>

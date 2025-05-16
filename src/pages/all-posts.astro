@@ -1,0 +1,262 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import PostCard from "../components/PostCard.astro";
+import { GetSortedPosts, GetAllCategories } from "../utils/content";
+import { i18n } from "../locales/translation";
+import I18nKeys from "../locales/keys";
+
+// 全ての記事とカテゴリーを取得
+const allPosts = await GetSortedPosts();
+const allCategories = await GetAllCategories();
+
+// 初期表示するカテゴリーの数（デフォルトは10）
+const initialCategoryCount = 10;
+// カテゴリーが多い場合は初期表示を制限
+const hasMoreCategories = allCategories.length > initialCategoryCount;
+---
+
+<MainLayout title="すべての記事">
+  <div class="page-container">
+    <h1 class="page-title">すべての記事</h1>
+    
+    <div class="categories-container">
+      <div class="categories-filter" id="categories-filter">
+        <a href="/all-posts" class="category-pill active">すべて</a>
+        {allCategories.map((category, index) => (
+          <a 
+            href={`/all-posts?category=${encodeURIComponent(category.name)}`} 
+            class={`category-pill ${index >= initialCategoryCount ? 'hidden-category' : ''}`}
+          >
+            {category.name}
+          </a>
+        ))}
+      </div>
+      
+      {hasMoreCategories && (
+        <div class="text-center mt-3">
+          <button id="show-more-categories" class="show-more-button">
+            もっと見る <span class="arrow-down">▼</span>
+          </button>
+        </div>
+      )}
+    </div>
+    
+    <div class="posts-grid">
+      {allPosts.map((entry, index) => (
+        <div 
+          class="post-card-animation"
+          style={`animation-delay: calc(var(--onload-animation-delay) + ${index % 12 + 1} * var(--onload-animation-interval));`}
+          data-category={entry.data.category || ""}
+        >
+          <PostCard
+            id={entry.id}
+            title={entry.data.title}
+            published={entry.data.published}
+            category={entry.data.category}
+            tags={entry.data.tags}
+            description={entry.data.description}
+            image={entry.data.cover}
+            readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .page-container {
+    @apply w-full space-y-8;
+  }
+  
+  .page-title {
+    @apply text-3xl md:text-4xl font-bold text-[var(--text-color)] text-center mb-8;
+    font-family: var(--primary-font);
+  }
+  
+  .categories-container {
+    @apply mb-8;
+  }
+  
+  .categories-filter {
+    @apply flex flex-wrap justify-center gap-2;
+  }
+  
+  .category-pill {
+    @apply px-4 py-2 rounded-full bg-[var(--card-color)] text-[var(--text-color)] border border-[var(--border-color)];
+    @apply hover:bg-[var(--primary-color-lighten)] hover:text-[var(--primary-color)] transition-all;
+  }
+  
+  .category-pill.active {
+    @apply bg-[var(--primary-color)] text-white border-transparent;
+  }
+  
+  .hidden-category {
+    @apply hidden;
+  }
+  
+  .show-more-button {
+    @apply px-4 py-1 rounded-full bg-[var(--card-color)] text-[var(--text-color)] border border-[var(--border-color)];
+    @apply hover:bg-[var(--primary-color-lighten)] hover:text-[var(--primary-color)] transition-all;
+    @apply inline-flex items-center gap-1 text-sm;
+  }
+  
+  .arrow-down {
+    @apply text-xs transition-transform duration-300;
+  }
+  
+  .posts-grid {
+    @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .post-card-animation {
+    @apply h-full;
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  // カテゴリーフィルタリング機能
+  function initializeFilters() {
+    console.log("カテゴリーフィルタ初期化");
+    // URLからカテゴリーパラメータを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    
+    // すべてのカテゴリーピルと記事カードを取得
+    const categoryPills = document.querySelectorAll('.category-pill');
+    const postCards = document.querySelectorAll('.post-card-animation');
+    const showMoreButton = document.getElementById('show-more-categories');
+    const hiddenCategories = document.querySelectorAll('.hidden-category');
+    
+    // もっと見るボタンのクリックイベント
+    if (showMoreButton) {
+      showMoreButton.addEventListener('click', () => {
+        const arrowSpan = showMoreButton.querySelector('.arrow-down');
+        const isExpanded = showMoreButton.getAttribute('data-expanded') === 'true';
+        
+        hiddenCategories.forEach(category => {
+          if (category instanceof HTMLElement) {
+            category.classList.toggle('hidden-category');
+          }
+        });
+        
+        if (isExpanded) {
+          showMoreButton.textContent = 'もっと見る ';
+          showMoreButton.setAttribute('data-expanded', 'false');
+        } else {
+          showMoreButton.textContent = '折りたたむ ';
+          showMoreButton.setAttribute('data-expanded', 'true');
+        }
+        
+        // 新しい矢印要素を作成
+        const newArrow = document.createElement('span');
+        newArrow.className = 'arrow-down';
+        newArrow.textContent = isExpanded ? '▼' : '▲';
+        showMoreButton.appendChild(newArrow);
+      });
+    }
+    
+    // カテゴリーピルのクリックイベントを設定
+    categoryPills.forEach(pill => {
+      if (pill instanceof HTMLAnchorElement) {
+        pill.addEventListener('click', (e) => {
+          console.log("カテゴリークリック:", pill.textContent?.trim());
+          
+          // すでにアクティブなピルをクリックした場合は通常の遷移を許可
+          if (pill.classList.contains('active')) return;
+          
+          e.preventDefault();
+          const pillUrl = new URL(pill.href);
+          const pillParams = new URLSearchParams(pillUrl.search);
+          const pillCategory = pillParams.get('category');
+          
+          // URLを更新
+          const newUrl = pillCategory 
+            ? `${window.location.pathname}?category=${encodeURIComponent(pillCategory.trim())}` 
+            : window.location.pathname;
+          
+          console.log("新しいURL:", newUrl);
+          window.history.pushState({}, '', newUrl);
+          
+          // カテゴリーピルの状態を更新
+          updateCategoryPills(pillCategory);
+          
+          // 記事をフィルタリング
+          filterPosts(pillCategory);
+        });
+      }
+    });
+    
+    // 初期ロード時のフィルタリング
+    if (categoryParam) {
+      console.log("初期カテゴリーフィルタ:", categoryParam);
+      updateCategoryPills(categoryParam);
+      filterPosts(categoryParam);
+    }
+    
+    // カテゴリーピルの状態を更新する関数
+    function updateCategoryPills(category: string | null) {
+      console.log("カテゴリーピル更新:", category);
+      const trimmedCategory = category ? category.trim() : null;
+      
+      categoryPills.forEach(pill => {
+        if (pill instanceof HTMLAnchorElement) {
+          const pillUrl = new URL(pill.href);
+          const pillParams = new URLSearchParams(pillUrl.search);
+          const pillCategory = pillParams.get('category');
+          const trimmedPillCategory = pillCategory ? pillCategory.trim() : null;
+          
+          if ((trimmedPillCategory === trimmedCategory) || (!trimmedPillCategory && !trimmedCategory)) {
+            pill.classList.add('active');
+          } else {
+            pill.classList.remove('active');
+          }
+        }
+      });
+    }
+    
+    // 記事をフィルタリングする関数
+    function filterPosts(category: string | null) {
+      console.log("記事フィルタリング:", category);
+      const trimmedCategory = category ? category.trim() : null;
+      
+      postCards.forEach(card => {
+        if (card instanceof HTMLElement) {
+          // カテゴリーがないか「すべて」の場合はすべて表示
+          if (!trimmedCategory) {
+            card.style.display = 'block';
+            return;
+          }
+          
+          const cardCategory = card.getAttribute('data-category');
+          const trimmedCardCategory = cardCategory ? cardCategory.trim() : '';
+          
+          console.log(`カード「${card.querySelector('.title')?.textContent}」のカテゴリー: 「${trimmedCardCategory}」, 比較: 「${trimmedCategory}」`);
+          
+          if (trimmedCardCategory === trimmedCategory) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        }
+      });
+    }
+  }
+
+  // DOMContentLoaded イベントでフィルター初期化
+  document.addEventListener('DOMContentLoaded', initializeFilters);
+  
+  // Astroのページ遷移イベントでも初期化
+  document.addEventListener('astro:page-load', initializeFilters);
+</script> 

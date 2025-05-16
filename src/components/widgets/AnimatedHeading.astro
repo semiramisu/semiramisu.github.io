@@ -1,0 +1,73 @@
+---
+export interface Props {
+  text: string;
+  typingSpeed?: number;
+  cursorDuration?: number;
+}
+
+const { text, typingSpeed = 100, cursorDuration = 700 } = Astro.props;
+---
+
+<div class="animated-heading">
+  <span class="typing-text" data-text={text}></span>
+  <span class="cursor">|</span>
+</div>
+
+<style define:vars={{ typingSpeed, cursorDuration }}>
+  .animated-heading {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .typing-text {
+    visibility: hidden;
+  }
+  
+  .typing-text::after {
+    content: attr(data-text);
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid transparent;
+    width: 0;
+    animation: typing calc(var(--typingSpeed) * 1ms * 0.05 * attr(data-text length)) steps(attr(data-text length)) forwards;
+    animation-delay: 0.5s;
+  }
+  
+  .cursor {
+    display: inline-block;
+    opacity: 1;
+    animation: blink calc(var(--cursorDuration) * 1ms) step-end infinite;
+  }
+  
+  @keyframes typing {
+    from { 
+      width: 0; 
+    }
+    to { 
+      width: 100%; 
+    }
+  }
+  
+  @keyframes blink {
+    from, to { 
+      opacity: 1; 
+    }
+    50% { 
+      opacity: 0; 
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const elements = document.querySelectorAll('.typing-text');
+    elements.forEach(element => {
+      const text = element.getAttribute('data-text') || '';
+      element.setAttribute('style', `--length: ${text.length}`);
+    });
+  });
+</script> 

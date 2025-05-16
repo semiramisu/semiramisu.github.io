@@ -1,0 +1,294 @@
+---
+import { Icon } from "astro-icon/components";
+import { IdToSlug } from "../utils/hash";
+import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
+import { formatDate } from "../utils/date";
+import YukinaConfig from "../../yukina.config";
+
+export interface Props {
+  posts: any[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="featured-carousel-container">
+  <div class="controls">
+    <button class="control-button prev" aria-label="Previous slide">
+      <Icon name="line-md:chevron-left" class="control-icon" />
+    </button>
+    <button class="control-button next" aria-label="Next slide">
+      <Icon name="line-md:chevron-right" class="control-icon" />
+    </button>
+  </div>
+  
+  <div class="carousel-track-container">
+    <div class="carousel-track">
+      {posts.map((post, index) => {
+        const entryID = IdToSlug(post.id);
+        const contentUrl = `/posts/${entryID}`;
+        return (
+          <div class="carousel-slide">
+            <a href={contentUrl} class="slide-content">
+              <div class="slide-image-container">
+                <img 
+                  class="lozad slide-image" 
+                  data-src={post.data.cover ?? GetCoverURLForUnspecifiedEntry(entryID)} 
+                  alt={post.data.title}
+                />
+                <div class="slide-overlay">
+                  <div class="slide-meta">
+                    <span class="slide-date">
+                      <Icon name="cuida:calendar-outline" class="slide-icon" />
+                      {formatDate(post.data.published, YukinaConfig.locale)}
+                    </span>
+                    {post.data.category && (
+                      <span class="slide-category">
+                        <Icon name="dashicons:category" class="slide-icon" />
+                        {post.data.category}
+                      </span>
+                    )}
+                  </div>
+                  <h3 class="slide-title">{post.data.title}</h3>
+                  {post.data.description && (
+                    <p class="slide-description">{post.data.description}</p>
+                  )}
+                  <div class="slide-read-more">
+                    <span>続きを読む</span>
+                    <Icon name="cuida:caret-right-outline" class="read-more-icon" />
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+  
+  <div class="carousel-indicators">
+    {posts.map((_, index) => (
+      <button 
+        class={`indicator ${index === 0 ? "active" : ""}`} 
+        data-index={index}
+        aria-label={`Go to slide ${index + 1}`}
+      ></button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .featured-carousel-container {
+    @apply relative w-full overflow-hidden rounded-2xl;
+    height: 400px;
+  }
+  
+  .carousel-track-container {
+    @apply w-full h-full overflow-hidden;
+  }
+  
+  .carousel-track {
+    @apply flex transition-transform duration-500 h-full;
+  }
+  
+  .carousel-slide {
+    @apply flex-none w-full h-full;
+  }
+  
+  .slide-content {
+    @apply block w-full h-full relative overflow-hidden;
+  }
+  
+  .slide-image-container {
+    @apply relative w-full h-full;
+  }
+  
+  .slide-image {
+    @apply w-full h-full object-cover transition-all duration-500;
+  }
+  
+  .slide-content:hover .slide-image {
+    @apply transform scale-105;
+  }
+  
+  .slide-overlay {
+    @apply absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white;
+    @apply flex flex-col gap-2;
+  }
+  
+  .slide-meta {
+    @apply flex flex-wrap gap-3 text-sm;
+  }
+  
+  .slide-date, .slide-category {
+    @apply flex items-center gap-1;
+  }
+  
+  .slide-icon {
+    @apply w-4 h-4;
+  }
+  
+  .slide-title {
+    @apply text-2xl font-bold line-clamp-2;
+    font-family: var(--primary-font);
+  }
+  
+  .slide-description {
+    @apply text-sm opacity-90 line-clamp-2;
+  }
+  
+  .slide-read-more {
+    @apply flex items-center gap-1 text-sm mt-2 opacity-80 hover:opacity-100 transition-opacity;
+  }
+  
+  .read-more-icon {
+    @apply w-4 h-4;
+  }
+  
+  .controls {
+    @apply absolute top-1/2 left-0 right-0 flex justify-between px-4 -translate-y-1/2 z-10;
+  }
+  
+  .control-button {
+    @apply flex items-center justify-center w-10 h-10 rounded-full bg-black/30 text-white backdrop-blur-sm;
+    @apply transform transition-all duration-300 hover:scale-110 hover:bg-black/50;
+  }
+  
+  .control-icon {
+    @apply w-6 h-6;
+  }
+  
+  .carousel-indicators {
+    @apply absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10;
+  }
+  
+  .indicator {
+    @apply w-2.5 h-2.5 rounded-full bg-white/50 transition-all duration-300;
+  }
+  
+  .indicator.active {
+    @apply bg-white w-6;
+  }
+</style>
+
+<script>
+  // カルーセルの初期化関数
+  function initCarousel() {
+    const track = document.querySelector('.carousel-track');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const nextButton = document.querySelector('.control-button.next');
+    const prevButton = document.querySelector('.control-button.prev');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (!track || !slides.length || !nextButton || !prevButton) return;
+    
+    let currentIndex = 0;
+    const slideCount = slides.length;
+    
+    // Set initial track width
+    track.style.width = `${slideCount * 100}%`;
+    
+    // Set each slide width
+    slides.forEach(slide => {
+      slide.style.width = `${100 / slideCount}%`;
+    });
+    
+    const updateSlidePosition = (index) => {
+      track.style.transform = `translateX(-${index * (100 / slideCount)}%)`;
+      
+      // Update active indicator
+      indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+      });
+      
+      currentIndex = index;
+    };
+    
+    // Clear existing event listeners
+    const newNextButton = nextButton.cloneNode(true);
+    const newPrevButton = prevButton.cloneNode(true);
+    nextButton.parentNode.replaceChild(newNextButton, nextButton);
+    prevButton.parentNode.replaceChild(newPrevButton, prevButton);
+    
+    // Next slide
+    newNextButton.addEventListener('click', () => {
+      const nextIndex = (currentIndex + 1) % slideCount;
+      updateSlidePosition(nextIndex);
+    });
+    
+    // Previous slide
+    newPrevButton.addEventListener('click', () => {
+      const prevIndex = (currentIndex - 1 + slideCount) % slideCount;
+      updateSlidePosition(prevIndex);
+    });
+    
+    // Clear existing indicator listeners
+    indicators.forEach((indicator, index) => {
+      const newIndicator = indicator.cloneNode(true);
+      indicator.parentNode.replaceChild(newIndicator, indicator);
+      
+      newIndicator.addEventListener('click', () => {
+        updateSlidePosition(index);
+      });
+    });
+    
+    // Auto advance slides
+    let intervalId = setInterval(() => {
+      const nextIndex = (currentIndex + 1) % slideCount;
+      updateSlidePosition(nextIndex);
+    }, 5000);
+    
+    // Pause on hover
+    track.addEventListener('mouseenter', () => {
+      clearInterval(intervalId);
+    });
+    
+    track.addEventListener('mouseleave', () => {
+      clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        const nextIndex = (currentIndex + 1) % slideCount;
+        updateSlidePosition(nextIndex);
+      }, 5000);
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        const nextIndex = (currentIndex + 1) % slideCount;
+        updateSlidePosition(nextIndex);
+      } else if (e.key === 'ArrowLeft') {
+        const prevIndex = (currentIndex - 1 + slideCount) % slideCount;
+        updateSlidePosition(prevIndex);
+      }
+    });
+    
+    // Lazy load images
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.getAttribute('data-src');
+          if (src) {
+            img.setAttribute('src', src);
+            observer.unobserve(img);
+          }
+        }
+      });
+    });
+    
+    document.querySelectorAll('.lozad').forEach(img => {
+      observer.observe(img);
+    });
+  }
+
+  // Astro's view transitions event
+  document.addEventListener('astro:page-load', initCarousel);
+  
+  // Standard DOM event as fallback
+  document.addEventListener('DOMContentLoaded', initCarousel);
+  
+  // Additional initialization for cases where both events might have already fired
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(initCarousel, 100);
+  }
+</script> 

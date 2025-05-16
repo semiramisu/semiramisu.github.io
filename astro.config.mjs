@@ -4,7 +4,6 @@ import icon from "astro-icon";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import svelte from "@astrojs/svelte";
-import swup from "@swup/astro";
 
 import rehypeSlug from "rehype-slug";
 import rehypeKatex from "rehype-katex";
@@ -26,17 +25,6 @@ export default defineConfig({
     tailwind(),
     svelte(),
     icon(),
-    swup({
-      theme: false,
-      containers: ["main", "footer", ".banner-inner"],
-      smoothScrolling: true,
-      progress: true,
-      cache: true,
-      preload: true,
-      updateHead: true,
-      updateBodyClass: false,
-      globalInstance: true,
-    }),
     sitemap(),
     pagefind(),
   ],

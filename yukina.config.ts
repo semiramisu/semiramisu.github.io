@@ -3,10 +3,10 @@ import type { Configuration } from "./src/types/config";
 
 const YukinaConfig: Configuration = {
   title: "セミラミスの庭",
-  subTitle: "毎日成長 毎日更新 IT、健康、運動、音楽etc",
+  subTitle: "日々の発見と思いを綴る、知識と経験の交差点",
   brandTitle: "semiramisu",
 
-  description: "blog site",
+  description: "IT、健康、仕事、趣味など様々なテーマについての考察や体験を共有するブログ",
 
   site: "http://semiramisu.com/",
 

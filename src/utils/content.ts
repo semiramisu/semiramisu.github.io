@@ -9,6 +9,9 @@ export interface Archive {
   id: string;
   date: Date;
   tags?: string[];
+  description?: string;
+  cover?: string;
+  readingMetadata?: { time: number; wordCount: number };
 }
 
 /**
@@ -83,11 +86,20 @@ export async function GetArchives() {
     if (!archives.has(year)) {
       archives.set(year, []);
     }
+
+    const readingMetadata = {
+      time: Math.ceil(post.body.length / 500), // 1分あたり約500文字として計算
+      wordCount: post.body.split(/\s+/).length
+    };
+
     archives.get(year)!.push({
       title: post.data.title,
       id: `/posts/${IdToSlug(post.id)}`,
       date: date,
       tags: post.data.tags,
+      description: post.data.description,
+      cover: post.data.cover,
+      readingMetadata
     });
   }
 
@@ -125,16 +137,36 @@ export async function GetTags() {
           posts: [],
         });
       }
+
+      const readingMetadata = {
+        time: Math.ceil(post.body.length / 500), // 1分あたり約500文字として計算
+        wordCount: post.body.split(/\s+/).length
+      };
+
       tags.get(tagSlug)!.posts.push({
         title: post.data.title,
         id: `/posts/${IdToSlug(post.id)}`,
         date: new Date(post.data.published),
         tags: post.data.tags,
+        description: post.data.description,
+        cover: post.data.cover,
+        readingMetadata
       });
     });
   });
 
   return tags;
+}
+
+/**
+ * Retrieves all tags as an array, sorted by post count.
+ *
+ * @returns A promise that resolves to an array of tags sorted by the number of posts that have each tag.
+ */
+export async function GetAllTags() {
+  const tags = await GetTags();
+  return Array.from(tags.values())
+    .sort((a, b) => b.posts.length - a.posts.length);
 }
 
 /**
@@ -163,13 +195,33 @@ export async function GetCategories() {
         posts: [],
       });
     }
+
+    const readingMetadata = {
+      time: Math.ceil(post.body.length / 500), // 1分あたり約500文字として計算
+      wordCount: post.body.split(/\s+/).length
+    };
+
     categories.get(categorySlug)!.posts.push({
       title: post.data.title,
       id: `/posts/${IdToSlug(post.id)}`,
       date: new Date(post.data.published),
       tags: post.data.tags,
+      description: post.data.description,
+      cover: post.data.cover,
+      readingMetadata
     });
   });
 
   return categories;
+}
+
+/**
+ * Retrieves all categories as an array, sorted by post count.
+ *
+ * @returns A promise that resolves to an array of categories sorted by the number of posts in each category.
+ */
+export async function GetAllCategories() {
+  const categories = await GetCategories();
+  return Array.from(categories.values())
+    .sort((a, b) => b.posts.length - a.posts.length);
 }

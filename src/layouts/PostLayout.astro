@@ -2,6 +2,7 @@
 import Main from "../layouts/MainLayout.astro";
 import Markdown from "../components/Markdown.astro";
 import CopyRight from "../components/misc/CopyRight.astro";
+import TableOfContents from "../components/TableOfContents.astro";
 
 interface Props {
   title?: string;
@@ -14,6 +15,11 @@ interface Props {
   };
   author?: string;
   sourceLink?: string;
+  headings?: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
 }
 
 const {
@@ -24,13 +30,14 @@ const {
   license,
   author,
   sourceLink,
+  headings = [],
 } = Astro.props;
 ---
 
-<Main title={title} subTitle={subTitle} bannerImage={bannerImage}>
-  <!-- <Fragment set:html={tocHTMLString} /> -->
-  <div class="article-wrapper">
-    <div class="article">
+<Main title={title} subTitle={subTitle} bannerImage={bannerImage} isHome={false}>
+  <div id="post-content-wrapper" class="post-content-wrapper">
+    <article id="post-article" class="post-article">
+      <div class="article-inner">
       <Markdown>
         <slot />
       </Markdown>
@@ -46,15 +53,65 @@ const {
         )
       }
     </div>
+    </article>
+    <aside id="post-toc" class="post-toc">
+      <TableOfContents headings={headings} />
+    </aside>
   </div>
 </Main>
 
-<style>
-  .article-wrapper {
-    @apply mx-3 rounded-2xl bg-[var(--card-color)] px-5 py-6 lg:mx-0 lg:px-10 lg:py-9;
+<style is:global>
+  /* 強制的にレイアウトを保持するための!importantスタイル */
+  .post-content-wrapper {
+    display: flex !important;
+    width: 100% !important;
+    gap: 1.5rem !important;
+    min-height: 300px !important;
   }
-  .article {
-    @apply flex flex-col;
+
+  .post-article {
+    flex: 1 !important;
+    background-color: var(--card-color) !important;
+    border-radius: 1rem !important;
+    padding: 1.5rem !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  @media (min-width: 768px) {
+    .post-article {
+      padding: 2rem 2.5rem !important;
+    }
+  }
+
+  .article-inner {
     font-size: var(--primary-font);
   }
+
+  .post-toc {
+    width: 220px !important;
+    flex-shrink: 0 !important;
+    display: none !important;
+  }
+
+  @media (min-width: 1024px) {
+    .post-toc {
+      display: block !important;
+    }
+  }
 </style>
+
+<script>
+  // MainLayoutのDOM操作を上書きするスクリプト
+  document.addEventListener('DOMContentLoaded', () => {
+    // MainLayoutのスクリプトの後に実行されるようタイマーを設定
+    setTimeout(() => {
+      const contentEl = document.querySelector('.content');
+      if (contentEl && contentEl instanceof HTMLElement) {
+        contentEl.style.width = '100%';
+      }
+    }, 50);
+  });
+</script>
+
+

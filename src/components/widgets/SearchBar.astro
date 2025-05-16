@@ -1,0 +1,134 @@
+---
+import { Icon } from "astro-icon/components";
+import { i18n } from "../../locales/translation";
+import I18nKeys from "../../locales/keys";
+---
+
+<div class="search-container">
+  <div class="search-input-container">
+    <input 
+      type="text" 
+      id="search-input" 
+      class="search-input" 
+      placeholder={i18n(I18nKeys.nav_bar_search_placeholder)}
+      aria-label="Search blog posts"
+    />
+    <Icon name="line-md:search" class="search-icon" />
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+<style>
+  .search-container {
+    @apply relative w-full;
+  }
+
+  .search-input-container {
+    @apply relative flex items-center w-full;
+  }
+
+  .search-input {
+    @apply w-full py-3 px-4 pr-10 rounded-full bg-[var(--card-color)] text-[var(--text-color)] border border-transparent;
+    @apply focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent;
+    @apply transition-all duration-300;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-icon {
+    @apply absolute right-4 w-5 h-5 text-[var(--text-color-lighten)];
+  }
+
+  .search-results {
+    @apply absolute top-full left-0 right-0 mt-2 max-h-96 overflow-y-auto rounded-xl bg-[var(--card-color)] shadow-lg z-50;
+    @apply opacity-0 transition-all duration-300;
+    visibility: hidden;
+    transform: translateY(-10px);
+  }
+
+  .search-results.visible {
+    @apply opacity-100;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .search-result-item {
+    @apply flex items-center p-3 cursor-pointer hover:bg-[var(--primary-color-lighten)];
+    @apply border-b border-[var(--border-color)];
+  }
+
+  .search-result-item:last-child {
+    @apply border-b-0;
+  }
+
+  .search-result-title {
+    @apply text-[var(--text-color)] font-medium truncate;
+  }
+
+  .search-result-description {
+    @apply text-[var(--text-color-lighten)] text-sm truncate;
+  }
+
+  .search-highlight {
+    @apply bg-[var(--primary-color-lighten)] px-1 rounded;
+  }
+</style>
+
+<script>
+  // Search functionality will be initialized after the page loads
+  document.addEventListener('astro:page-load', () => {
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    
+    if (!searchInput || !searchResults) return;
+    
+    // Simple placeholder search for development
+    // In production, this will be replaced by Pagefind
+    const performSimpleSearch = (query) => {
+      if (!query || query.length < 2) {
+        searchResults.classList.remove('visible');
+        return;
+      }
+      
+      searchResults.innerHTML = `
+        <div class="p-4 text-center text-[var(--text-color-lighten)]">
+          検索機能は本番環境でのみ動作します
+        </div>
+      `;
+      searchResults.classList.add('visible');
+    };
+    
+    // Debounce function for search input
+    const debounce = (func, delay) => {
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(null, args);
+        }, delay);
+      };
+    };
+    
+    // Debounced search function
+    const debouncedSearch = debounce(performSimpleSearch, 300);
+    
+    // Event listeners
+    searchInput.addEventListener('input', (e) => {
+      if (e.target) {
+        debouncedSearch(e.target.value);
+      }
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (e.target && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.remove('visible');
+      }
+    });
+    
+    searchInput.addEventListener('focus', () => {
+      const value = searchInput.value;
+      if (value && value.length >= 2) {
+        searchResults.classList.add('visible');
+      }
+    });
+  });
+</script> 

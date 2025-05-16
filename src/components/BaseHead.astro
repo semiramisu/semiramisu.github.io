@@ -4,6 +4,8 @@ import GlobalStyles from "./GlobalStyles.astro";
 import ScriptSetup from "./ScriptSetup.astro";
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const isHomePage = Astro.url.pathname === '/' || 
+                   Astro.url.pathname === '/index.html';
 ---
 
 <!-- Global Metadata -->
@@ -59,3 +61,77 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 <GlobalStyles />
 <ScriptSetup />
+
+<!-- カスタムスタイル追加：レイアウトに基づく条件付きスタイリング -->
+<style is:global>
+  /* ホームレイアウト用のスタイル */
+  html[data-layout="home"] .side-bar {
+    display: none !important;
+  }
+  
+  /* メインレイアウト用のスタイル */
+  html[data-layout="main"] .side-bar {
+    display: block !important;
+  }
+  
+  @media (max-width: 1023px) {
+    html[data-layout="main"] .side-bar {
+      display: none !important;
+    }
+  }
+  
+  /* 強制的なスタイル - 明示的にサイドバーIDで指定 */
+  #main-sidebar {
+    transition: opacity 0.3s ease;
+  }
+  
+  html[data-layout="home"] #main-sidebar {
+    opacity: 0;
+    pointer-events: none;
+    display: none !important;
+  }
+  
+  html[data-layout="main"] #main-sidebar {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  @media (max-width: 1023px) {
+    html[data-layout="main"] #main-sidebar {
+      opacity: 0;
+      pointer-events: none;
+      display: none !important;
+    }
+  }
+</style>
+
+<!-- ViewTransition制御用スクリプト -->
+<script>
+  // ViewTransitionsのための特別な処理
+  function handleTransitionComplete() {
+    // URLからページタイプを判断
+    const isHomePage = window.location.pathname === '/' || 
+                        window.location.pathname === '/index.html';
+    
+    // 適切なレイアウトを設定
+    document.documentElement.dataset.layout = isHomePage ? "home" : "main";
+    console.log("BaseHead: transition complete - layout set to", document.documentElement.dataset.layout);
+    
+    // サイドバーの表示状態も強制的に設定
+    const sidebar = document.getElementById('main-sidebar');
+    if (sidebar) {
+      if (isHomePage) {
+        sidebar.style.display = 'none';
+      } else if (window.innerWidth >= 1024) {
+        sidebar.style.display = 'block';
+      }
+    }
+  }
+
+  // トランジション完了時にレイアウトを確認・設定
+  document.addEventListener('astro:page-load', handleTransitionComplete);
+  document.addEventListener('astro:after-swap', handleTransitionComplete);
+  
+  // ページロード時にも実行
+  handleTransitionComplete();
+</script>

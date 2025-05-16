@@ -1,6 +1,6 @@
 ---
 // Component imports
-import Main from "../layouts/MainLayout.astro";
+import MainLayout from "../layouts/MainLayout.astro";
 import PostCard from "../components/PostCard.astro";
 import Pagination from "../components/controllers/Pagination.astro";
 // Utils
@@ -18,7 +18,7 @@ export async function getStaticPaths({
 const { page } = Astro.props;
 ---
 
-<Main>
+<MainLayout>
   <div class="space-y-8">
     <div class="w-full space-y-4">
       {
@@ -52,4 +52,4 @@ const { page } = Astro.props;
       style={`animation-delay: calc(var(--onload-animation-delay) + ${page.data.length + 1} * var(--onload-animation-interval));`}
     />
   </div>
-</Main>
+</MainLayout>

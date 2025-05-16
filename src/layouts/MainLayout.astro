@@ -2,7 +2,6 @@
 import Base from "./BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
 import Banner from "../components/Banner.astro";
-
 import YukinaConfig from "../../yukina.config";
 import Footer from "../components/Footer.astro";
 import SideBar from "../components/SideBar.astro";
@@ -12,52 +11,137 @@ export interface Props {
   subTitle?: string;
   bannerImage?: string;
   slug?: string;
+  isHome?: boolean;
 }
 
-const props = Astro.props;
+const { title, subTitle, bannerImage, slug, isHome = false } = Astro.props;
 ---
 
 <Base>
+  <meta name="page-type" content={isHome ? "home" : "content"} slot="head" />
+  <slot name="head" slot="head" />
+  
+  <div id="page-container" class={isHome ? 'is-home-page' : 'is-content-page'} data-is-home={isHome.toString()}>
   <NavBar />
 
   {
     YukinaConfig.bannerStyle == "LOOP" && (
       <Banner
-        title={props.title}
-        subTitle={props.subTitle}
-        bannerImage={props.bannerImage}
-        slug={props.slug}
+          title={title}
+          subTitle={subTitle}
+          bannerImage={bannerImage}
+          slug={slug}
       />
     )
   }
 
   <div class="main-container my-10">
-    <div class="flex flex-row items-start xl:space-x-4">
-      <div class="side-bar">
+      <div class="layout-container flex flex-col md:flex-row items-start lg:space-x-6">
+        {!isHome && (
+          <aside class="sidebar-container sticky-sidebar" id="sidebar-container">
         <SideBar />
-      </div>
-      <div class="transition-leaving w-full space-y-8">
-        <main class="content onload-animation">
+          </aside>
+        )}
+        <div class="content-container w-full space-y-8">
+          <main class="content">
           <slot />
         </main>
         <Footer />
+        </div>
       </div>
     </div>
   </div>
 </Base>
 
 <style>
+  /* コンテナスタイル */
   .main-container {
-    @apply w-full md:min-w-[80%] md:max-w-[80%] lg:min-w-[var(--page-width-lg)] lg:max-w-[var(--page-width-lg)] xl:min-w-[var(--page-width-xl)] xl:max-w-[var(--page-width-xl)];
+    @apply w-full md:min-w-[90%] md:max-w-[90%] lg:min-w-[var(--page-width-lg)] lg:max-w-[var(--page-width-lg)] xl:min-w-[var(--page-width-xl)] xl:max-w-[var(--page-width-xl)];
     @apply md:mx-auto;
   }
 
-  .side-bar {
-    @apply hidden min-w-[248px] xl:block;
+  /* サイドバースタイル */
+  .sidebar-container {
+    @apply hidden min-w-[248px] max-w-[248px] lg:block;
   }
 
-  .content {
-    @apply xl:w-[calc(var(--page-width-xl)-264px)];
+  /* 追従するサイドバー */
+  .sticky-sidebar {
+    position: sticky;
+    top: 6rem;
+    height: fit-content;
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+  }
+
+  /* コンテンツスタイル - ホームページ */
+  .is-home-page .content {
+    @apply w-full;
+  }
+
+  /* コンテンツスタイル - 通常ページ */
+  .is-content-page .content {
+    @apply w-full lg:w-[calc(100%-264px)] xl:w-[calc(var(--page-width-xl)-264px)];
+  }
+  
+  /* スクロールバーのスタイル */
+  .sticky-sidebar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .sticky-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .sticky-sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color-lighten);
+    border-radius: 4px;
   }
 </style>
+
+<script>
+  // ページタイプに応じたスタイル適用
+  function applyPageStyles() {
+    const container = document.getElementById('page-container');
+    const sidebar = document.getElementById('sidebar-container');
+    
+    if (!container) return;
+    
+    const isHomePage = container.getAttribute('data-is-home') === 'true';
+    
+    // サイドバーの表示制御
+    if (sidebar) {
+      if (isHomePage) {
+        sidebar.style.display = 'none';
+      } else if (window.innerWidth >= 1024) { // lg breakpoint
+        sidebar.style.display = 'block';
+      } else {
+        sidebar.style.display = 'none';
+      }
+    }
+    
+    // コンテンツ幅の設定
+    const contentElements = document.querySelectorAll('.content');
+    contentElements.forEach(el => {
+      if (el instanceof HTMLElement) {
+        if (isHomePage) {
+          el.style.width = '100%';
+        } else if (window.innerWidth >= 1024) {
+          el.style.width = 'calc(100% - 264px)';
+        } else {
+          el.style.width = '100%';
+        }
+      }
+    });
+  }
+  
+  // 即時実行
+  applyPageStyles();
+  
+  // DOMContentLoaded時に実行
+  document.addEventListener('DOMContentLoaded', applyPageStyles);
+  
+  // ウィンドウサイズ変更時にも実行
+  window.addEventListener('resize', applyPageStyles);
+</script>
 
