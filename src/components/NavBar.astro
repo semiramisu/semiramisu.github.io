@@ -443,4 +443,28 @@ const navCount = YukinaConfig.navigators.length;
   });
 </script>
 
-<!-- pagefind用スクリプトは削除 - 本番環境でビルド後にページファインドが適用されます -->
+<script is:inline>
+  // load pagefind - client-side only
+  async function loadPagefind() {
+    try {
+      const pagefind = await import("/pagefind/pagefind.js");
+      await pagefind.options({
+        excerptLength: 20,
+      });
+      pagefind.init();
+      window.pagefind = pagefind;
+      console.log("Pagefind loaded successfully");
+      pagefind.search("");
+    } catch (error) {
+      console.error("Failed to load pagefind:", error);
+    }
+  }
+  
+  // Load pagefind after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPagefind);
+  } else {
+    // Use setTimeout to ensure DOM is fully ready
+    setTimeout(loadPagefind, 100);
+  }
+</script>

@@ -11,10 +11,33 @@
 
   let resultPannel: HTMLDivElement;
   let searchBar: HTMLDivElement;
+  let pagefindLoaded = false;
 
   let search = (keyword: string) => {};
 
+  // Wait for pagefind to be available
+  const waitForPagefind = async () => {
+    let attempts = 0;
+    while (attempts < 50) { // Try for 5 seconds (50 * 100ms)
+      // @ts-ignore
+      if (typeof window !== 'undefined' && window.pagefind) {
+        pagefindLoaded = true;
+        console.log("Pagefind is now available");
+        // Trigger search if there's already a keyword
+        if (searchKeyword) {
+          search(searchKeyword);
+        }
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    console.error("Pagefind failed to load after 5 seconds");
+  };
+
   onMount(async () => {
+    // Start waiting for pagefind
+    waitForPagefind();
     // setup overlay scrollbars
     OverlayScrollbars(resultPannel, {
       scrollbars: {
@@ -32,12 +55,26 @@
     search = async (keyword: string) => {
       let searchResultArr = [];
 
+      // Check if pagefind is available
       // @ts-ignore
-      const ret = await pagefind.search(keyword);
-      for (const item of ret.results) {
-        searchResultArr.push(await item.data());
+      if (typeof window !== 'undefined' && window.pagefind && pagefindLoaded) {
+        try {
+          // @ts-ignore
+          const ret = await window.pagefind.search(keyword);
+          for (const item of ret.results) {
+            searchResultArr.push(await item.data());
+          }
+          searchResult = searchResultArr;
+        } catch (error) {
+          console.error("Search error:", error);
+          searchResult = [];
+        }
+      } else {
+        if (keyword) {
+          console.warn("Pagefind not loaded yet, search will be triggered when ready");
+        }
+        searchResult = [];
       }
-      searchResult = searchResultArr;
 
       const searchResultVisable = keyword != "" && searchResult.length != 0;
 
