@@ -62,6 +62,10 @@ jobs:
           console.log('Access Token present:', !!process.env.TWITTER_ACCESS_TOKEN);
           console.log('Access Token Secret present:', !!process.env.TWITTER_ACCESS_TOKEN_SECRET);
           
+          // Debug: Show first few characters (safe to display)
+          console.log('API Key starts with:', process.env.TWITTER_API_KEY?.substring(0, 5) + '...');
+          console.log('Access Token starts with:', process.env.TWITTER_ACCESS_TOKEN?.substring(0, 10) + '...');
+          
           const client = new TwitterApi({
             appKey: process.env.TWITTER_API_KEY,
             appSecret: process.env.TWITTER_API_SECRET,
