@@ -48,13 +48,20 @@ jobs:
         run: |
           npm install twitter-api-v2 front-matter
           
-          cat > tweet-post.js << 'EOF'
-          const { TwitterApi } = require('twitter-api-v2');
-          const fs = require('fs');
-          const fm = require('front-matter');
-          const path = require('path');
+          cat > tweet-post.mjs << 'EOF'
+          import { TwitterApi } from 'twitter-api-v2';
+          import fs from 'fs';
+          import fm from 'front-matter';
+          import path from 'path';
+          import crypto from 'crypto';
           
           // Initialize Twitter client
+          console.log('Initializing Twitter client...');
+          console.log('API Key present:', !!process.env.TWITTER_API_KEY);
+          console.log('API Secret present:', !!process.env.TWITTER_API_SECRET);
+          console.log('Access Token present:', !!process.env.TWITTER_ACCESS_TOKEN);
+          console.log('Access Token Secret present:', !!process.env.TWITTER_ACCESS_TOKEN_SECRET);
+          
           const client = new TwitterApi({
             appKey: process.env.TWITTER_API_KEY,
             appSecret: process.env.TWITTER_API_SECRET,
@@ -94,7 +101,6 @@ jobs:
                 const tags = attributes.tags ? attributes.tags.slice(0, 3).map(tag => `#${tag}`).join(' ') : '';
                 
                 // Generate slug using SHA256 (same as the blog's hash logic)
-                const crypto = require('crypto');
                 const fileName = path.basename(file, '.md');
                 const slug = crypto.createHash('sha256').update(fileName).digest('hex').substring(0, 8);
                 const postUrl = `https://semiramisu.github.io/posts/${slug}`;
@@ -143,7 +149,7 @@ jobs:
           tweetNewPost().catch(console.error);
           EOF
           
-          ADDED_FILES="${{ steps.changed-files.outputs.added_files }}" node tweet-post.js
+          ADDED_FILES="${{ steps.changed-files.outputs.added_files }}" node tweet-post.mjs
       
       - name: Commit tweet markers
         if: steps.changed-files.outputs.added_files != ''
