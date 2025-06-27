@@ -124,7 +124,7 @@ jobs:
                 // Generate slug using SHA256 (same as the blog's hash logic)
                 const fileName = path.basename(file, '.md');
                 const slug = crypto.createHash('sha256').update(fileName).digest('hex').substring(0, 8);
-                const postUrl = `https://semiramisu.github.io/posts/${slug}`;
+                const postUrl = `https://semiramisu.com/posts/${slug}`;
                 
                 // Compose tweet (280 character limit)
                 let tweetText = `📝 ブログを更新しました！\n\n「${postTitle}」\n`;
