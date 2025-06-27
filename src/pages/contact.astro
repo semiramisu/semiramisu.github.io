@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/ContactForm.svelte';
+import { getI18n } from '../utils/i18n';
+
+const i18n = getI18n(Astro.url);
+---
+
+<Layout 
+  title="お問い合わせ - セミラミスの庭" 
+  description="お問い合わせフォームです。ご意見・ご感想・ご質問などお気軽にどうぞ。"
+>
+  <main class="container mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-3xl font-bold mb-8 text-center">お問い合わせ</h1>
+      
+      <div class="prose prose-lg dark:prose-invert mb-12 max-w-none">
+        <p class="text-center mb-8">
+          ブログに関するご意見・ご感想・ご質問など、お気軽にお問い合わせください。
+        </p>
+        
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg mb-8">
+          <h2 class="text-xl font-semibold mb-4">ご注意事項</h2>
+          <ul class="space-y-2">
+            <li>すべてのお問い合わせに返信できない場合があります。</li>
+            <li>返信には数日お時間をいただく場合があります。</li>
+            <li>営業・勧誘等のメールはご遠慮ください。</li>
+          </ul>
+        </div>
+      </div>
+
+      <ContactForm client:load />
+    </div>
+  </main>
+</Layout>
+
+<style>
+  h1 {
+    @apply text-gray-900 dark:text-white;
+  }
+</style>
