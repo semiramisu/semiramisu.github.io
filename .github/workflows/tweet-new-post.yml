@@ -30,6 +30,12 @@ jobs:
           files: |
             src/contents/posts/*.md
           separator: ','
+          
+      - name: Debug changed files
+        run: |
+          echo "Added files: ${{ steps.changed-files.outputs.added_files }}"
+          echo "Modified files: ${{ steps.changed-files.outputs.modified_files }}"
+          echo "All changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
       
       - name: Process new posts and tweet
         if: steps.changed-files.outputs.added_files != ''
