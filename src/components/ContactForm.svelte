@@ -56,9 +56,10 @@
       const formData = new FormData();
       formData.append('form-name', 'contact');
       formData.append('name', name);
-      formData.append('email', email);
-      formData.append('subject', subject);
+      formData.append('email', wantsReply && replyEmail ? replyEmail : email);
+      formData.append('subject', `【セミラミスの庭】新しいお問い合わせ: ${subject || '件名なし'}`);
       formData.append('message', message);
+      formData.append('original-email', email);
       if (wantsReply && replyEmail) {
         formData.append('reply-email', replyEmail);
       }
@@ -104,6 +105,7 @@
   onsubmit={handleSubmit}
 >
   <input type="hidden" name="form-name" value="contact" />
+  <input type="hidden" name="subject" value={`【セミラミスの庭】新しいお問い合わせ: ${subject || '件名なし'}`} />
   <p class="hidden">
     <label>
       Don't fill this out if you're human: <input name="bot-field" />
