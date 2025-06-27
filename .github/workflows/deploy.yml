@@ -1,38 +1,53 @@
 name: Deploy to GitHub Pages
 
 on:
-  # `main`ブランチにプッシュするたびにワークフローを実行します。
-  # 異なるブランチ名を使用する場合は、`main`をブランチ名に置き換えてください。
   push:
     branches: [ main ]
-  # このワークフローをGitHubのActionsタブから手動で実行できるようにします。
   workflow_dispatch:
 
-# このジョブがリポジトリをクローンし、ページデプロイメントを作成することを許可します。
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your repository using git
+      - name: Checkout
         uses: actions/checkout@v4
-      - name: Install, build, and upload your site
-        uses: withastro/action@v3
-        # with:
-          # path: . # リポジトリ内のAstroプロジェクトのルートロケーション。（オプション）
-          # node-version: 20 # サイト構築に使用するNodeのバージョン。デフォルトは20です。（オプション）
-          # package-manager: pnpm@latest # 依存関係のインストールとサイトのビルドに使用するNodeパッケージマネージャ。ロックファイルに基づいて自動的に検出されます。（オプション）
+        
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build with Astro
+        run: pnpm build
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
