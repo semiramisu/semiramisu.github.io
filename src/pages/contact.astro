@@ -1,12 +1,9 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import MainLayout from '../layouts/MainLayout.astro';
 import ContactForm from '../components/ContactForm.svelte';
-import { getI18n } from '../utils/i18n';
-
-const i18n = getI18n(Astro.url);
 ---
 
-<Layout 
+<MainLayout 
   title="お問い合わせ - セミラミスの庭" 
   description="お問い合わせフォームです。ご意見・ご感想・ご質問などお気軽にどうぞ。"
 >
@@ -32,7 +29,7 @@ const i18n = getI18n(Astro.url);
       <ContactForm client:load />
     </div>
   </main>
-</Layout>
+</MainLayout>
 
 <style>
   h1 {
