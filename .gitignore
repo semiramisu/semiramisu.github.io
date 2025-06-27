@@ -156,3 +156,6 @@ dist
 src/pages/en
 src/pages/ja
 
+# twitter post tracking - DO NOT ignore this!
+# .github/tweeted/
+
