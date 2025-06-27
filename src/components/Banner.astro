@@ -1,6 +1,7 @@
 ---
 import YukinaConfig from "../../yukina.config";
 import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
+import ResponsiveImage from "./ResponsiveImage.astro";
 
 export interface Props {
   title?: string;
@@ -23,13 +24,17 @@ const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
       !hasHeaderImg && (
         <div class="carousel">
           <ul id="carousel_imgs">
-            {carouselImgsList.map((img, index) => (
-              <li
-                class="item lozad"
-                style={{ animationDelay: `${index * 6}s` }}
-                data-background-image={img}
-              />
-            ))}
+            {carouselImgsList.map((img, index) => {
+              const name = img.replace(/\.(jpg|jpeg|JPG|png)/i, '').replace(/^\//, '');
+              const optimizedBg = `/optimized/${name}-desktop.jpg`;
+              return (
+                <li
+                  class="item lozad"
+                  style={{ animationDelay: `${index * 6}s` }}
+                  data-background-image={optimizedBg}
+                />
+              );
+            })}
           </ul>
         </div>
       )
@@ -37,10 +42,10 @@ const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
     {
       hasHeaderImg && (
         <div class="cover">
-          <img
-            class="item lozad"
-            data-src={bannerImage ?? GetCoverURLForUnspecifiedEntry(slug ?? "")}
-            alt="PostCoverr"
+          <ResponsiveImage
+            class="item"
+            src={bannerImage ?? GetCoverURLForUnspecifiedEntry(slug ?? "")}
+            alt="PostCover"
           />
         </div>
       )

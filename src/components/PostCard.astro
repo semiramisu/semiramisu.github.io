@@ -7,6 +7,7 @@ import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
 import YukinaConfig from "../../yukina.config";
 import { formatDate } from "../utils/date";
+import ResponsiveImage from "./ResponsiveImage.astro";
 
 export interface Props {
   id: string;
@@ -24,6 +25,10 @@ const props = Astro.props;
 const contentUrl = props.id.startsWith('/') ? props.id : `/posts/${IdToSlug(props.id)}`;
 const entryID = props.id.startsWith('/') ? props.id.split('/').pop()! : IdToSlug(props.id);
 const { time = 0, wordCount = 0 } = props.readingMetadata ?? { time: 0, wordCount: 0 };
+
+// 画像URLを取得（外部URLの場合はそのまま使用）
+const imageUrl = props.image ?? GetCoverURLForUnspecifiedEntry(entryID);
+const isExternalImage = imageUrl.startsWith('http');
 ---
 
 <div
@@ -33,10 +38,12 @@ const { time = 0, wordCount = 0 } = props.readingMetadata ?? { time: 0, wordCoun
     href={contentUrl}
     class="relative h-[200px] transition-all hover:brightness-90"
   >
-    <img
-      class="lozad absolute left-0 top-0 h-full w-full object-cover"
-      data-src={props.image ?? GetCoverURLForUnspecifiedEntry(entryID)}
+    <ResponsiveImage
+      class="absolute left-0 top-0 h-full w-full object-cover"
+      src={imageUrl}
       alt="CoverPost"
+      width={400}
+      height={200}
     />
     <div class="absolute bottom-2 w-full">
       <div class="mx-2 flex flex-row justify-between">

@@ -1,0 +1,52 @@
+---
+export interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+  width?: number;
+  height?: number;
+  loading?: "lazy" | "eager";
+}
+
+const { src, alt, class: className = "", width = 800, height = 400, loading = "lazy" } = Astro.props;
+
+// 画像の拡張子を取得
+const ext = src.split('.').pop()?.toLowerCase();
+const isJpeg = ext === 'jpg' || ext === 'jpeg';
+
+// モバイル用の小さいサイズを生成するためのクエリパラメータ
+const generateSrcSet = (baseSrc: string) => {
+  if (baseSrc.startsWith('http')) {
+    return baseSrc;
+  }
+  
+  // 複数の解像度を生成
+  const sizes = [
+    { w: 400, q: 70 },  // モバイル
+    { w: 800, q: 80 },  // タブレット
+    { w: 1200, q: 85 }, // デスクトップ
+  ];
+  
+  return sizes.map(size => `${baseSrc}?w=${size.w}&q=${size.q} ${size.w}w`).join(', ');
+};
+
+const srcset = generateSrcSet(src);
+---
+
+<picture>
+  <source
+    type="image/webp"
+    srcset={srcset}
+    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+  />
+  <img
+    class={`lozad ${className}`}
+    data-src={src}
+    data-srcset={srcset}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    decoding="async"
+  />
+</picture>

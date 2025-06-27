@@ -29,6 +29,16 @@ export default defineConfig({
     pagefind(),
   ],
 
+  image: {
+    // 画像最適化の設定
+    service: {
+      entrypoint: 'astro/assets/services/sharp',
+      config: {
+        limitInputPixels: false,
+      },
+    },
+  },
+
   markdown: {
     shikiConfig: {
       theme: "github-dark-default",
