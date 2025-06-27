@@ -87,9 +87,17 @@ export async function GetArchives() {
       archives.set(year, []);
     }
 
+    // 日本語と英語の混在テキストに対応した読み時間計算
+    const japaneseCharCount = (post.body.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
+    const englishWords = post.body.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
+    const wordCount = japaneseCharCount + englishWords.length;
+    const japaneseReadingTime = japaneseCharCount / 400;
+    const englishReadingTime = englishWords.length / 200;
+    const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
+    
     const readingMetadata = {
-      time: Math.ceil(post.body.length / 500), // 1分あたり約500文字として計算
-      wordCount: post.body.split(/\s+/).length
+      time,
+      wordCount
     };
 
     archives.get(year)!.push({
@@ -196,9 +204,17 @@ export async function GetCategories() {
       });
     }
 
+    // 日本語と英語の混在テキストに対応した読み時間計算
+    const japaneseCharCount = (post.body.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
+    const englishWords = post.body.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
+    const wordCount = japaneseCharCount + englishWords.length;
+    const japaneseReadingTime = japaneseCharCount / 400;
+    const englishReadingTime = englishWords.length / 200;
+    const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
+    
     const readingMetadata = {
-      time: Math.ceil(post.body.length / 500), // 1分あたり約500文字として計算
-      wordCount: post.body.split(/\s+/).length
+      time,
+      wordCount
     };
 
     categories.get(categorySlug)!.posts.push({

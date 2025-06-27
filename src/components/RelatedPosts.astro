@@ -31,9 +31,9 @@ function calculateRelevanceScore(post: CollectionEntry<"posts">) {
   
   // タグの重複をカウント
   if (post.data.tags && currentPost.data.tags) {
-    const commonTags = post.data.tags.filter(tag => 
-      currentPost.data.tags?.includes(tag)
-    );
+    const commonTags = post.data.tags.filter((tag) => {
+      return currentPost.data.tags?.includes(tag);
+    });
     score += commonTags.length * 2;
   }
   
@@ -59,24 +59,38 @@ const relatedPosts = otherPosts
 const finalPosts = relatedPosts.length < maxPosts
   ? [...relatedPosts, ...otherPosts.slice(0, maxPosts - relatedPosts.length)]
   : relatedPosts;
+
 ---
 
 {finalPosts.length > 0 && (
   <div class="related-posts">
     <h2 class="related-posts-title">関連記事</h2>
     <div class="related-posts-grid">
-      {finalPosts.map((post) => (
-        <PostCard
-          id={post.id}
-          title={post.data.title}
-          published={post.data.published}
-          category={post.data.category}
-          tags={post.data.tags}
-          description={post.data.description}
-          image={post.data.cover}
-          readingMetadata={post.data.readingTime}
-        />
-      ))}
+      {finalPosts.map((post) => {
+        // 記事の本文から読み時間を計算
+        const bodyText = post.body || '';
+        // 日本語の文字数をカウント（英語の単語数と日本語の文字数を組み合わせる）
+        const japaneseCharCount = (bodyText.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
+        const englishWords = bodyText.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
+        const wordCount = japaneseCharCount + englishWords.length;
+        // 日本語は1分あたり400文字、英語は1分あたり200単語として計算
+        const japaneseReadingTime = japaneseCharCount / 400;
+        const englishReadingTime = englishWords.length / 200;
+        const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
+        
+        return (
+          <PostCard
+            id={post.id}
+            title={post.data.title}
+            published={post.data.published}
+            category={post.data.category}
+            tags={post.data.tags}
+            description={post.data.description}
+            image={post.data.cover}
+            readingMetadata={{ time, wordCount }}
+          />
+        );
+      })}
     </div>
   </div>
 )}
