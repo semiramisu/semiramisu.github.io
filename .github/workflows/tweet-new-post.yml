@@ -78,9 +78,16 @@ jobs:
             const user = await client.v2.me();
             console.log('Authentication successful! User:', user.data.username);
           } catch (authError) {
-            console.error('Authentication test failed:', authError.message);
-            console.error('Please check your API credentials');
-            throw authError;
+            console.error('v2 Authentication test failed:', authError.message);
+            try {
+              // Try v1.1 authentication
+              const user = await client.v1.verifyCredentials();
+              console.log('v1.1 Authentication successful! User:', user.screen_name);
+            } catch (v1Error) {
+              console.error('v1.1 Authentication also failed:', v1Error.message);
+              console.error('Please check your API credentials');
+              throw v1Error;
+            }
           }
           
           const rwClient = client.readWrite;
@@ -139,15 +146,23 @@ jobs:
                   tweetText += `\n${tags}\n\n${postUrl}`;
                 }
                 
-                // Send tweet
+                // Send tweet - try v1.1 API instead
                 console.log('Tweeting:', tweetText);
-                const tweet = await rwClient.v2.tweet(tweetText);
-                console.log('Tweet sent successfully:', tweet.data.id);
+                try {
+                  // First try v2
+                  const tweet = await rwClient.v2.tweet(tweetText);
+                  console.log('Tweet sent successfully via v2:', tweet.data.id);
+                } catch (v2Error) {
+                  console.log('v2 API failed, trying v1.1...');
+                  // Fallback to v1.1
+                  const tweet = await rwClient.v1.tweet(tweetText);
+                  console.log('Tweet sent successfully via v1.1:', tweet.id_str);
+                }
                 
                 // Mark as tweeted
                 fs.mkdirSync(path.dirname(tweetedFile), { recursive: true });
                 fs.writeFileSync(tweetedFile, JSON.stringify({
-                  tweetId: tweet.data.id,
+                  tweetId: tweet.data?.id || tweet.id_str,
                   timestamp: new Date().toISOString(),
                   file: file,
                   title: postTitle
