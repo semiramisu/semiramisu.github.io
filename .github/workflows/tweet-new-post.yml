@@ -73,6 +73,16 @@ jobs:
             accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
           });
           
+          // Test authentication first
+          try {
+            const user = await client.v2.me();
+            console.log('Authentication successful! User:', user.data.username);
+          } catch (authError) {
+            console.error('Authentication test failed:', authError.message);
+            console.error('Please check your API credentials');
+            throw authError;
+          }
+          
           const rwClient = client.readWrite;
           
           async function tweetNewPost() {
