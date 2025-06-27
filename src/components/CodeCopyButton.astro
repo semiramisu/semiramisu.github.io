@@ -1,0 +1,142 @@
+---
+// Component to add copy buttons to code blocks
+---
+
+<style>
+  :global(.code-block-wrapper) {
+    position: relative;
+  }
+
+  :global(.copy-button) {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    z-index: 10;
+  }
+
+  :global(.code-block-wrapper:hover .copy-button) {
+    opacity: 1;
+  }
+
+  :global(.copy-button:hover) {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  :global(.copy-button.copied) {
+    background-color: var(--primary-color);
+    color: #fff;
+  }
+
+  :global(.copy-button.copied::after) {
+    content: 'コピー完了!';
+  }
+
+  :global(.copy-button:not(.copied)::after) {
+    content: 'コピー';
+  }
+
+  /* モバイルでは常に表示 */
+  @media (max-width: 768px) {
+    :global(.copy-button) {
+      opacity: 0.8;
+    }
+  }
+</style>
+
+<script>
+  function setupCodeCopyButtons() {
+    // すべてのコードブロックを取得
+    const codeBlocks = document.querySelectorAll('pre > code');
+    
+    codeBlocks.forEach((codeBlock) => {
+      const pre = codeBlock.parentElement;
+      if (!pre) return;
+      
+      // ラッパーdivがすでに存在する場合はスキップ
+      if (pre.parentElement?.classList.contains('code-block-wrapper')) {
+        return;
+      }
+      
+      // コードブロックをラップ
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+      
+      // コピーボタンを作成
+      const button = document.createElement('button');
+      button.className = 'copy-button';
+      button.setAttribute('aria-label', 'コードをコピー');
+      
+      // クリックイベントを追加
+      button.addEventListener('click', async () => {
+        const code = codeBlock.textContent || '';
+        
+        try {
+          await navigator.clipboard.writeText(code);
+          
+          // 成功フィードバック
+          button.classList.add('copied');
+          setTimeout(() => {
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code:', err);
+          // フォールバック：古いブラウザ用
+          const textArea = document.createElement('textarea');
+          textArea.value = code;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            button.classList.add('copied');
+            setTimeout(() => {
+              button.classList.remove('copied');
+            }, 2000);
+          } catch (err) {
+            console.error('Fallback copy failed:', err);
+          }
+          document.body.removeChild(textArea);
+        }
+      });
+      
+      wrapper.appendChild(button);
+    });
+  }
+
+  // ページロード時とナビゲーション時に実行
+  document.addEventListener('DOMContentLoaded', setupCodeCopyButtons);
+  document.addEventListener('astro:after-swap', setupCodeCopyButtons);
+  
+  // 動的に追加されるコードブロックに対応
+  const observer = new MutationObserver((mutations) => {
+    const hasNewCode = mutations.some(mutation => 
+      Array.from(mutation.addedNodes).some(node => 
+        node instanceof Element && (
+          node.tagName === 'PRE' || 
+          node.querySelector?.('pre > code')
+        )
+      )
+    );
+    
+    if (hasNewCode) {
+      setupCodeCopyButtons();
+    }
+  });
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+</script>

@@ -1,0 +1,136 @@
+---
+// Component to add prefetch functionality for better navigation performance
+---
+
+<script>
+  // リンクプリフェッチの実装
+  function setupPrefetch() {
+    // プリフェッチ済みのURLを記録
+    const prefetchedUrls = new Set<string>();
+    
+    // プリフェッチ可能なリンクかチェック
+    function isPrefetchable(link: HTMLAnchorElement): boolean {
+      // 外部リンクは除外
+      if (link.hostname !== window.location.hostname) return false;
+      
+      // 同じページへのリンクは除外
+      if (link.pathname === window.location.pathname) return false;
+      
+      // ハッシュリンクは除外
+      if (link.hash && link.pathname === window.location.pathname) return false;
+      
+      // ダウンロードリンクは除外
+      if (link.hasAttribute('download')) return false;
+      
+      // 明示的にプリフェッチを無効化しているリンクは除外
+      if (link.dataset.noPrefetch !== undefined) return false;
+      
+      return true;
+    }
+    
+    // URLをプリフェッチ
+    function prefetchUrl(url: string) {
+      if (prefetchedUrls.has(url)) return;
+      
+      prefetchedUrls.add(url);
+      
+      // link要素でプリフェッチ
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      document.head.appendChild(link);
+      
+      // 画像のプリロード（最初の画像のみ）
+      fetch(url)
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          
+          // 最初の記事画像を見つける
+          const firstImage = doc.querySelector('img[data-src], img[src]');
+          if (firstImage) {
+            const imageSrc = firstImage.getAttribute('data-src') || firstImage.getAttribute('src');
+            if (imageSrc && !imageSrc.startsWith('data:')) {
+              const imageLink = document.createElement('link');
+              imageLink.rel = 'preload';
+              imageLink.as = 'image';
+              imageLink.href = imageSrc;
+              document.head.appendChild(imageLink);
+            }
+          }
+        })
+        .catch(() => {
+          // エラーは無視（プリフェッチは補助的な機能のため）
+        });
+    }
+    
+    // リンクホバー時の処理
+    function handleLinkHover(event: MouseEvent) {
+      const link = (event.target as HTMLElement).closest('a');
+      if (!link || !isPrefetchable(link)) return;
+      
+      prefetchUrl(link.href);
+    }
+    
+    // タッチデバイス用の処理
+    function handleLinkTouch(event: TouchEvent) {
+      const link = (event.target as HTMLElement).closest('a');
+      if (!link || !isPrefetchable(link)) return;
+      
+      // タッチ開始時にプリフェッチ
+      prefetchUrl(link.href);
+    }
+    
+    // IntersectionObserverでビューポート内のリンクをプリフェッチ
+    function setupIntersectionObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const link = entry.target as HTMLAnchorElement;
+            if (isPrefetchable(link)) {
+              // ビューポートに入ってから少し遅延させてプリフェッチ
+              setTimeout(() => {
+                if (entry.isIntersecting) {
+                  prefetchUrl(link.href);
+                }
+              }, 1000);
+            }
+          }
+        });
+      }, {
+        rootMargin: '50px', // ビューポートより少し前でトリガー
+      });
+      
+      // 記事カードのリンクを監視
+      const postLinks = document.querySelectorAll('.post-card a, .featured-post a');
+      postLinks.forEach(link => {
+        observer.observe(link as HTMLAnchorElement);
+      });
+    }
+    
+    // イベントリスナーの設定
+    document.addEventListener('mouseover', handleLinkHover);
+    document.addEventListener('touchstart', handleLinkTouch, { passive: true });
+    
+    // モバイルデバイスでない場合のみIntersectionObserverを使用
+    if (!('ontouchstart' in window)) {
+      setupIntersectionObserver();
+    }
+    
+    // Connection APIを使用してネットワーク状況を確認
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      if (connection) {
+        // 低速接続の場合はプリフェッチを無効化
+        if (connection.saveData || connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+          return;
+        }
+      }
+    }
+  }
+  
+  // ページ読み込み時とナビゲーション時に実行
+  document.addEventListener('DOMContentLoaded', setupPrefetch);
+  document.addEventListener('astro:after-swap', setupPrefetch);
+</script>

@@ -1,0 +1,96 @@
+---
+// This component shows a reading progress bar for blog posts
+---
+
+<div id="reading-progress" class="reading-progress-container">
+  <div class="reading-progress-bar"></div>
+</div>
+
+<style>
+  .reading-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: var(--card-color);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .reading-progress-container.show {
+    opacity: 1;
+  }
+
+  .reading-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color-dark) 100%);
+    width: 0%;
+    transition: width 0.1s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .reading-progress-container {
+      height: 3px;
+    }
+  }
+</style>
+
+<script>
+  function initReadingProgress() {
+    const progressContainer = document.getElementById('reading-progress');
+    const progressBar = progressContainer?.querySelector('.reading-progress-bar') as HTMLElement;
+    
+    if (!progressContainer || !progressBar) return;
+
+    const article = document.querySelector('article');
+    if (!article) return;
+
+    let isScrolling = false;
+    let lastScrollY = 0;
+
+    function updateProgress() {
+      const articleRect = article.getBoundingClientRect();
+      const articleTop = articleRect.top + window.scrollY;
+      const articleHeight = articleRect.height;
+      const windowHeight = window.innerHeight;
+      
+      // Calculate how much of the article has been read
+      const scrolled = window.scrollY - articleTop + windowHeight;
+      const progress = Math.max(0, Math.min(100, (scrolled / articleHeight) * 100));
+      
+      progressBar.style.width = `${progress}%`;
+      
+      // Show/hide progress bar based on scroll position
+      if (window.scrollY > articleTop - windowHeight / 2) {
+        progressContainer.classList.add('show');
+      } else {
+        progressContainer.classList.remove('show');
+      }
+    }
+
+    function handleScroll() {
+      if (!isScrolling) {
+        window.requestAnimationFrame(() => {
+          updateProgress();
+          isScrolling = false;
+        });
+        isScrolling = true;
+      }
+    }
+
+    // Initial update
+    updateProgress();
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', updateProgress, { passive: true });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initReadingProgress);
+  // Re-initialize on page navigation (for Astro's View Transitions)
+  document.addEventListener('astro:after-swap', initReadingProgress);
+</script>

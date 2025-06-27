@@ -1,0 +1,121 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import PostCard from "./PostCard.astro";
+import { IdToSlug } from "../utils/hash";
+
+export interface Props {
+  currentPost: CollectionEntry<"posts">;
+  maxPosts?: number;
+}
+
+const { currentPost, maxPosts = 3 } = Astro.props;
+
+// すべての公開済み記事を取得
+const allPosts = await getCollection("posts", ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+});
+
+// 現在の記事を除外し、公開日でソート
+const otherPosts = allPosts
+  .filter(post => post.id !== currentPost.id)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+// 関連スコアを計算する関数
+function calculateRelevanceScore(post: CollectionEntry<"posts">) {
+  let score = 0;
+  
+  // カテゴリが一致する場合
+  if (post.data.category === currentPost.data.category && currentPost.data.category) {
+    score += 3;
+  }
+  
+  // タグの重複をカウント
+  if (post.data.tags && currentPost.data.tags) {
+    const commonTags = post.data.tags.filter(tag => 
+      currentPost.data.tags?.includes(tag)
+    );
+    score += commonTags.length * 2;
+  }
+  
+  // 最近の記事を優先（1年以内）
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  if (post.data.published > oneYearAgo) {
+    score += 1;
+  }
+  
+  return score;
+}
+
+// 関連スコアでソートし、上位の記事を取得
+const relatedPosts = otherPosts
+  .map(post => ({ post, score: calculateRelevanceScore(post) }))
+  .filter(item => item.score > 0) // スコアが0より大きい記事のみ
+  .sort((a, b) => b.score - a.score)
+  .slice(0, maxPosts)
+  .map(item => item.post);
+
+// 関連記事が足りない場合は最新記事で補完
+const finalPosts = relatedPosts.length < maxPosts
+  ? [...relatedPosts, ...otherPosts.slice(0, maxPosts - relatedPosts.length)]
+  : relatedPosts;
+---
+
+{finalPosts.length > 0 && (
+  <div class="related-posts">
+    <h2 class="related-posts-title">関連記事</h2>
+    <div class="related-posts-grid">
+      {finalPosts.map((post) => (
+        <PostCard
+          id={post.id}
+          title={post.data.title}
+          published={post.data.published}
+          category={post.data.category}
+          tags={post.data.tags}
+          description={post.data.description}
+          image={post.data.cover}
+          readingMetadata={post.data.readingTime}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .related-posts {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line-color);
+  }
+
+  .related-posts-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .related-posts-title::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 1.5rem;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+  }
+
+  .related-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .related-posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

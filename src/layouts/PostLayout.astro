@@ -3,6 +3,9 @@ import Main from "../layouts/MainLayout.astro";
 import Markdown from "../components/Markdown.astro";
 import CopyRight from "../components/misc/CopyRight.astro";
 import TableOfContents from "../components/TableOfContents.astro";
+import ReadingProgress from "../components/ReadingProgress.astro";
+import ShareButtons from "../components/ShareButtons.astro";
+import RelatedPosts from "../components/RelatedPosts.astro";
 
 interface Props {
   title?: string;
@@ -20,6 +23,8 @@ interface Props {
     slug: string;
     text: string;
   }[];
+  slug?: string;
+  currentPost?: any; // 関連記事用
 }
 
 const {
@@ -31,16 +36,40 @@ const {
   author,
   sourceLink,
   headings = [],
+  slug,
+  currentPost,
 } = Astro.props;
+
+// 記事のURLを構築
+const siteUrl = Astro.site?.toString() || '';
+const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
 ---
 
 <Main title={title} subTitle={subTitle} bannerImage={bannerImage} isHome={false}>
+  <ReadingProgress />
   <div id="post-content-wrapper" class="post-content-wrapper">
     <article id="post-article" class="post-article">
       <div class="article-inner">
       <Markdown>
         <slot />
       </Markdown>
+      {
+        title && (
+          <ShareButtons
+            title={title}
+            url={postUrl}
+            description={subTitle}
+          />
+        )
+      }
+      {
+        currentPost && (
+          <RelatedPosts
+            currentPost={currentPost}
+            maxPosts={3}
+          />
+        )
+      }
       {
         published && title && (
           <CopyRight
