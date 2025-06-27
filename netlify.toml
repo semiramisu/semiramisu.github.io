@@ -3,32 +3,9 @@
   publish = "dist"
 
 [[plugins]]
-  package = "@netlify/plugin-emails"
-
-[plugins.inputs]
-  emails_directory = "./emails"
-
-[[plugins]]
   package = "netlify-plugin-submit-sitemap"
 
   [plugins.inputs]
     baseUrl = "https://semiramisu.github.io"
     sitemapPath = "/sitemap.xml"
     providers = ["google", "bing"]
-
-# Form notifications
-[[plugins]]
-  package = "@netlify/plugin-emails"
-
-[plugins.inputs.emails]
-  [[plugins.inputs.emails.templates]]
-    name = "contact-notification"
-    subject = "【セミラミスの庭】新しいお問い合わせ: {{subject}}"
-    to = ["semiramisuweb3@gmail.com"]
-    parameters = {
-      name = "{{name}}",
-      email = "{{email}}",
-      subject = "{{subject}}",
-      message = "{{message}}",
-      replyEmail = "{{reply-email}}"
-    }
