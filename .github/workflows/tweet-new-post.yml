@@ -11,7 +11,7 @@ on:
 jobs:
   tweet:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip-tweet]')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip-tweet]'))
     
     steps:
       - name: Checkout repository
@@ -39,7 +39,7 @@ jobs:
           echo "All changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
       
       - name: Process new posts and tweet
-        if: steps.changed-files.outputs.added_files != ''
+        if: steps.changed-files.outputs.added_files != '' || github.event_name == 'workflow_dispatch'
         env:
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
@@ -149,7 +149,14 @@ jobs:
           tweetNewPost().catch(console.error);
           EOF
           
-          ADDED_FILES="${{ steps.changed-files.outputs.added_files }}" node tweet-post.mjs
+          # Use test file for manual runs, otherwise use changed files
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ADDED_FILES="src/contents/posts/test-twitter-integration.md"
+          else
+            ADDED_FILES="${{ steps.changed-files.outputs.added_files }}"
+          fi
+          
+          ADDED_FILES="$ADDED_FILES" node tweet-post.mjs
       
       - name: Commit tweet markers
         if: steps.changed-files.outputs.added_files != ''
