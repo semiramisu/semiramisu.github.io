@@ -7,8 +7,6 @@ import ReadingProgress from "../components/ReadingProgress.astro";
 import ShareButtons from "../components/ShareButtons.astro";
 import RelatedPosts from "../components/RelatedPosts.astro";
 import Comments from "../components/Comments.astro";
-import BookmarkButton from "../components/BookmarkButton.astro";
-import RecordReadingHistory from "../components/RecordReadingHistory.astro";
 
 interface Props {
   title?: string;
@@ -50,16 +48,6 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
 
 <Main title={title} subTitle={subTitle} bannerImage={bannerImage} isHome={false}>
   <ReadingProgress />
-  {
-    slug && title && (
-      <RecordReadingHistory
-        postId={slug}
-        title={title}
-        url={postUrl}
-        readTime="5分"
-      />
-    )
-  }
   <div id="post-content-wrapper" class="post-content-wrapper">
     <article id="post-article" class="post-article">
       <div class="article-inner">
@@ -69,11 +57,6 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
       {
         title && slug && (
           <div class="post-actions">
-            <BookmarkButton
-              postId={slug}
-              title={title}
-              url={postUrl}
-            />
             <ShareButtons
               title={title}
               url={postUrl}

@@ -44,12 +44,6 @@
     </svg>
     <span>検索</span>
   </button>
-  <button class="nav-item" id="bookmarks-trigger" aria-label="ブックマーク">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke-width="2"/>
-    </svg>
-    <span>保存</span>
-  </button>
 </nav>
 
 <style>
@@ -268,12 +262,6 @@
       searchModal?.classList.add('visible');
     });
     
-    // ブックマークトリガー
-    const bookmarksTrigger = document.getElementById('bookmarks-trigger');
-    bookmarksTrigger?.addEventListener('click', () => {
-      // ブックマークページへ遷移
-      window.location.href = '/bookmarks';
-    });
   }
   
   // 振動フィードバック

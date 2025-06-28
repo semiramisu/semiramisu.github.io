@@ -10,7 +10,6 @@ export const ja: Translation = {
   [key.nav_bar_archive]: "アーカイブ",
   [key.nav_bar_about]: "About Me",
   [key.nav_bar_contact]: "お問い合わせ",
-  [key.nav_bar_bookmarks]: "ブックマーク",
   [key.nav_bar_github]: "GitHub",
   [key.nav_bar_x]: "X",
   [key.nav_bar_search_placeholder]: "検索",
