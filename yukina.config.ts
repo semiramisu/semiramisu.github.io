@@ -30,6 +30,10 @@ const YukinaConfig: Configuration = {
       href: "/contact",
     },
     {
+      nameKey: I18nKeys.nav_bar_bookmarks,
+      href: "/bookmarks",
+    },
+    {
       nameKey: I18nKeys.nav_bar_github,
       href: "https://github.com/semiramisu",  // GitHub アカウントページに直接リンク
     },

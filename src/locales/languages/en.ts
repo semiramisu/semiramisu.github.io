@@ -10,6 +10,7 @@ export const en: Translation = {
   [key.nav_bar_archive]: "Archive",
   [key.nav_bar_about]: "About",
   [key.nav_bar_contact]: "Contact",
+  [key.nav_bar_bookmarks]: "Bookmarks",
   [key.nav_bar_github]: "GitHub",
   [key.nav_bar_x]: "X",
   [key.nav_bar_search_placeholder]: "Search",
@@ -29,4 +30,8 @@ export const en: Translation = {
 
   [key.pages_tags_title]: "Tags",
   [key.pages_categories_title]: "Categories",
+
+  [key.featured_posts]: "Featured Posts",
+  [key.recent_posts]: "Recent Posts",
+  [key.explore_tags]: "Explore by Tags",
 };
