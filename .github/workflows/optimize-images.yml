@@ -1,0 +1,139 @@
+name: Optimize Images
+on:
+  push:
+    paths:
+      - '**.jpg'
+      - '**.jpeg'
+      - '**.png'
+      - '!public/optimized/**'
+      - '!src/assets/optimized/**'
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Install sharp
+        run: npm install sharp glob
+        
+      - name: Create optimization script
+        run: |
+          cat << 'EOF' > optimize-images-action.js
+          const sharp = require('sharp');
+          const fs = require('fs').promises;
+          const path = require('path');
+          const { glob } = require('glob');
+
+          async function optimizeImage(inputPath) {
+            const outputDir = path.join(path.dirname(inputPath), 'optimized');
+            const filename = path.basename(inputPath, path.extname(inputPath));
+            
+            // ディレクトリを作成
+            await fs.mkdir(outputDir, { recursive: true });
+            
+            const image = sharp(inputPath);
+            const metadata = await image.metadata();
+            
+            console.log(`Optimizing: ${inputPath}`);
+            
+            // WebP版を作成
+            const webpPath = path.join(outputDir, `${filename}.webp`);
+            await image
+              .webp({ quality: 85 })
+              .toFile(webpPath);
+            
+            // オリジナル形式も最適化
+            const ext = path.extname(inputPath).toLowerCase();
+            const optimizedPath = path.join(outputDir, `${filename}${ext}`);
+            
+            if (ext === '.jpg' || ext === '.jpeg') {
+              await sharp(inputPath)
+                .jpeg({ quality: 85, progressive: true })
+                .toFile(optimizedPath);
+            } else if (ext === '.png') {
+              await sharp(inputPath)
+                .png({ compressionLevel: 9 })
+                .toFile(optimizedPath);
+            }
+            
+            // サイズ情報をログ出力
+            const originalSize = (await fs.stat(inputPath)).size;
+            const webpSize = (await fs.stat(webpPath)).size;
+            const reduction = ((1 - webpSize / originalSize) * 100).toFixed(1);
+            
+            return {
+              original: inputPath,
+              webp: webpPath,
+              originalSize,
+              webpSize,
+              reduction: `${reduction}%`
+            };
+          }
+
+          async function main() {
+            // 変更されたファイルを取得
+            const patterns = [
+              'public/**/*.{jpg,jpeg,png}',
+              'src/assets/**/*.{jpg,jpeg,png}',
+              'src/contents/**/*.{jpg,jpeg,png}',
+              '!**/optimized/**'
+            ];
+            
+            let optimizedFiles = [];
+            
+            for (const pattern of patterns) {
+              const files = await glob(pattern);
+              for (const file of files) {
+                try {
+                  const result = await optimizeImage(file);
+                  optimizedFiles.push(result);
+                } catch (error) {
+                  console.error(`Error optimizing ${file}:`, error.message);
+                }
+              }
+            }
+            
+            // サマリーを出力
+            if (optimizedFiles.length > 0) {
+              console.log('\n=== Optimization Summary ===');
+              let totalOriginal = 0;
+              let totalOptimized = 0;
+              
+              optimizedFiles.forEach(file => {
+                console.log(`${file.original}: ${file.reduction} reduction`);
+                totalOriginal += file.originalSize;
+                totalOptimized += file.webpSize;
+              });
+              
+              const totalReduction = ((1 - totalOptimized / totalOriginal) * 100).toFixed(1);
+              console.log(`\nTotal: ${totalReduction}% reduction`);
+              console.log(`Optimized ${optimizedFiles.length} images`);
+            }
+          }
+
+          main().catch(console.error);
+          EOF
+          
+      - name: Run optimization
+        run: node optimize-images-action.js
+        
+      - name: Commit optimized images
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: '🖼️ Optimize images automatically'
+          add: |
+            public/**/optimized/*
+            src/assets/**/optimized/*
+            src/contents/**/optimized/*
+          default_author: github_actions

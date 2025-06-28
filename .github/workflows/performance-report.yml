@@ -1,0 +1,92 @@
+name: Performance Report
+on:
+  schedule:
+    - cron: '0 0 * * 0' # 毎週日曜日の深夜
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  performance-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Enable pnpm
+        run: corepack enable
+        
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Build site
+        run: pnpm build
+        
+      - name: Run performance tests
+        run: |
+          npx lighthouse https://semiramisu.com \
+            --output=json \
+            --output-path=./lighthouse-report.json \
+            --chrome-flags="--headless"
+            
+      - name: Create performance report
+        run: |
+          cat << 'EOF' > create-report.js
+          const fs = require('fs');
+          const report = require('./lighthouse-report.json');
+          
+          const date = new Date().toISOString().split('T')[0];
+          const scores = {
+            performance: Math.round(report.categories.performance.score * 100),
+            accessibility: Math.round(report.categories.accessibility.score * 100),
+            bestPractices: Math.round(report.categories['best-practices'].score * 100),
+            seo: Math.round(report.categories.seo.score * 100)
+          };
+          
+          const metrics = {
+            fcp: report.audits['first-contentful-paint'].numericValue,
+            lcp: report.audits['largest-contentful-paint'].numericValue,
+            tbt: report.audits['total-blocking-time'].numericValue,
+            cls: report.audits['cumulative-layout-shift'].numericValue,
+            si: report.audits['speed-index'].numericValue
+          };
+          
+          const issueBody = `# 📊 週次パフォーマンスレポート - ${date}
+
+          ## スコア
+          - 🚀 Performance: ${scores.performance}/100
+          - ♿ Accessibility: ${scores.accessibility}/100
+          - 📋 Best Practices: ${scores.bestPractices}/100
+          - 🔍 SEO: ${scores.seo}/100
+
+          ## Core Web Vitals
+          - First Contentful Paint: ${(metrics.fcp / 1000).toFixed(2)}s
+          - Largest Contentful Paint: ${(metrics.lcp / 1000).toFixed(2)}s
+          - Total Blocking Time: ${metrics.tbt.toFixed(0)}ms
+          - Cumulative Layout Shift: ${metrics.cls.toFixed(3)}
+          - Speed Index: ${(metrics.si / 1000).toFixed(2)}s
+
+          ## 改善提案
+          ${report.categories.performance.auditRefs
+            .filter(ref => report.audits[ref.id].score < 0.9)
+            .slice(0, 5)
+            .map(ref => `- ${report.audits[ref.id].title}`)
+            .join('\n')}
+          `;
+          
+          fs.writeFileSync('issue-body.md', issueBody);
+          EOF
+          
+          node create-report.js
+          
+      - name: Create issue
+        uses: peter-evans/create-issue@v6
+        with:
+          title: "📊 週次パフォーマンスレポート - ${{ env.DATE }}"
+          body-path: issue-body.md
+          labels: |
+            performance
+            automated
