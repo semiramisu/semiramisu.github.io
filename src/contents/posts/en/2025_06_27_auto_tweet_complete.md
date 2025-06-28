@@ -12,7 +12,7 @@ category: Tech
 draft: false
 lang: en
 translatedFrom: ja
-translatedAt: '2025-06-28T11:09:31.104Z'
+translatedAt: 2025-06-28T11:09:31.104Z
 ---
 
 ## Implementation of Automatic X Posting Feature
