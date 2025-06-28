@@ -70,13 +70,6 @@ const finalPosts = relatedPosts.length < maxPosts
       <div class="related-posts-list">
         {finalPosts.map((post) => (
           <a href={`/posts/${IdToSlug(post.id)}/`} class="related-post-item">
-            <div class="related-post-image">
-              <img 
-                src={post.data.cover || `/api/og/${post.id}.png`} 
-                alt={post.data.title}
-                loading="lazy"
-              />
-            </div>
             <div class="related-post-content">
               <h3 class="related-post-title">{post.data.title}</h3>
               <div class="related-post-meta">
@@ -85,6 +78,13 @@ const finalPosts = relatedPosts.length < maxPosts
                   <span class="related-post-category">{post.data.category}</span>
                 )}
               </div>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="related-post-tags">
+                  {post.data.tags.slice(0, 3).map(tag => (
+                    <span class="related-post-tag">{tag}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </a>
         ))}
@@ -177,34 +177,18 @@ const finalPosts = relatedPosts.length < maxPosts
   }
 
   .related-post-item {
-    display: flex;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    display: block;
+    padding: 0.875rem;
     background-color: var(--card-color);
     border-radius: 0.5rem;
     text-decoration: none;
     transition: all 0.2s ease;
-    border: 1px solid transparent;
+    border: 1px solid var(--border-color);
   }
 
   .related-post-item:hover {
     border-color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .related-post-image {
-    flex-shrink: 0;
-    width: 60px;
-    height: 60px;
-    border-radius: 0.375rem;
-    overflow: hidden;
-  }
-
-  .related-post-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    background-color: var(--primary-color-lighten);
   }
 
   .related-post-content {
@@ -213,13 +197,13 @@ const finalPosts = relatedPosts.length < maxPosts
   }
 
   .related-post-title {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-color);
     line-height: 1.4;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.375rem;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -231,6 +215,7 @@ const finalPosts = relatedPosts.length < maxPosts
     gap: 0.5rem;
     font-size: 0.75rem;
     color: var(--text-color-lighten);
+    margin-bottom: 0.375rem;
   }
 
   .related-post-category {
@@ -239,5 +224,20 @@ const finalPosts = relatedPosts.length < maxPosts
     color: var(--primary-color);
     border-radius: 0.25rem;
     font-size: 0.625rem;
+  }
+
+  .related-post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .related-post-tag {
+    padding: 0.125rem 0.375rem;
+    background-color: var(--background-color);
+    color: var(--text-color-lighten);
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    border: 1px solid var(--border-color);
   }
 </style>
