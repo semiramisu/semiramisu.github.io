@@ -172,8 +172,16 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   @media (min-width: 768px) {
     .slide-overlay {
       @apply bottom-auto top-0 h-full justify-center;
-      background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.85) 40%, transparent 100%);
-      width: 60%;
+      background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.7) 50%, transparent 80%);
+      width: 50%;
+      padding-left: 3rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .slide-overlay {
+      width: 45%;
+      padding-left: 4rem;
     }
   }
   
