@@ -169,12 +169,24 @@ function getExcerpt(body: string, maxLength: number = 150): string {
     width: 100%;
   }
   
+  /* ライトモードでも暗い背景を維持 */
+  :global(.light) .slide-overlay,
+  :global([data-theme="light"]) .slide-overlay {
+    background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.85), transparent);
+  }
+  
   @media (min-width: 768px) {
     .slide-overlay {
       @apply bottom-auto top-0 h-full justify-center;
       background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.7) 50%, transparent 80%);
       width: 50%;
       padding-left: 3rem;
+    }
+    
+    /* ライトモードでも暗い背景を維持 */
+    :global(.light) .slide-overlay,
+    :global([data-theme="light"]) .slide-overlay {
+      background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.7) 50%, transparent 80%);
     }
   }
   
@@ -186,7 +198,8 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-meta {
-    @apply flex flex-wrap gap-3 text-sm text-white/80;
+    @apply flex flex-wrap gap-3 text-sm;
+    color: rgba(255, 255, 255, 0.8) !important;
   }
   
   .slide-date, .slide-category {
@@ -198,8 +211,9 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-title {
-    @apply text-xl font-bold line-clamp-2 text-white mb-2;
+    @apply text-xl font-bold line-clamp-2 mb-2;
     font-family: var(--primary-font);
+    color: white !important;
   }
   
   @media (min-width: 768px) {
@@ -209,11 +223,13 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-description {
-    @apply text-sm line-clamp-2 text-white/90;
+    @apply text-sm line-clamp-2;
+    color: rgba(255, 255, 255, 0.9) !important;
   }
   
   .slide-excerpt {
-    @apply text-sm text-white/80 line-clamp-3 mt-2;
+    @apply text-sm line-clamp-3 mt-2;
+    color: rgba(255, 255, 255, 0.8) !important;
   }
   
   @media (min-width: 768px) {
@@ -223,8 +239,12 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-read-more {
-    @apply flex items-center gap-1 text-sm mt-3 text-white hover:text-white/80 transition-colors;
-    @apply font-medium;
+    @apply flex items-center gap-1 text-sm mt-3 transition-colors font-medium;
+    color: white !important;
+  }
+  
+  .slide-read-more:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
   }
   
   @media (min-width: 768px) {
