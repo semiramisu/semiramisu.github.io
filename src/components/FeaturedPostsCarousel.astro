@@ -147,24 +147,11 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-content {
-    @apply flex w-full h-full relative overflow-hidden bg-[var(--card-color)];
-    flex-direction: column;
-  }
-  
-  @media (min-width: 768px) {
-    .slide-content {
-      flex-direction: row;
-    }
+    @apply block w-full h-full relative overflow-hidden;
   }
   
   .slide-image-container {
-    @apply relative w-full h-1/2 overflow-hidden;
-  }
-  
-  @media (min-width: 768px) {
-    .slide-image-container {
-      @apply w-1/2 h-full;
-    }
+    @apply relative w-full h-full;
   }
   
   .slide-image {
@@ -176,18 +163,19 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-overlay {
-    @apply p-6 bg-[var(--card-color)] text-[var(--text-color)];
-    @apply flex flex-col gap-3 h-1/2;
+    @apply absolute inset-0 p-6 bg-gradient-to-r from-black/90 via-black/80 to-transparent;
+    @apply flex flex-col justify-end text-white;
   }
   
   @media (min-width: 768px) {
     .slide-overlay {
-      @apply w-1/2 h-full justify-center;
+      @apply bg-gradient-to-r from-black/90 via-black/70 to-transparent;
+      @apply w-3/4;
     }
   }
   
   .slide-meta {
-    @apply flex flex-wrap gap-3 text-sm text-[var(--text-color-lighten)];
+    @apply flex flex-wrap gap-3 text-sm text-white/80;
   }
   
   .slide-date, .slide-category {
@@ -199,7 +187,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-title {
-    @apply text-xl font-bold line-clamp-2 text-[var(--text-color)];
+    @apply text-xl font-bold line-clamp-2 text-white;
     font-family: var(--primary-font);
   }
   
@@ -210,11 +198,11 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-description {
-    @apply text-sm line-clamp-2 text-[var(--text-color-lighten)];
+    @apply text-sm line-clamp-2 text-white/90;
   }
   
   .slide-excerpt {
-    @apply text-sm text-[var(--text-color)] line-clamp-3 mt-2 flex-grow;
+    @apply text-sm text-white/80 line-clamp-3 mt-2;
   }
   
   @media (min-width: 768px) {
@@ -224,7 +212,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-read-more {
-    @apply flex items-center gap-1 text-sm mt-auto text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] transition-colors;
+    @apply flex items-center gap-1 text-sm mt-2 text-white hover:text-white/80 transition-colors;
     @apply font-medium;
   }
   
