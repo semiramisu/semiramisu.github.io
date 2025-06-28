@@ -74,7 +74,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
                   class="slide-image" 
                   src={post.data.cover ?? GetCoverURLForUnspecifiedEntry(entryID)} 
                   alt={post.data.title}
-                  width={600}
+                  width={800}
                   height={400}
                   loading="lazy"
                 />
@@ -130,7 +130,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   
   @media (min-width: 768px) {
     .featured-carousel-container {
-      height: 450px;
+      height: 400px;
     }
   }
   
@@ -151,7 +151,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-image-container {
-    @apply relative w-full h-full;
+    @apply relative w-full h-full overflow-hidden;
   }
   
   .slide-image {
