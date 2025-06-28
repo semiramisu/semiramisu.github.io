@@ -1,8 +1,15 @@
 import type { APIRoute } from 'astro';
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import { ImageResponse } from '@vercel/og';
 
+// 注意: Netlifyではedge functionsでの動的生成が必要です
+// 現在は静的生成のみサポート
 export async function getStaticPaths() {
+  if (import.meta.env.PROD) {
+    // 本番環境では静的生成をスキップ
+    return [];
+  }
+  
   const posts = await getCollection('posts');
   return posts.map((post) => ({
     params: { slug: `posts/${post.slug}` },
@@ -10,7 +17,12 @@ export async function getStaticPaths() {
   }));
 }
 
-export const GET: APIRoute = async ({ props }) => {
+export const GET: APIRoute = async ({ props, params }) => {
+  // 本番環境では404を返す（将来的にedge functionsで実装）
+  if (import.meta.env.PROD) {
+    return new Response('Not Found', { status: 404 });
+  }
+  
   const { post } = props as { post: any };
   
   // フォントファイルを読み込む（日本語対応）
