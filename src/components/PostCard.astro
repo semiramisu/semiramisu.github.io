@@ -18,11 +18,14 @@ export interface Props {
   description?: string;
   image?: string;
   readingMetadata?: { time: number; wordCount: number };
+  lang?: "ja" | "en";
 }
 
 const props = Astro.props;
 // IDが既にパスを含んでいる場合はそのまま使用し、そうでない場合はIdToSlugを適用
-const contentUrl = props.id.startsWith('/') ? props.id : `/posts/${IdToSlug(props.id)}`;
+const baseUrl = props.id.startsWith('/') ? props.id : `/posts/${IdToSlug(props.id)}`;
+const langParam = props.lang === 'en' ? '?lang=en' : '';
+const contentUrl = `${baseUrl}${langParam}`;
 const entryID = props.id.startsWith('/') ? props.id.split('/').pop()! : IdToSlug(props.id);
 const { time = 0, wordCount = 0 } = props.readingMetadata ?? { time: 0, wordCount: 0 };
 

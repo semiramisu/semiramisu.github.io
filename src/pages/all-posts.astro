@@ -5,9 +5,13 @@ import { GetSortedPosts, GetAllCategories } from "../utils/content";
 import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
 
+// Get language from URL parameter
+const url = new URL(Astro.request.url);
+const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
+
 // 全ての記事とカテゴリーを取得
-const allPosts = await GetSortedPosts();
-const allCategories = await GetAllCategories();
+const allPosts = await GetSortedPosts(lang);
+const allCategories = await GetAllCategories(lang);
 
 // 初期表示するカテゴリーの数（デフォルトは10）
 const initialCategoryCount = 10;
@@ -15,16 +19,16 @@ const initialCategoryCount = 10;
 const hasMoreCategories = allCategories.length > initialCategoryCount;
 ---
 
-<MainLayout title="すべての記事">
+<MainLayout title={lang === 'ja' ? "すべての記事" : "All Posts"}>
   <div class="page-container">
-    <h1 class="page-title">すべての記事</h1>
+    <h1 class="page-title">{lang === 'ja' ? 'すべての記事' : 'All Posts'}</h1>
     
     <div class="categories-container">
       <div class="categories-filter" id="categories-filter">
-        <a href="/all-posts" class="category-pill active">すべて</a>
+        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="category-pill active">{lang === 'ja' ? 'すべて' : 'All'}</a>
         {allCategories.map((category, index) => (
           <a 
-            href={`/all-posts?category=${encodeURIComponent(category.name)}`} 
+            href={`/all-posts?category=${encodeURIComponent(category.name)}${lang === 'en' ? '&lang=en' : ''}`} 
             class={`category-pill ${index >= initialCategoryCount ? 'hidden-category' : ''}`}
           >
             {category.name}
@@ -35,7 +39,7 @@ const hasMoreCategories = allCategories.length > initialCategoryCount;
       {hasMoreCategories && (
         <div class="text-center mt-3">
           <button id="show-more-categories" class="show-more-button">
-            もっと見る <span class="arrow-down">▼</span>
+            {lang === 'ja' ? 'もっと見る' : 'Show more'} <span class="arrow-down">▼</span>
           </button>
         </div>
       )}
@@ -57,6 +61,7 @@ const hasMoreCategories = allCategories.length > initialCategoryCount;
             description={entry.data.description}
             image={entry.data.cover}
             readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
+            lang={lang}
           />
         </div>
       ))}
@@ -151,11 +156,12 @@ const hasMoreCategories = allCategories.length > initialCategoryCount;
           }
         });
         
+        const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ja';
         if (isExpanded) {
-          showMoreButton.textContent = 'もっと見る ';
+          showMoreButton.textContent = lang === 'ja' ? 'もっと見る ' : 'Show more ';
           showMoreButton.setAttribute('data-expanded', 'false');
         } else {
-          showMoreButton.textContent = '折りたたむ ';
+          showMoreButton.textContent = lang === 'ja' ? '折りたたむ ' : 'Collapse ';
           showMoreButton.setAttribute('data-expanded', 'true');
         }
         
@@ -182,8 +188,14 @@ const hasMoreCategories = allCategories.length > initialCategoryCount;
           const pillCategory = pillParams.get('category');
           
           // URLを更新
-          const newUrl = pillCategory 
-            ? `${window.location.pathname}?category=${encodeURIComponent(pillCategory.trim())}` 
+          const currentParams = new URLSearchParams(window.location.search);
+          const lang = currentParams.get('lang');
+          const newParams = new URLSearchParams();
+          if (lang) newParams.set('lang', lang);
+          if (pillCategory) newParams.set('category', pillCategory.trim());
+          
+          const newUrl = newParams.toString() 
+            ? `${window.location.pathname}?${newParams.toString()}` 
             : window.location.pathname;
           
           console.log("新しいURL:", newUrl);

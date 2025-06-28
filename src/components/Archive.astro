@@ -5,9 +5,11 @@ import { Icon } from 'astro-icon/components';
 
 interface Props {
   posts: CollectionEntry<'posts'>[];
+  lang?: "ja" | "en";
 }
 
-const { posts } = Astro.props;
+const { posts, lang = "ja" } = Astro.props;
+const langParam = lang === 'en' ? '?lang=en' : '';
 
 // 記事を年ごとにグループ化
 const postsByYear = posts.reduce((acc, post) => {
@@ -25,7 +27,7 @@ const groupPostsByMonth = (posts: CollectionEntry<'posts'>[]) => {
   
   posts.forEach(post => {
     const date = new Date(post.data.published);
-    const monthKey = `${date.getMonth() + 1}月`;
+    const monthKey = lang === 'ja' ? `${date.getMonth() + 1}月` : `Month ${date.getMonth() + 1}`;
     
     if (!months[monthKey]) {
       months[monthKey] = [];
@@ -66,7 +68,7 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
     <h2 class="section-title mb-6">ARCHIVE</h2>
     <a href="/admin/dashboard" class="dashboard-link">
       <Icon name="mdi:chart-line" class="w-5 h-5" />
-      <span>統計ダッシュボード</span>
+      <span>{lang === 'ja' ? '統計ダッシュボード' : 'Analytics Dashboard'}</span>
     </a>
   </div>
   {years.map(year => {
@@ -99,7 +101,7 @@ const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
                       <ul class="posts hidden" data-week-content={`${year}-${month}-${week}`}>
                         {weekGroups[week].map(post => (
                           <li>
-                            <a href={`/posts/${IdToSlug(post.id)}`} class="post-link">
+                            <a href={`/posts/${IdToSlug(post.id)}${langParam}`} class="post-link">
                               {post.data.title}
                             </a>
                           </li>

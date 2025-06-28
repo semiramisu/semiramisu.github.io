@@ -18,6 +18,9 @@ const posts = defineCollection({
     sourceLink: z.string().optional(),
     licenseName: z.string().optional(),
     licenseUrl: z.string().optional(),
+    lang: z.enum(["ja", "en"]).optional().default("ja"),
+    translatedFrom: z.string().optional(),
+    translatedAt: z.date().optional(),
   }),
 });
 

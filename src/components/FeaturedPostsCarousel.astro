@@ -8,9 +8,11 @@ import OptimizedImage from "./OptimizedImage.astro";
 
 export interface Props {
   posts: any[];
+  lang?: "ja" | "en";
 }
 
-const { posts } = Astro.props;
+const { posts, lang = "ja" } = Astro.props;
+const langParam = lang === 'en' ? '?lang=en' : '';
 
 // 記事の冒頭部分を抽出する関数
 function getExcerpt(body: string, maxLength: number = 150): string {
@@ -64,7 +66,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
     <div class="carousel-track">
       {posts.map((post, index) => {
         const entryID = IdToSlug(post.id);
-        const contentUrl = `/posts/${entryID}`;
+        const contentUrl = `/posts/${entryID}${langParam}`;
         const excerpt = getExcerpt(post.body);
         return (
           <div class="carousel-slide">
@@ -99,7 +101,7 @@ function getExcerpt(body: string, maxLength: number = 150): string {
                     <p class="slide-excerpt">{excerpt}</p>
                   )}
                   <div class="slide-read-more">
-                    <span>続きを読む</span>
+                    <span>{lang === 'ja' ? '続きを読む' : 'Read More'}</span>
                     <Icon name="cuida:caret-right-outline" class="read-more-icon" />
                   </div>
                 </div>

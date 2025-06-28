@@ -39,11 +39,14 @@ export interface Category {
  * and sorts them in descending order by their published date. It also adds `nextSlug`, `nextTitle`, `prevSlug`,
  * and `prevTitle` properties to each post for navigation purposes.
  *
+ * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to an array of sorted blog posts with navigation properties.
  */
-export async function GetSortedPosts() {
+export async function GetSortedPosts(lang: "ja" | "en" = "ja") {
   const allBlogPosts = await getCollection("posts", ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true;
+    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
+    const isLangFiltered = (data.lang || "ja") === lang;
+    return isDraftFiltered && isLangFiltered;
   });
   const sorted = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.data.published);
@@ -71,11 +74,14 @@ export async function GetSortedPosts() {
  * Each archive entry contains the post's title, slug, publication date, and tags.
  * The archives are sorted in descending order by year and by date within each year.
  *
+ * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to a map of archives grouped by year.
  */
-export async function GetArchives() {
+export async function GetArchives(lang: "ja" | "en" = "ja") {
   const allBlogPosts = await getCollection("posts", ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true;
+    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
+    const isLangFiltered = (data.lang || "ja") === lang;
+    return isDraftFiltered && isLangFiltered;
   });
 
   const archives = new Map<number, Archive[]>();
@@ -127,11 +133,14 @@ export async function GetArchives() {
  * This function fetches all blog posts from the "posts" collection and extracts tags from each post.
  * It then organizes the tags into a map where each tag is associated with its metadata and the posts that have that tag.
  *
+ * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to a map of tags. Each key is a tag slug, and the value is an object containing the tag's name, slug, and associated posts.
  */
-export async function GetTags() {
+export async function GetTags(lang: "ja" | "en" = "ja") {
   const allBlogPosts = await getCollection("posts", ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true;
+    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
+    const isLangFiltered = (data.lang || "ja") === lang;
+    return isDraftFiltered && isLangFiltered;
   });
 
   const tags = new Map<string, Tag>();
@@ -169,10 +178,11 @@ export async function GetTags() {
 /**
  * Retrieves all tags as an array, sorted by post count.
  *
+ * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to an array of tags sorted by the number of posts that have each tag.
  */
-export async function GetAllTags() {
-  const tags = await GetTags();
+export async function GetAllTags(lang: "ja" | "en" = "ja") {
+  const tags = await GetTags(lang);
   return Array.from(tags.values())
     .sort((a, b) => b.posts.length - a.posts.length);
 }
@@ -183,11 +193,14 @@ export async function GetAllTags() {
  * This function fetches all blog posts from the "posts" collection and filters them based on the environment.
  * In production, it excludes drafts. It then organizes the posts into categories and returns a map of categories.
  *
+ * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to a map of categories, where each category contains its name, slug, and associated posts.
  */
-export async function GetCategories() {
+export async function GetCategories(lang: "ja" | "en" = "ja") {
   const allBlogPosts = await getCollection("posts", ({ data }) => {
-    return import.meta.env.PROD ? data.draft !== true : true;
+    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
+    const isLangFiltered = (data.lang || "ja") === lang;
+    return isDraftFiltered && isLangFiltered;
   });
 
   const categories = new Map<string, Category>();
@@ -234,10 +247,11 @@ export async function GetCategories() {
 /**
  * Retrieves all categories as an array, sorted by post count.
  *
+ * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to an array of categories sorted by the number of posts in each category.
  */
-export async function GetAllCategories() {
-  const categories = await GetCategories();
+export async function GetAllCategories(lang: "ja" | "en" = "ja") {
+  const categories = await GetCategories(lang);
   return Array.from(categories.values())
     .sort((a, b) => b.posts.length - a.posts.length);
 }

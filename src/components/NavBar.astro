@@ -5,9 +5,14 @@ import { i18n } from "../locales/translation";
 import { Icon } from "astro-icon/components";
 import SearchBar from "./SearchBar.svelte";
 import MobileSearchBar from "./MobileSearchBar.svelte";
+import LanguageSwitcher from "./LanguageSwitcher.astro";
 import "astro-pagefind";
 
 const navCount = YukinaConfig.navigators.length;
+
+// Get language from URL parameter
+const url = new URL(Astro.request.url);
+const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
 ---
 
 <nav class="nav" id="nav">
@@ -59,6 +64,7 @@ const navCount = YukinaConfig.navigators.length;
       <div class="hidden lg:block">
         <SearchBar client:only="svelte" />
       </div>
+      <LanguageSwitcher currentLang={lang} />
       <div class="theme-switcher">
         <button type="button" id="theme-switcher" aria-label="ダークモード切り替え" class="theme-toggle">
           <div class="sun-moon-container">

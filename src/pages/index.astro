@@ -10,11 +10,15 @@ import { GetSortedPosts, GetAllTags } from "../utils/content";
 import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
 
+// Get language from URL parameter
+const url = new URL(Astro.request.url);
+const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
+
 // Get all posts and tags
-const allPosts = await GetSortedPosts();
+const allPosts = await GetSortedPosts(lang);
 const recentPosts = allPosts.slice(0, 6);
-const featuredPosts = allPosts.filter(post => post.data.tags?.includes("仕事")).slice(0, 5);
-const allTags = await GetAllTags();
+const featuredPosts = allPosts.filter(post => post.data.tags?.includes(lang === 'ja' ? "仕事" : "Work")).slice(0, 5);
+const allTags = await GetAllTags(lang);
 ---
 
 <MainLayout isHome={true}>
@@ -22,7 +26,7 @@ const allTags = await GetAllTags();
   <div class="hero-section-simple mb-2">
     <div class="fade-in-up flex flex-col items-center justify-center space-y-4 text-center py-3">
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient">
-        <AnimatedHeading text="ようこそ！私のブログへ" />
+        <AnimatedHeading text={lang === 'ja' ? "ようこそ！私のブログへ" : "Welcome to My Blog!"} />
       </h1>
     </div>
   </div>
@@ -31,7 +35,7 @@ const allTags = await GetAllTags();
     <!-- Featured Posts Carousel -->
     <section class="featured-posts">
       <h2 class="section-title mb-6">{i18n(I18nKeys.featured_posts)}</h2>
-      <FeaturedPostsCarousel posts={featuredPosts} />
+      <FeaturedPostsCarousel posts={featuredPosts} lang={lang} />
     </section>
 
     <!-- Recent Posts -->
@@ -52,13 +56,14 @@ const allTags = await GetAllTags();
               description={entry.data.description}
               image={entry.data.cover}
               readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
+              lang={lang}
             />
           </div>
         ))}
       </div>
       <div class="mt-8 text-center">
-        <a href="/all-posts" class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all transform hover:scale-105">
-          すべての記事を見る
+        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all transform hover:scale-105">
+          {lang === 'ja' ? 'すべての記事を見る' : 'View All Posts'}
         </a>
       </div>
     </section>
@@ -71,15 +76,15 @@ const allTags = await GetAllTags();
 
     <!-- Archive Section -->
     <section class="archive-section">
-      <Archive posts={allPosts} />
+      <Archive posts={allPosts} lang={lang} />
     </section>
     
     <!-- Search Section -->
     <section class="search-section py-14 mt-14">
       <div class="search-container fade-in-up">
-        <h2 class="section-title mb-4 text-center">記事を検索</h2>
+        <h2 class="section-title mb-4 text-center">{lang === 'ja' ? '記事を検索' : 'Search Articles'}</h2>
         <p class="max-w-2xl text-lg text-[var(--text-color-lighten)] text-center mx-auto mb-6">
-          日々の思いや発見、学びを共有する場所です。お楽しみください！
+          {lang === 'ja' ? '日々の思いや発見、学びを共有する場所です。お楽しみください！' : 'A place to share daily thoughts, discoveries, and learnings. Enjoy!'}
         </p>
         <div class="w-full max-w-xl mx-auto px-4">
           <SearchBar />

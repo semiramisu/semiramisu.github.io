@@ -1,0 +1,62 @@
+---
+interface Props {
+  currentLang?: "ja" | "en";
+}
+
+const { currentLang = "ja" } = Astro.props;
+const currentUrl = new URL(Astro.request.url);
+---
+
+<div class="language-switcher">
+  <a 
+    href={(() => {
+      const params = new URLSearchParams(currentUrl.search);
+      if (currentLang === 'ja') {
+        params.set('lang', 'en');
+      } else {
+        params.delete('lang'); // Remove lang param for Japanese (default)
+      }
+      const newSearch = params.toString();
+      return `${currentUrl.pathname}${newSearch ? `?${newSearch}` : ''}`;
+    })()}
+    class="lang-toggle"
+    aria-label={currentLang === 'ja' ? 'Switch to English' : '日本語に切り替え'}
+  >
+    <span class={`lang-option ${currentLang === 'ja' ? 'active' : ''}`}>JP</span>
+    <span class="separator">|</span>
+    <span class={`lang-option ${currentLang === 'en' ? 'active' : ''}`}>EN</span>
+  </a>
+</div>
+
+<style>
+  .language-switcher {
+    @apply inline-flex items-center;
+  }
+
+  .lang-toggle {
+    @apply flex items-center gap-1 px-3 py-1 rounded-full;
+    @apply bg-[var(--card-color)] border border-[var(--border-color)];
+    @apply hover:bg-[var(--primary-color-lighten)] transition-all;
+    @apply text-sm font-medium;
+    text-decoration: none;
+  }
+
+  .lang-option {
+    @apply transition-colors;
+    color: var(--text-color-lighten);
+  }
+
+  .lang-option.active {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .separator {
+    color: var(--text-color-lighten);
+    opacity: 0.5;
+  }
+
+  .lang-toggle:hover .lang-option:not(.active) {
+    color: var(--text-color);
+  }
+</style>
