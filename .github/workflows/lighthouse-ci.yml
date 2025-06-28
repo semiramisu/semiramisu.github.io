@@ -35,20 +35,62 @@ jobs:
           runs: 3 # 3回実行して平均を取る
           configPath: './.lighthouserc.json'
           
+      - name: Format Lighthouse Score
+        if: always()
+        id: format_lighthouse_score
+        run: |
+          # .lighthouseci ディレクトリから最新のJSONファイルを取得
+          if [ -d ".lighthouseci" ]; then
+            LATEST_JSON=$(find .lighthouseci -name "lhr-*.json" | sort | tail -n 1)
+            if [ -f "$LATEST_JSON" ]; then
+              # スコアを抽出
+              PERFORMANCE=$(jq -r '.categories.performance.score // 0' "$LATEST_JSON" | awk '{printf "%.0f", $1*100}')
+              ACCESSIBILITY=$(jq -r '.categories.accessibility.score // 0' "$LATEST_JSON" | awk '{printf "%.0f", $1*100}')
+              BEST_PRACTICES=$(jq -r '.categories["best-practices"].score // 0' "$LATEST_JSON" | awk '{printf "%.0f", $1*100}')
+              SEO=$(jq -r '.categories.seo.score // 0' "$LATEST_JSON" | awk '{printf "%.0f", $1*100}')
+              
+              # Core Web Vitals
+              FCP=$(jq -r '.audits["first-contentful-paint"].numericValue // 0' "$LATEST_JSON" | awk '{printf "%.2f", $1/1000}')
+              LCP=$(jq -r '.audits["largest-contentful-paint"].numericValue // 0' "$LATEST_JSON" | awk '{printf "%.2f", $1/1000}')
+              TBT=$(jq -r '.audits["total-blocking-time"].numericValue // 0' "$LATEST_JSON" | awk '{printf "%.0f", $1}')
+              CLS=$(jq -r '.audits["cumulative-layout-shift"].numericValue // 0' "$LATEST_JSON" | awk '{printf "%.3f", $1}')
+              
+              # 結果を出力用に保存
+              echo "PERFORMANCE=$PERFORMANCE" >> $GITHUB_OUTPUT
+              echo "ACCESSIBILITY=$ACCESSIBILITY" >> $GITHUB_OUTPUT
+              echo "BEST_PRACTICES=$BEST_PRACTICES" >> $GITHUB_OUTPUT
+              echo "SEO=$SEO" >> $GITHUB_OUTPUT
+              echo "FCP=$FCP" >> $GITHUB_OUTPUT
+              echo "LCP=$LCP" >> $GITHUB_OUTPUT
+              echo "TBT=$TBT" >> $GITHUB_OUTPUT
+              echo "CLS=$CLS" >> $GITHUB_OUTPUT
+            fi
+          fi
+          
       - name: Comment on PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         with:
           script: |
-            const results = require('./lighthouse-results.json');
             const comment = `## 🚦 Lighthouse Results
             
-            | Metric | Score |
-            |--------|-------|
-            | Performance | ${results.performance} |
-            | Accessibility | ${results.accessibility} |
-            | Best Practices | ${results.bestPractices} |
-            | SEO | ${results.seo} |
+            ### カテゴリスコア
+            | Metric | Score | Status |
+            |--------|-------|--------|
+            | 🚀 Performance | ${{ steps.format_lighthouse_score.outputs.PERFORMANCE }}/100 | ${${{ steps.format_lighthouse_score.outputs.PERFORMANCE }} >= 80 ? '✅' : ${{ steps.format_lighthouse_score.outputs.PERFORMANCE }} >= 50 ? '⚠️' : '❌'} |
+            | ♿ Accessibility | ${{ steps.format_lighthouse_score.outputs.ACCESSIBILITY }}/100 | ${${{ steps.format_lighthouse_score.outputs.ACCESSIBILITY }} >= 90 ? '✅' : ${{ steps.format_lighthouse_score.outputs.ACCESSIBILITY }} >= 80 ? '⚠️' : '❌'} |
+            | 📋 Best Practices | ${{ steps.format_lighthouse_score.outputs.BEST_PRACTICES }}/100 | ${${{ steps.format_lighthouse_score.outputs.BEST_PRACTICES }} >= 90 ? '✅' : ${{ steps.format_lighthouse_score.outputs.BEST_PRACTICES }} >= 70 ? '⚠️' : '❌'} |
+            | 🔍 SEO | ${{ steps.format_lighthouse_score.outputs.SEO }}/100 | ${${{ steps.format_lighthouse_score.outputs.SEO }} >= 90 ? '✅' : ${{ steps.format_lighthouse_score.outputs.SEO }} >= 80 ? '⚠️' : '❌'} |
+            
+            ### Core Web Vitals
+            | Metric | Value | Status |
+            |--------|-------|--------|
+            | First Contentful Paint | ${{ steps.format_lighthouse_score.outputs.FCP }}s | ${${{ steps.format_lighthouse_score.outputs.FCP }} <= 1.8 ? '✅' : ${{ steps.format_lighthouse_score.outputs.FCP }} <= 3 ? '⚠️' : '❌'} |
+            | Largest Contentful Paint | ${{ steps.format_lighthouse_score.outputs.LCP }}s | ${${{ steps.format_lighthouse_score.outputs.LCP }} <= 2.5 ? '✅' : ${{ steps.format_lighthouse_score.outputs.LCP }} <= 4 ? '⚠️' : '❌'} |
+            | Total Blocking Time | ${{ steps.format_lighthouse_score.outputs.TBT }}ms | ${${{ steps.format_lighthouse_score.outputs.TBT }} <= 200 ? '✅' : ${{ steps.format_lighthouse_score.outputs.TBT }} <= 600 ? '⚠️' : '❌'} |
+            | Cumulative Layout Shift | ${{ steps.format_lighthouse_score.outputs.CLS }} | ${${{ steps.format_lighthouse_score.outputs.CLS }} <= 0.1 ? '✅' : ${{ steps.format_lighthouse_score.outputs.CLS }} <= 0.25 ? '⚠️' : '❌'} |
+            
+            [詳細なレポートを見る](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             `;
             
             github.rest.issues.createComment({
