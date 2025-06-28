@@ -1,0 +1,234 @@
+---
+export interface Props {
+  type?: 'card' | 'text' | 'image' | 'toc' | 'carousel';
+  count?: number;
+}
+
+const { type = 'card', count = 1 } = Astro.props;
+---
+
+{type === 'card' && (
+  <div class="skeleton-grid">
+    {Array.from({ length: count }).map(() => (
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text skeleton-text-short"></div>
+          <div class="skeleton-meta">
+            <div class="skeleton-tag"></div>
+            <div class="skeleton-tag"></div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+{type === 'carousel' && (
+  <div class="skeleton-carousel">
+    <div class="skeleton-carousel-image"></div>
+    <div class="skeleton-carousel-overlay">
+      <div class="skeleton-title skeleton-title-large"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text skeleton-text-short"></div>
+    </div>
+  </div>
+)}
+
+{type === 'toc' && (
+  <div class="skeleton-toc">
+    <div class="skeleton-toc-header"></div>
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div class={`skeleton-toc-item depth-${(i % 3) + 1}`}></div>
+    ))}
+  </div>
+)}
+
+{type === 'text' && (
+  <div class="skeleton-text-block">
+    {Array.from({ length: count }).map(() => (
+      <>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text"></div>
+        <div class="skeleton-text skeleton-text-short"></div>
+        <div class="skeleton-space"></div>
+      </>
+    ))}
+  </div>
+)}
+
+{type === 'image' && (
+  <div class="skeleton-image-full"></div>
+)}
+
+<style>
+  /* 基本的なスケルトン要素 */
+  .skeleton-card,
+  .skeleton-carousel,
+  .skeleton-toc,
+  .skeleton-text-block,
+  .skeleton-image-full {
+    @apply bg-[var(--card-color)] rounded-xl overflow-hidden;
+  }
+  
+  /* アニメーション */
+  @keyframes skeleton-loading {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  .skeleton-image,
+  .skeleton-title,
+  .skeleton-text,
+  .skeleton-tag,
+  .skeleton-toc-header,
+  .skeleton-toc-item,
+  .skeleton-carousel-image,
+  .skeleton-image-full {
+    background: linear-gradient(
+      90deg,
+      var(--skeleton-base) 25%,
+      var(--skeleton-shine) 50%,
+      var(--skeleton-base) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+  }
+  
+  /* カードスケルトン */
+  .skeleton-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  
+  .skeleton-card {
+    @apply h-96;
+  }
+  
+  .skeleton-image {
+    @apply w-full h-48;
+  }
+  
+  .skeleton-content {
+    @apply p-6 space-y-3;
+  }
+  
+  .skeleton-title {
+    @apply h-6 w-3/4 rounded;
+  }
+  
+  .skeleton-text {
+    @apply h-4 w-full rounded;
+  }
+  
+  .skeleton-text-short {
+    @apply w-2/3;
+  }
+  
+  .skeleton-meta {
+    @apply flex gap-2 mt-4;
+  }
+  
+  .skeleton-tag {
+    @apply h-6 w-16 rounded-full;
+  }
+  
+  /* カルーセルスケルトン */
+  .skeleton-carousel {
+    @apply relative h-96 md:h-[450px];
+  }
+  
+  .skeleton-carousel-image {
+    @apply absolute inset-0;
+  }
+  
+  .skeleton-carousel-overlay {
+    @apply absolute bottom-0 right-0 p-6 space-y-3;
+    @apply w-full md:w-1/2;
+  }
+  
+  .skeleton-title-large {
+    @apply h-8 w-3/4;
+  }
+  
+  /* 目次スケルトン */
+  .skeleton-toc {
+    @apply p-4 space-y-3;
+  }
+  
+  .skeleton-toc-header {
+    @apply h-6 w-20 rounded mb-4;
+  }
+  
+  .skeleton-toc-item {
+    @apply h-4 rounded;
+  }
+  
+  .skeleton-toc-item.depth-1 {
+    @apply w-full ml-0;
+  }
+  
+  .skeleton-toc-item.depth-2 {
+    @apply w-5/6 ml-4;
+  }
+  
+  .skeleton-toc-item.depth-3 {
+    @apply w-4/6 ml-8;
+  }
+  
+  /* テキストブロックスケルトン */
+  .skeleton-text-block {
+    @apply space-y-2 p-6;
+  }
+  
+  .skeleton-space {
+    @apply h-4;
+  }
+  
+  /* 画像スケルトン */
+  .skeleton-image-full {
+    @apply w-full h-64 md:h-96;
+  }
+  
+  /* カラー変数 */
+  :root {
+    --skeleton-base: #e5e5e5;
+    --skeleton-shine: #f0f0f0;
+  }
+  
+  :global([data-theme="dark"]) {
+    --skeleton-base: #2a2a2a;
+    --skeleton-shine: #3a3a3a;
+  }
+</style>
+
+<script>
+  // スケルトンを自動的に非表示にする
+  function hideSkeletons() {
+    const skeletons = document.querySelectorAll('[class*="skeleton-"]');
+    skeletons.forEach(skeleton => {
+      // 実際のコンテンツが読み込まれたら非表示
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes.length > 0) {
+            skeleton.style.display = 'none';
+            observer.disconnect();
+          }
+        });
+      });
+      
+      const parent = skeleton.parentElement;
+      if (parent) {
+        observer.observe(parent, { childList: true });
+      }
+    });
+  }
+  
+  document.addEventListener('astro:page-load', hideSkeletons);
+  document.addEventListener('DOMContentLoaded', hideSkeletons);
+</script>

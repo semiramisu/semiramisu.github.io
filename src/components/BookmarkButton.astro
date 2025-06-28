@@ -1,0 +1,172 @@
+---
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  postId: string;
+  title: string;
+  url: string;
+}
+
+const { postId, title, url } = Astro.props;
+---
+
+<button 
+  class="bookmark-button" 
+  data-post-id={postId}
+  data-title={title}
+  data-url={url}
+  aria-label="ブックマークに追加"
+>
+  <Icon name="line-md:star" class="bookmark-icon" />
+  <span class="bookmark-text">ブックマーク</span>
+</button>
+
+<style>
+  .bookmark-button {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full;
+    @apply bg-[var(--card-color)] text-[var(--text-color)];
+    @apply border border-[var(--border-color)];
+    @apply hover:border-[var(--primary-color)] hover:text-[var(--primary-color)];
+    @apply transition-all duration-200;
+  }
+  
+  .bookmark-button.bookmarked {
+    @apply bg-[var(--primary-color)] text-white border-[var(--primary-color)];
+  }
+  
+  .bookmark-icon {
+    @apply w-5 h-5;
+  }
+  
+  .bookmark-button.bookmarked .bookmark-icon {
+    @apply fill-current;
+  }
+  
+  .bookmark-text {
+    @apply text-sm font-medium;
+  }
+  
+  @media (max-width: 640px) {
+    .bookmark-text {
+      @apply hidden;
+    }
+  }
+</style>
+
+<script>
+  function initBookmarkButtons() {
+    const buttons = document.querySelectorAll('.bookmark-button');
+    
+    // ブックマークを取得
+    function getBookmarks() {
+      const stored = localStorage.getItem('bookmarks');
+      return stored ? JSON.parse(stored) : [];
+    }
+    
+    // ブックマークを保存
+    function saveBookmarks(bookmarks) {
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+      
+      // カスタムイベントを発火
+      window.dispatchEvent(new CustomEvent('bookmarksUpdated', { 
+        detail: { bookmarks } 
+      }));
+    }
+    
+    // ボタンの状態を更新
+    function updateButtonState(button: Element, isBookmarked: boolean) {
+      const textElement = button.querySelector('.bookmark-text');
+      
+      if (isBookmarked) {
+        button.classList.add('bookmarked');
+        if (textElement) textElement.textContent = 'ブックマーク済み';
+      } else {
+        button.classList.remove('bookmarked');
+        if (textElement) textElement.textContent = 'ブックマーク';
+      }
+    }
+    
+    // 初期状態を設定
+    const bookmarks = getBookmarks();
+    buttons.forEach(button => {
+      const postId = button.getAttribute('data-post-id');
+      const isBookmarked = bookmarks.some(b => b.id === postId);
+      updateButtonState(button, isBookmarked);
+    });
+    
+    // クリックイベント
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const postId = button.getAttribute('data-post-id');
+        const title = button.getAttribute('data-title');
+        const url = button.getAttribute('data-url');
+        
+        if (!postId || !title || !url) return;
+        
+        let bookmarks = getBookmarks();
+        const existingIndex = bookmarks.findIndex(b => b.id === postId);
+        
+        if (existingIndex !== -1) {
+          // 削除
+          bookmarks.splice(existingIndex, 1);
+          updateButtonState(button, false);
+          
+          // トースト通知
+          showToast('ブックマークから削除しました');
+        } else {
+          // 追加
+          bookmarks.unshift({
+            id: postId,
+            title,
+            url,
+            timestamp: new Date().toISOString()
+          });
+          updateButtonState(button, true);
+          
+          // トースト通知
+          showToast('ブックマークに追加しました');
+        }
+        
+        saveBookmarks(bookmarks);
+      });
+    });
+  }
+  
+  // トースト通知
+  function showToast(message: string) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 2000);
+  }
+  
+  // ページロード時に初期化
+  document.addEventListener('astro:page-load', initBookmarkButtons);
+  document.addEventListener('DOMContentLoaded', initBookmarkButtons);
+</script>
+
+<style is:global>
+  .toast-notification {
+    @apply fixed bottom-4 left-1/2 -translate-x-1/2;
+    @apply px-4 py-2 rounded-full;
+    @apply bg-[var(--primary-color)] text-white;
+    @apply opacity-0 transform translate-y-4;
+    @apply transition-all duration-300;
+    z-index: 1000;
+  }
+  
+  .toast-notification.show {
+    @apply opacity-100 translate-y-0;
+  }
+</style>

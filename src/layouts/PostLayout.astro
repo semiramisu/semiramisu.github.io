@@ -2,10 +2,13 @@
 import Main from "../layouts/MainLayout.astro";
 import Markdown from "../components/Markdown.astro";
 import CopyRight from "../components/misc/CopyRight.astro";
-import TableOfContents from "../components/TableOfContents.astro";
+import EnhancedTableOfContents from "../components/EnhancedTableOfContents.astro";
 import ReadingProgress from "../components/ReadingProgress.astro";
 import ShareButtons from "../components/ShareButtons.astro";
 import RelatedPosts from "../components/RelatedPosts.astro";
+import Comments from "../components/Comments.astro";
+import BookmarkButton from "../components/BookmarkButton.astro";
+import RecordReadingHistory from "../components/RecordReadingHistory.astro";
 
 interface Props {
   title?: string;
@@ -47,6 +50,16 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
 
 <Main title={title} subTitle={subTitle} bannerImage={bannerImage} isHome={false}>
   <ReadingProgress />
+  {
+    slug && title && (
+      <RecordReadingHistory
+        postId={slug}
+        title={title}
+        url={postUrl}
+        readTime="5分"
+      />
+    )
+  }
   <div id="post-content-wrapper" class="post-content-wrapper">
     <article id="post-article" class="post-article">
       <div class="article-inner">
@@ -54,12 +67,19 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
         <slot />
       </Markdown>
       {
-        title && (
-          <ShareButtons
-            title={title}
-            url={postUrl}
-            description={subTitle}
-          />
+        title && slug && (
+          <div class="post-actions">
+            <BookmarkButton
+              postId={slug}
+              title={title}
+              url={postUrl}
+            />
+            <ShareButtons
+              title={title}
+              url={postUrl}
+              description={subTitle}
+            />
+          </div>
         )
       }
       {
@@ -81,10 +101,11 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
           />
         )
       }
+      <Comments lang="ja" />
     </div>
     </article>
     <aside id="post-toc" class="post-toc">
-      <TableOfContents headings={headings} />
+      <EnhancedTableOfContents headings={headings} />
     </aside>
   </div>
 </Main>
@@ -115,6 +136,11 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
 
   .article-inner {
     font-size: var(--primary-font);
+  }
+  
+  .post-actions {
+    @apply flex flex-wrap items-center gap-4 mt-8 pt-8;
+    @apply border-t border-[var(--border-color)];
   }
 
   .post-toc {

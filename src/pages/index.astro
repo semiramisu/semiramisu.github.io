@@ -4,7 +4,7 @@ import PostCard from "../components/PostCard.astro";
 import AnimatedHeading from "../components/widgets/AnimatedHeading.astro";
 import FeaturedPostsCarousel from "../components/FeaturedPostsCarousel.astro";
 import TagCloud from "../components/widgets/TagCloud.astro";
-import SearchBar from "../components/widgets/LazySearchBar.astro";
+import EnhancedSearch from "../components/EnhancedSearch.astro";
 import Archive from "../components/Archive.astro";
 import { GetSortedPosts, GetAllTags } from "../utils/content";
 import { i18n } from "../locales/translation";
@@ -81,8 +81,8 @@ const allTags = await GetAllTags();
         <p class="max-w-2xl text-lg text-[var(--text-color-lighten)] text-center mx-auto mb-6">
           日々の思いや発見、学びを共有する場所です。お楽しみください！
         </p>
-        <div class="w-full max-w-xl mx-auto px-4">
-          <SearchBar />
+        <div class="w-full mx-auto px-4">
+          <EnhancedSearch />
         </div>
       </div>
     </section>

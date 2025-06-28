@@ -1,0 +1,500 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  headings: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+}
+
+const { headings = [] } = Astro.props;
+
+// 階層構造を作成
+function buildHeadingTree(headings: typeof headings) {
+  const tree: any[] = [];
+  const stack: any[] = [];
+  
+  headings.forEach(heading => {
+    const item = {
+      ...heading,
+      children: []
+    };
+    
+    while (stack.length > 0 && stack[stack.length - 1].depth >= heading.depth) {
+      stack.pop();
+    }
+    
+    if (stack.length === 0) {
+      tree.push(item);
+    } else {
+      stack[stack.length - 1].children.push(item);
+    }
+    
+    stack.push(item);
+  });
+  
+  return tree;
+}
+
+const headingTree = buildHeadingTree(headings);
+---
+
+<div class="enhanced-toc-container">
+  <div class="toc-header">
+    <h2>目次</h2>
+    <button class="toc-toggle" aria-label="目次を折りたたむ">
+      <Icon name="line-md:chevron-down" class="toggle-icon" />
+    </button>
+  </div>
+  
+  <div class="reading-progress-bar">
+    <div class="progress-fill"></div>
+  </div>
+  
+  {headings.length > 0 ? (
+    <nav class="toc-content" aria-label="目次">
+      <ul class="toc-list">
+        {headingTree.map((heading) => (
+          <li class={`toc-item depth-${heading.depth}`}>
+            <a 
+              href={`#${heading.slug}`} 
+              class="toc-link" 
+              data-slug={heading.slug}
+              data-depth={heading.depth}
+            >
+              <span class="toc-text">{heading.text}</span>
+              <span class="toc-progress"></span>
+            </a>
+            {heading.children.length > 0 && (
+              <button 
+                class="toc-collapse-btn" 
+                aria-label="サブセクションを展開"
+                data-expanded="true"
+              >
+                <Icon name="line-md:chevron-right" class="collapse-icon" />
+              </button>
+            )}
+            {heading.children.length > 0 && (
+              <ul class="toc-sublist">
+                {heading.children.map((child: any) => (
+                  <li class={`toc-item depth-${child.depth}`}>
+                    <a 
+                      href={`#${child.slug}`} 
+                      class="toc-link" 
+                      data-slug={child.slug}
+                      data-depth={child.depth}
+                    >
+                      <span class="toc-text">{child.text}</span>
+                      <span class="toc-progress"></span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  ) : (
+    <p class="toc-empty">この記事には目次がありません</p>
+  )}
+  
+  <!-- モバイル用フローティングボタン -->
+  <button class="toc-mobile-toggle" aria-label="目次を表示">
+    <Icon name="line-md:list-3" />
+  </button>
+</div>
+
+<!-- モバイル用目次モーダル -->
+<div class="toc-mobile-modal">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>目次</h3>
+      <button class="modal-close" aria-label="閉じる">
+        <Icon name="line-md:close" />
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- 目次の内容がここに動的に挿入されます -->
+    </div>
+  </div>
+</div>
+
+<style>
+  .enhanced-toc-container {
+    @apply sticky top-20 max-h-[calc(100vh-6rem)] overflow-hidden;
+    @apply bg-[var(--card-color)] rounded-xl p-4;
+    @apply transition-all duration-300;
+  }
+  
+  .toc-header {
+    @apply flex items-center justify-between mb-3;
+  }
+  
+  .toc-header h2 {
+    @apply text-lg font-bold text-[var(--text-color)];
+  }
+  
+  .toc-toggle {
+    @apply p-1 rounded-lg hover:bg-[var(--background-color)];
+    @apply transition-colors duration-200;
+  }
+  
+  .toggle-icon {
+    @apply w-5 h-5 transition-transform duration-300;
+  }
+  
+  .enhanced-toc-container.collapsed .toggle-icon {
+    @apply -rotate-90;
+  }
+  
+  /* 読書進捗バー */
+  .reading-progress-bar {
+    @apply h-1 bg-[var(--border-color)] rounded-full mb-4 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-[var(--primary-color)] rounded-full;
+    @apply transition-all duration-300 ease-out;
+    width: 0%;
+  }
+  
+  /* 目次コンテンツ */
+  .toc-content {
+    @apply overflow-y-auto max-h-[calc(100vh-12rem)];
+    @apply transition-all duration-300;
+  }
+  
+  .enhanced-toc-container.collapsed .toc-content {
+    @apply max-h-0 overflow-hidden;
+  }
+  
+  .toc-list {
+    @apply space-y-1;
+  }
+  
+  .toc-item {
+    @apply relative;
+  }
+  
+  .toc-link {
+    @apply block py-1.5 px-3 rounded-lg;
+    @apply text-sm text-[var(--text-color-lighten)];
+    @apply hover:bg-[var(--background-color)] hover:text-[var(--text-color)];
+    @apply transition-all duration-200;
+    @apply relative overflow-hidden;
+  }
+  
+  .depth-1 > .toc-link { @apply pl-3; }
+  .depth-2 > .toc-link { @apply pl-6; }
+  .depth-3 > .toc-link { @apply pl-9; }
+  .depth-4 > .toc-link { @apply pl-12; }
+  
+  .toc-text {
+    @apply relative z-10 block truncate;
+  }
+  
+  /* 進捗インジケーター */
+  .toc-progress {
+    @apply absolute top-0 left-0 h-full bg-[var(--primary-color)];
+    @apply opacity-0 transition-all duration-300;
+    width: 0%;
+  }
+  
+  .toc-link.active {
+    @apply text-[var(--primary-color)] font-medium;
+    @apply bg-[var(--primary-color-lighten)];
+  }
+  
+  .toc-link.read .toc-progress {
+    @apply opacity-10;
+    width: 100%;
+  }
+  
+  /* 折りたたみボタン */
+  .toc-collapse-btn {
+    @apply absolute right-2 top-1.5 p-1;
+    @apply text-[var(--text-color-lighten)] hover:text-[var(--text-color)];
+    @apply transition-colors duration-200;
+  }
+  
+  .collapse-icon {
+    @apply w-4 h-4 transition-transform duration-200;
+  }
+  
+  .toc-collapse-btn[data-expanded="true"] .collapse-icon {
+    @apply rotate-90;
+  }
+  
+  .toc-sublist {
+    @apply space-y-1 mt-1 overflow-hidden;
+    @apply transition-all duration-300;
+  }
+  
+  .toc-sublist.collapsed {
+    @apply max-h-0;
+  }
+  
+  /* モバイル用フローティングボタン */
+  .toc-mobile-toggle {
+    @apply fixed bottom-6 right-6 z-40;
+    @apply w-14 h-14 rounded-full;
+    @apply bg-[var(--primary-color)] text-white;
+    @apply shadow-lg hover:shadow-xl;
+    @apply flex items-center justify-center;
+    @apply transition-all duration-300;
+    @apply lg:hidden;
+  }
+  
+  .toc-mobile-toggle:hover {
+    @apply transform scale-110;
+  }
+  
+  /* モバイルモーダル */
+  .toc-mobile-modal {
+    @apply fixed inset-0 z-50 pointer-events-none;
+  }
+  
+  .modal-backdrop {
+    @apply absolute inset-0 bg-black bg-opacity-50;
+    @apply opacity-0 transition-opacity duration-300;
+  }
+  
+  .modal-content {
+    @apply absolute bottom-0 left-0 right-0;
+    @apply bg-[var(--card-color)] rounded-t-2xl;
+    @apply transform translate-y-full;
+    @apply transition-transform duration-300;
+    @apply max-h-[80vh] overflow-hidden flex flex-col;
+  }
+  
+  .toc-mobile-modal.active {
+    @apply pointer-events-auto;
+  }
+  
+  .toc-mobile-modal.active .modal-backdrop {
+    @apply opacity-100;
+  }
+  
+  .toc-mobile-modal.active .modal-content {
+    @apply translate-y-0;
+  }
+  
+  .modal-header {
+    @apply flex items-center justify-between p-4 border-b border-[var(--border-color)];
+  }
+  
+  .modal-header h3 {
+    @apply text-lg font-bold text-[var(--text-color)];
+  }
+  
+  .modal-close {
+    @apply p-2 rounded-lg hover:bg-[var(--background-color)];
+  }
+  
+  .modal-body {
+    @apply flex-1 overflow-y-auto p-4;
+  }
+  
+  /* スクロールバースタイル */
+  .toc-content::-webkit-scrollbar,
+  .modal-body::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .toc-content::-webkit-scrollbar-track,
+  .modal-body::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .toc-content::-webkit-scrollbar-thumb,
+  .modal-body::-webkit-scrollbar-thumb {
+    @apply bg-[var(--border-color)] rounded-full;
+  }
+  
+  /* デスクトップでモバイル要素を非表示 */
+  @media (min-width: 1024px) {
+    .toc-mobile-toggle,
+    .toc-mobile-modal {
+      display: none !important;
+    }
+  }
+  
+  .toc-empty {
+    @apply text-sm text-[var(--text-color-lighten)] italic text-center py-4;
+  }
+</style>
+
+<script>
+  function initEnhancedTOC() {
+    const container = document.querySelector('.enhanced-toc-container');
+    const toggleBtn = document.querySelector('.toc-toggle');
+    const progressFill = document.querySelector('.progress-fill') as HTMLElement;
+    const mobileToggle = document.querySelector('.toc-mobile-toggle');
+    const mobileModal = document.querySelector('.toc-mobile-modal');
+    const modalClose = document.querySelector('.modal-close');
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    const modalBody = document.querySelector('.modal-body');
+    
+    if (!container) return;
+    
+    // 目次の開閉
+    toggleBtn?.addEventListener('click', () => {
+      container.classList.toggle('collapsed');
+    });
+    
+    // 折りたたみボタンの処理
+    const collapseButtons = document.querySelectorAll('.toc-collapse-btn');
+    collapseButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('data-expanded') === 'true';
+        const sublist = btn.nextElementSibling as HTMLElement;
+        
+        if (sublist) {
+          btn.setAttribute('data-expanded', expanded ? 'false' : 'true');
+          if (expanded) {
+            sublist.classList.add('collapsed');
+          } else {
+            sublist.classList.remove('collapsed');
+          }
+        }
+      });
+    });
+    
+    // スムーズスクロール
+    const tocLinks = document.querySelectorAll('.toc-link');
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const slug = link.getAttribute('data-slug');
+        if (!slug) return;
+        
+        const target = document.getElementById(slug);
+        if (target) {
+          const offset = 100;
+          const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+          
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+          
+          // モバイルモーダルを閉じる
+          mobileModal?.classList.remove('active');
+        }
+      });
+    });
+    
+    // スクロール追跡
+    const headings = Array.from(tocLinks).map(link => {
+      const slug = link.getAttribute('data-slug');
+      return slug ? document.getElementById(slug) : null;
+    }).filter(Boolean) as HTMLElement[];
+    
+    let readSections = new Set<string>();
+    
+    function updateProgress() {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // 全体の読書進捗
+      const scrollPercent = (scrollY / (documentHeight - windowHeight)) * 100;
+      if (progressFill) {
+        progressFill.style.width = `${Math.min(100, scrollPercent)}%`;
+      }
+      
+      // 現在の見出しを特定
+      let currentIndex = -1;
+      const offset = 150;
+      
+      for (let i = 0; i < headings.length; i++) {
+        const heading = headings[i];
+        const rect = heading.getBoundingClientRect();
+        
+        if (rect.top <= offset) {
+          currentIndex = i;
+          // 読んだセクションを記録
+          const slug = heading.id;
+          if (slug) readSections.add(slug);
+        }
+      }
+      
+      // アクティブ状態とread状態を更新
+      tocLinks.forEach((link, index) => {
+        const slug = link.getAttribute('data-slug');
+        
+        if (index === currentIndex) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+        
+        if (slug && readSections.has(slug)) {
+          link.classList.add('read');
+        }
+      });
+    }
+    
+    // デバウンス処理
+    let scrollTimer: NodeJS.Timeout;
+    window.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(updateProgress, 50);
+    });
+    
+    // モバイルモーダル
+    mobileToggle?.addEventListener('click', () => {
+      mobileModal?.classList.add('active');
+      
+      // モーダルに目次をコピー
+      if (modalBody) {
+        const tocContent = document.querySelector('.toc-content');
+        if (tocContent) {
+          modalBody.innerHTML = tocContent.innerHTML;
+          
+          // モーダル内のリンクにもイベントを設定
+          const modalLinks = modalBody.querySelectorAll('.toc-link');
+          modalLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              const slug = link.getAttribute('data-slug');
+              if (!slug) return;
+              
+              const target = document.getElementById(slug);
+              if (target) {
+                const offset = 100;
+                const targetPosition = target.getBoundingClientRect().top + window.scrollY - offset;
+                
+                window.scrollTo({
+                  top: targetPosition,
+                  behavior: 'smooth'
+                });
+                
+                mobileModal?.classList.remove('active');
+              }
+            });
+          });
+        }
+      }
+    });
+    
+    modalClose?.addEventListener('click', () => {
+      mobileModal?.classList.remove('active');
+    });
+    
+    modalBackdrop?.addEventListener('click', () => {
+      mobileModal?.classList.remove('active');
+    });
+    
+    // 初期化
+    updateProgress();
+  }
+  
+  // ページロード時に初期化
+  document.addEventListener('astro:page-load', initEnhancedTOC);
+  document.addEventListener('DOMContentLoaded', initEnhancedTOC);
+</script>

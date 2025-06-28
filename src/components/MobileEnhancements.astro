@@ -1,0 +1,313 @@
+---
+// モバイル体験向上のための機能
+---
+
+<!-- Pull to Refresh インジケーター -->
+<div class="pull-to-refresh">
+  <div class="ptr-spinner">
+    <svg class="ptr-icon" viewBox="0 0 24 24">
+      <path d="M12 2v4m0 12v4m-8-8h4m12 0h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
+
+<!-- スワイプナビゲーションインジケーター -->
+<div class="swipe-indicator swipe-left">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
+<div class="swipe-indicator swipe-right">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <path d="M9 18l6-6-6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<!-- 下部ナビゲーションバー（モバイルのみ） -->
+<nav class="bottom-nav">
+  <a href="/" class="nav-item" aria-label="ホーム">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-width="2"/>
+    </svg>
+    <span>ホーム</span>
+  </a>
+  <a href="/archive" class="nav-item" aria-label="アーカイブ">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-width="2"/>
+    </svg>
+    <span>アーカイブ</span>
+  </a>
+  <button class="nav-item" id="search-trigger" aria-label="検索">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="11" cy="11" r="8" stroke-width="2"/>
+      <path d="M21 21l-4.35-4.35" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span>検索</span>
+  </button>
+  <button class="nav-item" id="bookmarks-trigger" aria-label="ブックマーク">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke-width="2"/>
+    </svg>
+    <span>保存</span>
+  </button>
+</nav>
+
+<style>
+  /* Pull to Refresh */
+  .pull-to-refresh {
+    @apply fixed top-0 left-0 right-0 z-50;
+    @apply flex justify-center items-center;
+    @apply h-20 -mt-20;
+    @apply transition-transform duration-300;
+    @apply pointer-events-none;
+  }
+  
+  .pull-to-refresh.visible {
+    @apply transform translate-y-20;
+  }
+  
+  .ptr-spinner {
+    @apply w-10 h-10 rounded-full;
+    @apply bg-[var(--primary-color)] text-white;
+    @apply flex items-center justify-center;
+    @apply shadow-lg;
+  }
+  
+  .ptr-icon {
+    @apply w-6 h-6;
+    @apply animate-spin;
+  }
+  
+  /* スワイプインジケーター */
+  .swipe-indicator {
+    @apply fixed top-1/2 -translate-y-1/2;
+    @apply w-12 h-12 rounded-full;
+    @apply bg-[var(--primary-color)] text-white;
+    @apply flex items-center justify-center;
+    @apply opacity-0 scale-0;
+    @apply transition-all duration-300;
+    @apply pointer-events-none;
+    z-index: 100;
+  }
+  
+  .swipe-indicator.active {
+    @apply opacity-100 scale-100;
+  }
+  
+  .swipe-left {
+    @apply left-4;
+  }
+  
+  .swipe-right {
+    @apply right-4;
+  }
+  
+  .swipe-indicator svg {
+    @apply w-6 h-6;
+  }
+  
+  /* 下部ナビゲーション */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0;
+    @apply bg-[var(--card-color)] border-t border-[var(--border-color)];
+    @apply flex justify-around items-center;
+    @apply h-16 px-2;
+    @apply lg:hidden;
+    z-index: 90;
+  }
+  
+  .nav-item {
+    @apply flex flex-col items-center justify-center;
+    @apply text-[var(--text-color-lighten)] hover:text-[var(--primary-color)];
+    @apply transition-colors duration-200;
+    @apply p-2 rounded-lg;
+    @apply flex-1;
+  }
+  
+  .nav-item.active {
+    @apply text-[var(--primary-color)];
+  }
+  
+  .nav-item svg {
+    @apply w-6 h-6 mb-1;
+  }
+  
+  .nav-item span {
+    @apply text-xs;
+  }
+  
+  /* タッチターゲットの最適化 */
+  @media (max-width: 768px) {
+    a, button {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    
+    /* 下部ナビゲーションがある場合のコンテンツパディング */
+    body {
+      padding-bottom: 64px;
+    }
+  }
+</style>
+
+<script>
+  // Pull to Refresh実装
+  function initPullToRefresh() {
+    const ptr = document.querySelector('.pull-to-refresh');
+    let startY = 0;
+    let currentY = 0;
+    let pulling = false;
+    
+    document.addEventListener('touchstart', (e) => {
+      if (window.scrollY === 0) {
+        startY = e.touches[0].clientY;
+        pulling = true;
+      }
+    });
+    
+    document.addEventListener('touchmove', (e) => {
+      if (!pulling) return;
+      
+      currentY = e.touches[0].clientY;
+      const diff = currentY - startY;
+      
+      if (diff > 0 && diff < 150) {
+        e.preventDefault();
+        ptr?.classList.add('visible');
+        ptr.style.transform = `translateY(${Math.min(diff, 80)}px)`;
+      }
+    });
+    
+    document.addEventListener('touchend', () => {
+      if (!pulling) return;
+      
+      const diff = currentY - startY;
+      if (diff > 80) {
+        // リフレッシュ実行
+        ptr?.classList.add('refreshing');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        ptr?.classList.remove('visible');
+        ptr.style.transform = '';
+      }
+      
+      pulling = false;
+      startY = 0;
+      currentY = 0;
+    });
+  }
+  
+  // スワイプナビゲーション
+  function initSwipeNavigation() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const threshold = 50;
+    
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+    
+    function handleSwipe() {
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) < threshold) return;
+      
+      if (diff > 0) {
+        // 左スワイプ - 次のページ
+        const nextLink = document.querySelector('a[rel="next"]') as HTMLAnchorElement;
+        if (nextLink) {
+          showSwipeIndicator('right');
+          setTimeout(() => {
+            nextLink.click();
+          }, 300);
+        }
+      } else {
+        // 右スワイプ - 前のページ
+        const prevLink = document.querySelector('a[rel="prev"]') as HTMLAnchorElement;
+        if (prevLink) {
+          showSwipeIndicator('left');
+          setTimeout(() => {
+            prevLink.click();
+          }, 300);
+        }
+      }
+    }
+    
+    function showSwipeIndicator(direction: 'left' | 'right') {
+      const indicator = document.querySelector(`.swipe-${direction}`);
+      indicator?.classList.add('active');
+      setTimeout(() => {
+        indicator?.classList.remove('active');
+      }, 600);
+    }
+  }
+  
+  // 下部ナビゲーション
+  function initBottomNav() {
+    const currentPath = window.location.pathname;
+    const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+    
+    // アクティブ状態を設定
+    navItems.forEach(item => {
+      if (item.getAttribute('href') === currentPath) {
+        item.classList.add('active');
+      }
+    });
+    
+    // 検索トリガー
+    const searchTrigger = document.getElementById('search-trigger');
+    searchTrigger?.addEventListener('click', () => {
+      const searchModal = document.getElementById('search-modal');
+      searchModal?.classList.add('visible');
+    });
+    
+    // ブックマークトリガー
+    const bookmarksTrigger = document.getElementById('bookmarks-trigger');
+    bookmarksTrigger?.addEventListener('click', () => {
+      // ブックマークページへ遷移またはモーダル表示
+      window.location.href = '/bookmarks';
+    });
+  }
+  
+  // 振動フィードバック
+  function hapticFeedback(type: 'light' | 'medium' | 'heavy' = 'light') {
+    if ('vibrate' in navigator) {
+      const patterns = {
+        light: [10],
+        medium: [20],
+        heavy: [30]
+      };
+      navigator.vibrate(patterns[type]);
+    }
+  }
+  
+  // タッチ可能な要素に振動フィードバックを追加
+  function initHapticFeedback() {
+    const touchables = document.querySelectorAll('button, a, .nav-item');
+    touchables.forEach(element => {
+      element.addEventListener('touchstart', () => {
+        hapticFeedback('light');
+      });
+    });
+  }
+  
+  // 初期化
+  function initMobileEnhancements() {
+    if ('ontouchstart' in window) {
+      initPullToRefresh();
+      initSwipeNavigation();
+      initBottomNav();
+      initHapticFeedback();
+    }
+  }
+  
+  document.addEventListener('astro:page-load', initMobileEnhancements);
+  document.addEventListener('DOMContentLoaded', initMobileEnhancements);
+</script>

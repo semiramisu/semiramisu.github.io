@@ -1,0 +1,53 @@
+---
+export interface Props {
+  postId: string;
+  title: string;
+  url: string;
+  readTime?: string;
+}
+
+const { postId, title, url, readTime = '5分' } = Astro.props;
+---
+
+<script define:vars={{ postId, title, url, readTime }}>
+  // 閲覧履歴を記録
+  function recordReading() {
+    const historyKey = 'readingHistory';
+    const maxHistoryItems = 50;
+    
+    // 既存の履歴を取得
+    const stored = localStorage.getItem(historyKey);
+    let history = stored ? JSON.parse(stored) : [];
+    
+    // 同じ記事を削除（最新を上に持ってくるため）
+    history = history.filter(item => item.id !== postId);
+    
+    // 新しいエントリを追加
+    history.unshift({
+      id: postId,
+      title: title,
+      url: url,
+      readTime: readTime,
+      timestamp: new Date().toISOString()
+    });
+    
+    // 最大数を超えたら古いものを削除
+    if (history.length > maxHistoryItems) {
+      history = history.slice(0, maxHistoryItems);
+    }
+    
+    // 保存
+    localStorage.setItem(historyKey, JSON.stringify(history));
+    
+    // カスタムイベントを発火
+    window.dispatchEvent(new CustomEvent('readingHistoryUpdated', { 
+      detail: { history } 
+    }));
+  }
+  
+  // ページ読み込み時に記録
+  document.addEventListener('DOMContentLoaded', () => {
+    // 少し遅延させて確実にページが表示されてから記録
+    setTimeout(recordReading, 1000);
+  });
+</script>

@@ -1,0 +1,431 @@
+---
+import { Icon } from "astro-icon/components";
+import { i18n } from "../locales/translation";
+import I18nKeys from "../locales/keys";
+---
+
+<div class="enhanced-search-container">
+  <div class="search-wrapper">
+    <div class="search-input-wrapper">
+      <Icon name="line-md:search" class="search-icon" />
+      <input
+        type="text"
+        id="enhanced-search-input"
+        class="search-input"
+        placeholder={i18n(I18nKeys.nav_bar_search_placeholder)}
+        aria-label="検索（Cmd/Ctrl+K）"
+      />
+      <kbd class="search-shortcut">⌘K</kbd>
+    </div>
+    
+    <div id="search-filters" class="search-filters">
+      <button class="filter-button active" data-filter="all">すべて</button>
+      <button class="filter-button" data-filter="title">タイトル</button>
+      <button class="filter-button" data-filter="content">本文</button>
+      <button class="filter-button" data-filter="category">カテゴリ</button>
+      <button class="filter-button" data-filter="tag">タグ</button>
+    </div>
+  </div>
+  
+  <div id="enhanced-search-results" class="search-results-container">
+    <div class="search-status"></div>
+    <div class="search-results"></div>
+  </div>
+</div>
+
+<!-- 検索モーダル -->
+<div id="search-modal" class="search-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>検索</h3>
+      <button class="modal-close" aria-label="閉じる">
+        <Icon name="line-md:close" />
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-search-wrapper">
+        <Icon name="line-md:search" class="modal-search-icon" />
+        <input
+          type="text"
+          id="modal-search-input"
+          class="modal-search-input"
+          placeholder="記事を検索..."
+          autofocus
+        />
+      </div>
+      <div class="modal-filters">
+        <label class="filter-checkbox">
+          <input type="checkbox" id="filter-recent" checked />
+          <span>最近の記事のみ</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" id="filter-featured" />
+          <span>注目の記事のみ</span>
+        </label>
+      </div>
+      <div id="modal-search-results" class="modal-results"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .enhanced-search-container {
+    @apply relative w-full max-w-lg mx-auto;
+  }
+  
+  .search-wrapper {
+    @apply relative;
+  }
+  
+  .search-input-wrapper {
+    @apply relative flex items-center;
+  }
+  
+  .search-input {
+    @apply w-full py-3 pl-12 pr-16 rounded-full;
+    @apply bg-[var(--card-color)] text-[var(--text-color)];
+    @apply border-2 border-transparent;
+    @apply focus:outline-none focus:border-[var(--primary-color)];
+    @apply transition-all duration-300;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-icon {
+    @apply absolute left-4 w-5 h-5 text-[var(--text-color-lighten)];
+  }
+  
+  .search-shortcut {
+    @apply absolute right-4 px-2 py-1 text-xs;
+    @apply bg-[var(--background-color)] text-[var(--text-color-lighten)];
+    @apply rounded border border-[var(--border-color)];
+    font-family: ui-monospace, monospace;
+  }
+  
+  /* フィルター */
+  .search-filters {
+    @apply flex gap-2 mt-3 overflow-x-auto;
+    scrollbar-width: none;
+  }
+  
+  .search-filters::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .filter-button {
+    @apply px-3 py-1 text-sm rounded-full whitespace-nowrap;
+    @apply bg-[var(--card-color)] text-[var(--text-color-lighten)];
+    @apply border border-[var(--border-color)];
+    @apply transition-all duration-200;
+  }
+  
+  .filter-button:hover {
+    @apply border-[var(--primary-color)] text-[var(--primary-color)];
+  }
+  
+  .filter-button.active {
+    @apply bg-[var(--primary-color)] text-white border-[var(--primary-color)];
+  }
+  
+  /* 検索結果 */
+  .search-results-container {
+    @apply absolute top-full left-0 right-0 mt-2;
+    @apply max-h-96 overflow-hidden rounded-xl;
+    @apply bg-[var(--card-color)] shadow-2xl;
+    @apply opacity-0 invisible;
+    @apply transform translate-y-4;
+    @apply transition-all duration-300;
+    z-index: 100;
+  }
+  
+  .search-results-container.visible {
+    @apply opacity-100 visible translate-y-0;
+  }
+  
+  .search-status {
+    @apply px-4 py-2 text-sm text-[var(--text-color-lighten)];
+    @apply border-b border-[var(--border-color)];
+  }
+  
+  .search-results {
+    @apply overflow-y-auto;
+    max-height: 320px;
+  }
+  
+  .search-result-item {
+    @apply block p-4 hover:bg-[var(--background-color)];
+    @apply border-b border-[var(--border-color)] last:border-b-0;
+    @apply transition-colors duration-200;
+  }
+  
+  .search-result-title {
+    @apply text-[var(--text-color)] font-medium mb-1;
+  }
+  
+  .search-result-excerpt {
+    @apply text-sm text-[var(--text-color-lighten)] line-clamp-2;
+  }
+  
+  .search-result-meta {
+    @apply flex gap-3 mt-2 text-xs text-[var(--text-color-lighten)];
+  }
+  
+  .search-highlight {
+    @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded;
+  }
+  
+  /* モーダル */
+  .search-modal {
+    @apply fixed inset-0 z-50 flex items-start justify-center pt-20;
+    @apply bg-black bg-opacity-50 backdrop-blur-sm;
+    @apply opacity-0 invisible;
+    @apply transition-all duration-300;
+  }
+  
+  .search-modal.visible {
+    @apply opacity-100 visible;
+  }
+  
+  .modal-content {
+    @apply w-full max-w-3xl mx-4;
+    @apply bg-[var(--card-color)] rounded-2xl shadow-2xl;
+    @apply transform scale-95;
+    @apply transition-transform duration-300;
+  }
+  
+  .search-modal.visible .modal-content {
+    @apply scale-100;
+  }
+  
+  .modal-header {
+    @apply flex items-center justify-between p-6 pb-4;
+    @apply border-b border-[var(--border-color)];
+  }
+  
+  .modal-header h3 {
+    @apply text-xl font-bold text-[var(--text-color)];
+  }
+  
+  .modal-close {
+    @apply p-2 rounded-lg hover:bg-[var(--background-color)];
+    @apply transition-colors duration-200;
+  }
+  
+  .modal-body {
+    @apply p-6;
+  }
+  
+  .modal-search-wrapper {
+    @apply relative mb-4;
+  }
+  
+  .modal-search-input {
+    @apply w-full py-4 pl-12 pr-4 text-lg;
+    @apply bg-[var(--background-color)] text-[var(--text-color)];
+    @apply rounded-xl border-2 border-transparent;
+    @apply focus:outline-none focus:border-[var(--primary-color)];
+    @apply transition-all duration-200;
+  }
+  
+  .modal-search-icon {
+    @apply absolute left-4 top-1/2 -translate-y-1/2;
+    @apply w-6 h-6 text-[var(--text-color-lighten)];
+  }
+  
+  .modal-filters {
+    @apply flex gap-4 mb-4;
+  }
+  
+  .filter-checkbox {
+    @apply flex items-center gap-2 cursor-pointer;
+    @apply text-sm text-[var(--text-color-lighten)];
+  }
+  
+  .filter-checkbox input {
+    @apply cursor-pointer;
+  }
+  
+  .modal-results {
+    @apply max-h-96 overflow-y-auto;
+    @apply border-t border-[var(--border-color)];
+  }
+  
+  /* スクロールバーのスタイル */
+  .search-results::-webkit-scrollbar,
+  .modal-results::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .search-results::-webkit-scrollbar-track,
+  .modal-results::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .search-results::-webkit-scrollbar-thumb,
+  .modal-results::-webkit-scrollbar-thumb {
+    @apply bg-[var(--border-color)] rounded-full;
+  }
+  
+  .search-results::-webkit-scrollbar-thumb:hover,
+  .modal-results::-webkit-scrollbar-thumb:hover {
+    @apply bg-[var(--text-color-lighten)];
+  }
+</style>
+
+<script>
+  // 検索機能の初期化
+  function initEnhancedSearch() {
+    const searchInput = document.getElementById('enhanced-search-input') as HTMLInputElement;
+    const modalSearchInput = document.getElementById('modal-search-input') as HTMLInputElement;
+    const searchResults = document.querySelector('.search-results-container');
+    const searchModal = document.getElementById('search-modal');
+    const modalClose = document.querySelector('.modal-close');
+    const filterButtons = document.querySelectorAll('.filter-button');
+    
+    if (!searchInput || !searchResults || !searchModal) return;
+    
+    let currentFilter = 'all';
+    let searchHistory: string[] = [];
+    
+    // 検索履歴の読み込み
+    const savedHistory = localStorage.getItem('searchHistory');
+    if (savedHistory) {
+      searchHistory = JSON.parse(savedHistory);
+    }
+    
+    // キーボードショートカット（Cmd/Ctrl + K）
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchModal?.classList.add('visible');
+        modalSearchInput?.focus();
+      }
+      
+      if (e.key === 'Escape') {
+        searchModal?.classList.remove('visible');
+        searchResults?.classList.remove('visible');
+      }
+    });
+    
+    // フィルターボタンの処理
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        currentFilter = button.getAttribute('data-filter') || 'all';
+        // 検索を再実行
+        if (searchInput.value) {
+          performSearch(searchInput.value, currentFilter);
+        }
+      });
+    });
+    
+    // モーダルを閉じる
+    modalClose?.addEventListener('click', () => {
+      searchModal?.classList.remove('visible');
+    });
+    
+    searchModal?.addEventListener('click', (e) => {
+      if (e.target === searchModal) {
+        searchModal.classList.remove('visible');
+      }
+    });
+    
+    // 検索処理（開発環境用のモック）
+    function performSearch(query: string, filter: string) {
+      if (!query || query.length < 2) {
+        searchResults?.classList.remove('visible');
+        return;
+      }
+      
+      // 検索履歴に追加
+      if (!searchHistory.includes(query)) {
+        searchHistory.unshift(query);
+        searchHistory = searchHistory.slice(0, 10); // 最新10件のみ保持
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+      }
+      
+      const resultsContainer = searchResults?.querySelector('.search-results');
+      const statusContainer = searchResults?.querySelector('.search-status');
+      
+      if (resultsContainer && statusContainer) {
+        statusContainer.textContent = `「${query}」の検索結果（フィルター: ${filter === 'all' ? 'すべて' : filter}）`;
+        
+        // モックの検索結果
+        resultsContainer.innerHTML = `
+          <div class="p-4 text-center text-[var(--text-color-lighten)]">
+            <p>検索機能は本番環境でPagefindと連携して動作します</p>
+            <p class="mt-2 text-sm">キーボードショートカット: Cmd/Ctrl + K</p>
+          </div>
+        `;
+        
+        searchResults?.classList.add('visible');
+      }
+    }
+    
+    // デバウンス関数
+    function debounce(func: Function, delay: number) {
+      let timeoutId: NodeJS.Timeout;
+      return (...args: any[]) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(null, args), delay);
+      };
+    }
+    
+    const debouncedSearch = debounce(performSearch, 300);
+    
+    // イベントリスナー
+    searchInput.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      debouncedSearch(target.value, currentFilter);
+    });
+    
+    modalSearchInput?.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      debouncedSearch(target.value, 'all');
+    });
+    
+    // フォーカス時に検索履歴を表示
+    searchInput.addEventListener('focus', () => {
+      if (!searchInput.value && searchHistory.length > 0) {
+        const resultsContainer = searchResults?.querySelector('.search-results');
+        const statusContainer = searchResults?.querySelector('.search-status');
+        
+        if (resultsContainer && statusContainer) {
+          statusContainer.textContent = '最近の検索';
+          resultsContainer.innerHTML = searchHistory.map(term => `
+            <a href="#" class="search-result-item search-history-item" data-term="${term}">
+              <span class="text-[var(--text-color-lighten)]">🕐</span> ${term}
+            </a>
+          `).join('');
+          
+          searchResults?.classList.add('visible');
+        }
+      }
+    });
+    
+    // 検索履歴のクリック処理
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('search-history-item')) {
+        e.preventDefault();
+        const term = target.getAttribute('data-term');
+        if (term) {
+          searchInput.value = term;
+          performSearch(term, currentFilter);
+        }
+      }
+    });
+    
+    // クリック外で閉じる
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.enhanced-search-container')) {
+        searchResults?.classList.remove('visible');
+      }
+    });
+  }
+  
+  // ページロード時に初期化
+  document.addEventListener('astro:page-load', initEnhancedSearch);
+  document.addEventListener('DOMContentLoaded', initEnhancedSearch);
+</script>

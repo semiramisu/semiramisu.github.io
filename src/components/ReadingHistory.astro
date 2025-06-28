@@ -1,0 +1,162 @@
+---
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  maxItems?: number;
+}
+
+const { maxItems = 5 } = Astro.props;
+---
+
+<div class="reading-history-container">
+  <div class="history-header">
+    <h3>閲覧履歴</h3>
+    <button class="clear-history" aria-label="履歴をクリア">
+      <Icon name="line-md:close-circle" />
+    </button>
+  </div>
+  
+  <div id="history-list" class="history-list">
+    <div class="history-empty">
+      <Icon name="line-md:document-list" class="empty-icon" />
+      <p>まだ閲覧履歴がありません</p>
+    </div>
+  </div>
+  
+  <div class="history-footer">
+    <a href="#" class="show-all-history">すべての履歴を表示</a>
+  </div>
+</div>
+
+<style>
+  .reading-history-container {
+    @apply bg-[var(--card-color)] rounded-xl p-4;
+  }
+  
+  .history-header {
+    @apply flex items-center justify-between mb-4;
+  }
+  
+  .history-header h3 {
+    @apply text-lg font-bold text-[var(--text-color)];
+  }
+  
+  .clear-history {
+    @apply p-1 text-[var(--text-color-lighten)] hover:text-[var(--text-color)];
+    @apply transition-colors duration-200;
+  }
+  
+  .history-list {
+    @apply space-y-2;
+  }
+  
+  .history-item {
+    @apply block p-3 rounded-lg;
+    @apply bg-[var(--background-color)] hover:bg-[var(--primary-color-lighten)];
+    @apply transition-colors duration-200;
+  }
+  
+  .history-item-title {
+    @apply text-sm font-medium text-[var(--text-color)] truncate;
+  }
+  
+  .history-item-meta {
+    @apply flex items-center gap-3 mt-1 text-xs text-[var(--text-color-lighten)];
+  }
+  
+  .history-empty {
+    @apply text-center py-8;
+  }
+  
+  .empty-icon {
+    @apply w-12 h-12 mx-auto mb-3 text-[var(--text-color-lighten)];
+  }
+  
+  .history-empty p {
+    @apply text-sm text-[var(--text-color-lighten)];
+  }
+  
+  .history-footer {
+    @apply mt-4 text-center;
+  }
+  
+  .show-all-history {
+    @apply text-sm text-[var(--primary-color)] hover:underline;
+  }
+</style>
+
+<script define:vars={{ maxItems }}>
+  function initReadingHistory() {
+    const historyList = document.getElementById('history-list');
+    const clearBtn = document.querySelector('.clear-history');
+    const showAllBtn = document.querySelector('.show-all-history');
+    
+    if (!historyList) return;
+    
+    // 履歴を取得
+    function getHistory() {
+      const stored = localStorage.getItem('readingHistory');
+      return stored ? JSON.parse(stored) : [];
+    }
+    
+    // 履歴を保存
+    function saveHistory(history) {
+      localStorage.setItem('readingHistory', JSON.stringify(history));
+    }
+    
+    // 履歴を表示
+    function displayHistory(showAll = false) {
+      const history = getHistory();
+      const itemsToShow = showAll ? history : history.slice(0, maxItems);
+      
+      if (itemsToShow.length === 0) {
+        historyList.innerHTML = `
+          <div class="history-empty">
+            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p>まだ閲覧履歴がありません</p>
+          </div>
+        `;
+        return;
+      }
+      
+      historyList.innerHTML = itemsToShow.map(item => `
+        <a href="${item.url}" class="history-item">
+          <div class="history-item-title">${item.title}</div>
+          <div class="history-item-meta">
+            <span>${new Date(item.timestamp).toLocaleDateString('ja-JP')}</span>
+            <span>・</span>
+            <span>${item.readTime || '5分'}</span>
+          </div>
+        </a>
+      `).join('');
+    }
+    
+    // 履歴をクリア
+    clearBtn?.addEventListener('click', () => {
+      if (confirm('閲覧履歴をすべて削除しますか？')) {
+        localStorage.removeItem('readingHistory');
+        displayHistory();
+      }
+    });
+    
+    // すべて表示
+    let showingAll = false;
+    showAllBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      showingAll = !showingAll;
+      displayHistory(showingAll);
+      if (showAllBtn) {
+        showAllBtn.textContent = showingAll ? '表示を減らす' : 'すべての履歴を表示';
+      }
+    });
+    
+    // 初期表示
+    displayHistory();
+  }
+  
+  // ページロード時に初期化
+  document.addEventListener('astro:page-load', initReadingHistory);
+  document.addEventListener('DOMContentLoaded', initReadingHistory);
+</script>
