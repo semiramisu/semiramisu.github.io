@@ -1,19 +1,30 @@
+/* GPU加速を活用したアニメーション最適化 */
+
+/* will-changeプロパティでGPU最適化をヒント */
+.onload-animation,
+.onload-animation-fade-in,
+.fade-in-up,
+.post-card-animation {
+  will-change: transform, opacity;
+}
+
 .onload-animation {
   opacity: 0;
   animation: 300ms fade-in-up;
   animation-fill-mode: forwards;
+  /* アニメーション完了後にwill-changeを削除 */
+  animation-play-state: paused;
 }
 
+/* transform3dを使用してGPUレイヤーを強制 */
 @keyframes fade-in-up {
   0% {
-    scale: 98%;
-    transform: translateY(2rem);
+    transform: translate3d(0, 2rem, 0) scale3d(0.98, 0.98, 1);
     opacity: 0;
   }
 
   100% {
-    scale: 100%;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
     opacity: 1;
   }
 }
@@ -22,6 +33,7 @@
   opacity: 0;
   animation: 300ms fade-in ease-in;
   animation-fill-mode: forwards;
+  animation-play-state: paused;
 }
 
 @keyframes fade-in {
@@ -31,5 +43,59 @@
 
   100% {
     opacity: 1;
+  }
+}
+
+/* カルーセルアニメーションの最適化 */
+.carousel .item {
+  transform: translateZ(0); /* GPU レイヤーの生成 */
+  backface-visibility: hidden; /* 裏面の計算を省略 */
+  perspective: 1000px; /* 3D変換のパフォーマンス向上 */
+}
+
+/* ポストカードのホバーエフェクト最適化 */
+.hover\:shadow-md {
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
+  transform: translateZ(0);
+}
+
+.hover\:shadow-md:hover {
+  transform: translate3d(0, -2px, 0);
+}
+
+/* スクロールアニメーションの最適化 */
+.fade-in-on-scroll {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-on-scroll.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* アニメーション終了後のクリーンアップ */
+.animation-finished {
+  will-change: auto;
+}
+
+/* メディアクエリでモーション設定を尊重 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .onload-animation,
+  .onload-animation-fade-in,
+  .fade-in-up,
+  .post-card-animation {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

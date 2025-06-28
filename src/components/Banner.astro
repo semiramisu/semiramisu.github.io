@@ -2,6 +2,22 @@
 import YukinaConfig from "../../yukina.config";
 import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
 import ResponsiveImage from "./ResponsiveImage.astro";
+import OptimizedImage from "./OptimizedImage.astro";
+
+// バナー画像をインポート
+import banner1 from "../assets/banners/IMG_3258.jpg";
+import banner2 from "../assets/banners/IMG_4018.jpg";
+import banner3 from "../assets/banners/IMG_4033.JPG";
+import banner4 from "../assets/banners/IMG_4035.JPG";
+import banner5 from "../assets/banners/IMG_4345.jpg";
+
+const bannerImages = [
+  banner1,
+  banner2,
+  banner3,
+  banner4,
+  banner5
+];
 
 export interface Props {
   title?: string;
@@ -14,8 +30,7 @@ const { title, subTitle, bannerImage, slug } = Astro.props;
 const hasTitle = title !== undefined || subTitle !== undefined;
 const hasHeaderImg = bannerImage !== undefined || slug !== undefined;
 
-let carouselImgsList = YukinaConfig.banners;
-const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
+const carouselAnimationTime = `${bannerImages.length * 6}s`;
 ---
 
 <div id="banner" class="banner onload-animation-fade-in">
@@ -24,17 +39,22 @@ const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
       !hasHeaderImg && (
         <div class="carousel">
           <ul id="carousel_imgs">
-            {carouselImgsList.map((img, index) => {
-              const name = img.replace(/\.(jpg|jpeg|JPG|png)/i, '').replace(/^\//, '');
-              const optimizedBg = `/optimized/${name}-desktop.jpg`;
-              return (
-                <li
-                  class="item lozad"
-                  style={{ animationDelay: `${index * 6}s` }}
-                  data-background-image={optimizedBg}
+            {bannerImages.map((img, index) => (
+              <li
+                class="item"
+                style={{ animationDelay: `${index * 6}s` }}
+              >
+                <OptimizedImage
+                  src={img}
+                  alt="Banner"
+                  class="carousel-image"
+                  width={1920}
+                  height={600}
+                  loading="eager"
+                  format="webp"
                 />
-              );
-            })}
+              </li>
+            ))}
           </ul>
         </div>
       )
@@ -165,11 +185,15 @@ const carouselAnimationTime = `${carouselImgsList.length * 6}s`;
   }
 
   .carousel .item {
-    @apply absolute left-0 top-0 z-0 h-full w-full origin-center bg-cover bg-center bg-no-repeat opacity-0;
+    @apply absolute left-0 top-0 z-0 h-full w-full origin-center opacity-0;
     animation: carousel-animation var(--carouselAnimationTime) linear infinite
       0s;
     backface-visibility: hidden;
     transform-style: preserve-3d;
+  }
+  
+  .carousel .item .carousel-image {
+    @apply h-full w-full object-cover;
   }
 
   .cover {

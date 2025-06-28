@@ -1,0 +1,57 @@
+---
+// 非クリティカルなCSSをインライン化して非同期で適用
+import animationsCSS from "../styles/animations.css?raw";
+import scrollbarCSS from "../styles/scrollbar.css?raw";
+import transitionsCSS from "../styles/transitions.css?raw";
+import searchbarCSS from "../styles/searchbar.css?raw";
+
+const combinedCSS = `
+/* Animations */
+${animationsCSS}
+
+/* Scrollbar */
+${scrollbarCSS}
+
+/* Transitions */
+${transitionsCSS}
+
+/* Searchbar */
+${searchbarCSS}
+`;
+---
+
+<!-- 非クリティカルCSSを非同期で適用 -->
+<script is:inline define:vars={{ combinedCSS }}>
+  // CSSを動的に挿入
+  const style = document.createElement('style');
+  style.textContent = combinedCSS;
+  style.id = 'async-styles';
+  
+  // DOMが読み込まれたら挿入
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      document.head.appendChild(style);
+    });
+  } else {
+    document.head.appendChild(style);
+  }
+</script>
+
+<!-- OverlayScrollbarsのCSS -->
+<link
+  rel="preload"
+  as="style"
+  href="https://unpkg.com/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css"
+  media="print"
+  onload="this.media='all'"
+/>
+
+<!-- noscriptフォールバック -->
+<noscript>
+  <style set:html={combinedCSS}></style>
+  <link rel="stylesheet" href="https://unpkg.com/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css" />
+</noscript>

@@ -1,0 +1,159 @@
+---
+// Critical CSS - ファーストビューに必要な最小限のスタイル
+---
+
+<style is:inline>
+  /* テーマの基本設定 - 最重要部分のみ */
+  :root {
+    --hue: 240;
+    --primary-font: "Noto Sans SC", sans-serif;
+    --brand-font: "Raleway", "Noto Sans SC", sans-serif;
+    --page-width-lg: 992px;
+    --page-width-xl: 1264px;
+    --banner-height: 55vh;
+    --transition-speed: 0.3s;
+    --transition-timing: ease;
+    
+    /* ライトモード用の基本色のみ */
+    --light-primary-color: oklch(60% 0.18 var(--hue));
+    --light-primary-color-lighten: oklch(90% 0.05 var(--hue));
+    --light-text-color: oklch(25% 0 0);
+    --light-card-color: oklch(100% 0 0);
+    --light-background-color: oklch(98% 0.01 var(--hue));
+    --light-border-color: oklch(90% 0.02 var(--hue));
+    
+    /* デフォルトカラー */
+    --primary-color: var(--light-primary-color);
+    --primary-color-lighten: var(--light-primary-color-lighten);
+    --text-color: var(--light-text-color);
+    --card-color: var(--light-card-color);
+    --background-color: var(--light-background-color);
+    --border-color: var(--light-border-color);
+  }
+
+  /* 基本的なリセットとボディスタイル */
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--primary-font);
+    color: var(--text-color);
+    background-color: var(--background-color);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+  
+  /* レイアウトの基本構造 */
+  .main-container {
+    max-width: var(--page-width-xl);
+    margin: 0 auto;
+    display: flex;
+    position: relative;
+  }
+  
+  .content-container {
+    flex: 1;
+    min-width: 0;
+    padding: 0 1rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .content-container {
+      padding: 0 2rem;
+    }
+  }
+  
+  /* バナーの基本スタイル */
+  .banner {
+    position: relative;
+    height: calc(var(--banner-height) * 3 / 4);
+    opacity: 1;
+  }
+  
+  @media (min-width: 1024px) {
+    .banner {
+      height: var(--banner-height);
+    }
+  }
+  
+  /* ヒーローセクションの基本スタイル */
+  .hero-section-simple {
+    padding: 0 1rem;
+  }
+  
+  /* 見出しの基本スタイル */
+  h1, h2, h3 {
+    font-family: var(--brand-font);
+    line-height: 1.2;
+    margin: 0;
+  }
+  
+  /* アニメーションを最初は無効化（後で有効化） */
+  .fade-in-up,
+  .post-card-animation,
+  .onload-animation-fade-in {
+    opacity: 0;
+  }
+  
+  /* ナビゲーションバーの基本スタイル */
+  nav {
+    background-color: var(--card-color);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  /* カードの基本スタイル */
+  .rounded-3xl {
+    border-radius: 1.5rem;
+  }
+  
+  .bg-\\[var\\(--card-color\\)\\] {
+    background-color: var(--card-color);
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  /* グリッドレイアウトの基本 */
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  /* 画像の基本スタイル */
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  /* リンクの基本スタイル */
+  a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  /* ローディング中の最適化 */
+  .lozad:not(.loaded) {
+    background-color: var(--border-color);
+  }
+</style>

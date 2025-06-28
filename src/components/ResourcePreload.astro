@@ -1,0 +1,66 @@
+---
+// 重要なリソースのプリロード設定
+const isHomePage = Astro.url.pathname === '/' || Astro.url.pathname === '/index.html';
+---
+
+<!-- 重要なJavaScriptのプリロード -->
+<link rel="modulepreload" href="/_astro/ScriptSetup.astro_astro_type_script_index_0_lang.CyOBe_3A.js" />
+<link rel="modulepreload" href="/_astro/index-client.BdpIUOv7.js" />
+
+<!-- 重要な画像のプリロード（ホームページのみ） -->
+{isHomePage && (
+  <>
+    <!-- アバター画像 -->
+    <link rel="preload" as="image" href="/icon.jpg" />
+    
+    <!-- 最初のバナー画像（WebP対応） -->
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/_astro/IMG_3258.CmdzeWWP_13YEvr.webp"
+      type="image/webp"
+    />
+    <!-- WebP非対応ブラウザ用フォールバック -->
+    <link 
+      rel="preload" 
+      as="image" 
+      href="/IMG_3258.jpg"
+      type="image/jpeg"
+    />
+  </>
+)}
+
+<!-- リソースヒント -->
+<link rel="dns-prefetch" href="https://fonts.bunny.net" />
+<link rel="dns-prefetch" href="https://fastly.jsdelivr.net" />
+
+<!-- 重要なWeb Fontのプリロード -->
+<link 
+  rel="preload" 
+  as="font" 
+  href="https://fonts.bunny.net/noto-sans-sc-v37-chinese-simplified-regular.woff2" 
+  type="font/woff2" 
+  crossorigin
+/>
+<link 
+  rel="preload" 
+  as="font" 
+  href="https://fonts.bunny.net/raleway-v34-latin-700.woff2" 
+  type="font/woff2" 
+  crossorigin
+/>
+
+<script is:inline>
+  // Resource Priority Hints API を使用
+  if ('fetchpriority' in HTMLImageElement.prototype) {
+    // 最初に表示される画像に高優先度を設定
+    document.addEventListener('DOMContentLoaded', () => {
+      const firstImages = document.querySelectorAll('.banner img, .hero-section img');
+      firstImages.forEach((img, index) => {
+        if (index < 3) {
+          img.setAttribute('fetchpriority', 'high');
+        }
+      });
+    });
+  }
+</script>

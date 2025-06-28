@@ -1,4 +1,6 @@
 ---
+import OptimizedImage from './OptimizedImage.astro';
+
 export interface Props {
   src: string;
   alt: string;
@@ -8,51 +10,14 @@ export interface Props {
 }
 
 const { src, alt, class: className = "", width, height } = Astro.props;
-
-// 画像ファイル名から最適化されたパスを生成
-function getOptimizedPaths(originalSrc: string) {
-  if (originalSrc.startsWith('http')) {
-    return {
-      srcset: originalSrc,
-      webpSrcset: null,
-      mobileSrc: originalSrc
-    };
-  }
-  
-  const baseName = originalSrc.replace(/\.(jpg|jpeg|JPG|png)/i, '').replace(/^\//, '');
-  const name = baseName.split('/').pop();
-  
-  return {
-    srcset: `/optimized/${name}-mobile.jpg 640w, /optimized/${name}-tablet.jpg 1024w, /optimized/${name}-desktop.jpg 1920w`,
-    webpSrcset: `/optimized/${name}-mobile.webp 640w, /optimized/${name}.webp 1920w`,
-    mobileSrc: `/optimized/${name}-mobile.jpg`,
-    fallbackSrc: originalSrc
-  };
-}
-
-const { srcset, webpSrcset, mobileSrc, fallbackSrc } = getOptimizedPaths(src);
 ---
 
-<picture>
-  {webpSrcset && (
-    <source
-      type="image/webp"
-      data-srcset={webpSrcset}
-      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-    />
-  )}
-  <source
-    data-srcset={srcset}
-    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-  />
-  <img
-    class={`lozad ${className}`}
-    data-src={mobileSrc}
-    src={fallbackSrc}
-    alt={alt}
-    width={width}
-    height={height}
-    loading="lazy"
-    decoding="async"
-  />
-</picture>
+<OptimizedImage
+  src={src}
+  alt={alt}
+  class={className}
+  width={width}
+  height={height}
+  loading="lazy"
+  format="webp"
+/>

@@ -1,0 +1,112 @@
+---
+// アニメーションの実行とクリーンアップを制御
+---
+
+<script>
+  // アニメーションの実行制御
+  function initAnimations() {
+    // アニメーション要素を取得
+    const animatedElements = document.querySelectorAll(
+      '.onload-animation, .onload-animation-fade-in, .post-card-animation'
+    );
+    
+    // IntersectionObserverでビューポート内の要素のみアニメーション実行
+    const animationObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const element = entry.target as HTMLElement;
+            // アニメーションを開始
+            element.style.animationPlayState = 'running';
+            
+            // アニメーション完了後にwill-changeを削除
+            element.addEventListener('animationend', () => {
+              element.classList.add('animation-finished');
+              element.style.willChange = 'auto';
+            }, { once: true });
+            
+            // 監視を停止
+            animationObserver.unobserve(element);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+    
+    // 各要素を監視
+    animatedElements.forEach((element) => {
+      animationObserver.observe(element);
+    });
+    
+    // スクロールアニメーション用
+    const scrollElements = document.querySelectorAll('.fade-in-on-scroll');
+    const scrollObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            scrollObserver.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+      }
+    );
+    
+    scrollElements.forEach((element) => {
+      scrollObserver.observe(element);
+    });
+  }
+  
+  // パフォーマンス最適化: 低スペックデバイスではアニメーションを簡略化
+  function checkPerformance() {
+    // デバイスのメモリをチェック
+    if ('deviceMemory' in navigator && (navigator as any).deviceMemory < 4) {
+      document.documentElement.classList.add('low-performance');
+    }
+    
+    // バッテリーセーバーモードをチェック
+    if ('getBattery' in navigator) {
+      (navigator as any).getBattery().then((battery: any) => {
+        if (battery.level < 0.2) {
+          document.documentElement.classList.add('battery-saver');
+        }
+      });
+    }
+  }
+  
+  // ページ読み込み時に実行
+  document.addEventListener('DOMContentLoaded', () => {
+    checkPerformance();
+    initAnimations();
+  });
+  
+  // Astroのページ遷移後も実行
+  document.addEventListener('astro:page-load', () => {
+    initAnimations();
+  });
+</script>
+
+<style is:global>
+  /* 低パフォーマンスモード用のスタイル */
+  .low-performance *,
+  .battery-saver * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .low-performance .onload-animation,
+  .low-performance .onload-animation-fade-in,
+  .low-performance .post-card-animation,
+  .battery-saver .onload-animation,
+  .battery-saver .onload-animation-fade-in,
+  .battery-saver .post-card-animation {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+</style>

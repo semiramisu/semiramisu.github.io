@@ -1,0 +1,246 @@
+---
+import { Icon } from "astro-icon/components";
+import { i18n } from "../../locales/translation";
+import I18nKeys from "../../locales/keys";
+---
+
+<div class="search-container">
+  <div class="search-input-container">
+    <input 
+      type="text" 
+      id="search-input" 
+      class="search-input" 
+      placeholder={i18n(I18nKeys.nav_bar_search_placeholder)}
+      aria-label="Search blog posts"
+      data-search-lazy
+    />
+    <Icon name="line-md:search" class="search-icon" />
+  </div>
+  <div id="search-results" class="search-results"></div>
+  <div id="search-loading" class="search-loading hidden">
+    <div class="loading-spinner"></div>
+  </div>
+</div>
+
+<style>
+  .search-container {
+    @apply relative w-full;
+  }
+
+  .search-input-container {
+    @apply relative flex items-center w-full;
+  }
+
+  .search-input {
+    @apply w-full py-3 px-4 pr-10 rounded-full bg-[var(--card-color)] text-[var(--text-color)] border border-transparent;
+    @apply focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-transparent;
+    @apply transition-all duration-300;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-icon {
+    @apply absolute right-4 w-5 h-5 text-[var(--text-color-lighten)];
+  }
+
+  .search-results {
+    @apply absolute top-full left-0 right-0 mt-2 max-h-96 overflow-y-auto rounded-xl bg-[var(--card-color)] shadow-lg z-50;
+    @apply opacity-0 transition-all duration-300;
+    visibility: hidden;
+    transform: translateY(-10px);
+  }
+
+  .search-results.visible {
+    @apply opacity-100;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .search-loading {
+    @apply absolute top-full left-0 right-0 mt-2 p-4 rounded-xl bg-[var(--card-color)] shadow-lg z-50;
+    @apply flex items-center justify-center;
+  }
+
+  .loading-spinner {
+    @apply w-6 h-6 border-2 border-[var(--primary-color)] border-t-transparent rounded-full animate-spin;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .search-result-item {
+    @apply flex flex-col p-3 cursor-pointer hover:bg-[var(--primary-color-lighten)];
+    @apply border-b border-[var(--border-color)] transition-colors duration-200;
+  }
+
+  .search-result-item:last-child {
+    @apply border-b-0;
+  }
+
+  .search-result-title {
+    @apply text-[var(--text-color)] font-medium mb-1;
+  }
+
+  .search-result-description {
+    @apply text-[var(--text-color-lighten)] text-sm line-clamp-2;
+  }
+
+  .search-highlight {
+    @apply bg-[var(--primary-color-lighten)] px-1 rounded;
+  }
+</style>
+
+<script>
+  // 検索機能の遅延読み込み
+  let searchInitialized = false;
+  let pagefindInstance = null;
+  
+  async function initializeSearch() {
+    if (searchInitialized) return;
+    
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results');
+    const searchLoading = document.getElementById('search-loading');
+    
+    if (!searchInput || !searchResults || !searchLoading) return;
+    
+    // 検索ライブラリを動的にインポート
+    try {
+      searchLoading.classList.remove('hidden');
+      
+      // Pagefindを遅延読み込み
+      if (typeof window !== 'undefined' && window.pagefind === undefined) {
+        const script = document.createElement('script');
+        script.src = '/pagefind/pagefind-ui.js';
+        script.async = true;
+        
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+        
+        // CSS も遅延読み込み
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/pagefind/pagefind-ui.css';
+        document.head.appendChild(link);
+      }
+      
+      // Pagefind の初期化を待つ
+      if (window.pagefind) {
+        pagefindInstance = await window.pagefind.init();
+        searchInitialized = true;
+      }
+      
+    } catch (error) {
+      console.error('Failed to initialize search:', error);
+    } finally {
+      searchLoading.classList.add('hidden');
+    }
+  }
+  
+  // 実際の検索を実行
+  async function performSearch(query: string) {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults || !pagefindInstance) return;
+    
+    if (!query || query.length < 2) {
+      searchResults.classList.remove('visible');
+      searchResults.innerHTML = '';
+      return;
+    }
+    
+    try {
+      const results = await pagefindInstance.search(query);
+      
+      if (results.results.length === 0) {
+        searchResults.innerHTML = `
+          <div class="p-4 text-center text-[var(--text-color-lighten)]">
+            検索結果が見つかりませんでした
+          </div>
+        `;
+      } else {
+        const resultsHTML = await Promise.all(
+          results.results.slice(0, 10).map(async (result) => {
+            const data = await result.data();
+            return `
+              <a href="${data.url}" class="search-result-item">
+                <div class="search-result-title">${highlightText(data.meta.title || 'Untitled', query)}</div>
+                <div class="search-result-description">${highlightText(data.excerpt || '', query)}</div>
+              </a>
+            `;
+          })
+        );
+        
+        searchResults.innerHTML = resultsHTML.join('');
+      }
+      
+      searchResults.classList.add('visible');
+    } catch (error) {
+      console.error('Search error:', error);
+      searchResults.innerHTML = `
+        <div class="p-4 text-center text-[var(--text-color-lighten)]">
+          検索中にエラーが発生しました
+        </div>
+      `;
+      searchResults.classList.add('visible');
+    }
+  }
+  
+  // テキストハイライト
+  function highlightText(text: string, query: string): string {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<span class="search-highlight">$1</span>');
+  }
+  
+  // デバウンス関数
+  function debounce<T extends (...args: any[]) => any>(func: T, delay: number): T {
+    let timeoutId: NodeJS.Timeout;
+    return ((...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    }) as T;
+  }
+  
+  // イベントリスナーの設定
+  document.addEventListener('astro:page-load', () => {
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results');
+    
+    if (!searchInput || !searchResults) return;
+    
+    const debouncedSearch = debounce(performSearch, 300);
+    
+    // 初回フォーカス時に検索機能を初期化
+    searchInput.addEventListener('focus', async () => {
+      if (!searchInitialized) {
+        await initializeSearch();
+      }
+    }, { once: true });
+    
+    // 検索入力の処理
+    searchInput.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (searchInitialized) {
+        debouncedSearch(target.value);
+      }
+    });
+    
+    // クリック外で検索結果を非表示
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (!searchInput.contains(target) && !searchResults.contains(target)) {
+        searchResults.classList.remove('visible');
+      }
+    });
+  });
+  
+  // TypeScript用の型定義
+  declare global {
+    interface Window {
+      pagefind: any;
+    }
+  }
+</script>

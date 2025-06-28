@@ -2,6 +2,11 @@
 import YukinaConfig from "../../yukina.config";
 import GlobalStyles from "./GlobalStyles.astro";
 import ScriptSetup from "./ScriptSetup.astro";
+import CriticalStyles from "./CriticalStyles.astro";
+import AsyncStyles from "./AsyncStyles.astro";
+import ResourcePreload from "./ResourcePreload.astro";
+import AnimationController from "./AnimationController.astro";
+import ServiceWorkerSetup from "./ServiceWorkerSetup.astro";
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const isHomePage = Astro.url.pathname === '/' || 
@@ -47,20 +52,56 @@ const isHomePage = Astro.url.pathname === '/' ||
 <!-- SiteMap -->
 <link rel="sitemap" href="/sitemap-index.xml" />
 
-<!-- CSS -->
+<!-- Resource Preload -->
+<ResourcePreload />
+
+<!-- Critical CSS -->
+<CriticalStyles />
+
+<!-- Fonts - 非同期読み込み -->
+<link rel="preconnect" href="https://fonts.bunny.net" />
+<link
+  rel="preload"
+  as="style"
+  href="https://fonts.bunny.net/css?family=noto-sans-sc:100,200,300,400,500,600,700,800,900|raleway:500,700"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.bunny.net/css?family=noto-sans-sc:100,200,300,400,500,600,700,800,900|raleway:500,700"
+  media="print"
+  onload="this.media='all'"
+/>
+<noscript>
+  <link
+    rel="stylesheet"
+    href="https://fonts.bunny.net/css?family=noto-sans-sc:100,200,300,400,500,600,700,800,900|raleway:500,700"
+  />
+</noscript>
+
+<!-- KaTeX CSS - 非同期読み込み -->
+<link
+  rel="preload"
+  as="style"
+  href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
+/>
 <link
   rel="stylesheet"
   href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
+  media="print"
+  onload="this.media='all'"
 />
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.bunny.net" />
-<link
-  href="https://fonts.bunny.net/css?family=noto-sans-sc:100,200,300,400,500,600,700,800,900|raleway:500,700"
-  rel="stylesheet"
-/>
+<noscript>
+  <link
+    rel="stylesheet"
+    href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
+  />
+</noscript>
 
 <GlobalStyles />
+<AsyncStyles />
 <ScriptSetup />
+<AnimationController />
+<ServiceWorkerSetup />
 
 <!-- カスタムスタイル追加：レイアウトに基づく条件付きスタイリング -->
 <style is:global>

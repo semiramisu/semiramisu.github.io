@@ -4,6 +4,7 @@ import { IdToSlug } from "../utils/hash";
 import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
 import { formatDate } from "../utils/date";
 import YukinaConfig from "../../yukina.config";
+import OptimizedImage from "./OptimizedImage.astro";
 
 export interface Props {
   posts: any[];
@@ -31,10 +32,13 @@ const { posts } = Astro.props;
           <div class="carousel-slide">
             <a href={contentUrl} class="slide-content">
               <div class="slide-image-container">
-                <img 
-                  class="lozad slide-image" 
-                  data-src={post.data.cover ?? GetCoverURLForUnspecifiedEntry(entryID)} 
+                <OptimizedImage
+                  class="slide-image" 
+                  src={post.data.cover ?? GetCoverURLForUnspecifiedEntry(entryID)} 
                   alt={post.data.title}
+                  width={600}
+                  height={400}
+                  loading="lazy"
                 />
                 <div class="slide-overlay">
                   <div class="slide-meta">
