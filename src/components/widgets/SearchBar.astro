@@ -74,61 +74,131 @@ import I18nKeys from "../../locales/keys";
 </style>
 
 <script>
-  // Search functionality will be initialized after the page loads
-  document.addEventListener('astro:page-load', () => {
-    const searchInput = document.getElementById('search-input');
+  // Pagefind search implementation
+  async function initializeSearch() {
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
     const searchResults = document.getElementById('search-results');
     
     if (!searchInput || !searchResults) return;
     
-    // Simple placeholder search for development
-    // In production, this will be replaced by Pagefind
-    const performSimpleSearch = (query) => {
+    let pagefind: any = null;
+    
+    // Pagefindを初期化
+    try {
+      // @ts-ignore
+      if (typeof window.pagefind !== 'undefined') {
+        // @ts-ignore
+        pagefind = window.pagefind;
+      } else {
+        // Pagefindスクリプトを動的に読み込む
+        const script = document.createElement('script');
+        script.src = '/pagefind/pagefind.js';
+        document.head.appendChild(script);
+        
+        // スクリプトの読み込みを待つ
+        await new Promise((resolve) => {
+          script.onload = resolve;
+        });
+        
+        // @ts-ignore
+        if (typeof window.pagefind !== 'undefined') {
+          // @ts-ignore
+          pagefind = window.pagefind;
+        }
+      }
+    } catch (error) {
+      console.error('Pagefind initialization error:', error);
+    }
+    
+    // 検索を実行する関数
+    async function performSearch(query: string) {
       if (!query || query.length < 2) {
         searchResults.classList.remove('visible');
         return;
       }
       
-      searchResults.innerHTML = `
-        <div class="p-4 text-center text-[var(--text-color-lighten)]">
-          検索機能は本番環境でのみ動作します
-        </div>
-      `;
-      searchResults.classList.add('visible');
-    };
-    
-    // Debounce function for search input
-    const debounce = (func, delay) => {
-      let timeoutId;
-      return (...args) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          func.apply(null, args);
-        }, delay);
-      };
-    };
-    
-    // Debounced search function
-    const debouncedSearch = debounce(performSimpleSearch, 300);
-    
-    // Event listeners
-    searchInput.addEventListener('input', (e) => {
-      if (e.target) {
-        debouncedSearch(e.target.value);
+      if (!pagefind) {
+        searchResults.innerHTML = `
+          <div class="p-4 text-center text-[var(--text-color-lighten)]">
+            検索機能を初期化中...
+          </div>
+        `;
+        searchResults.classList.add('visible');
+        return;
       }
+      
+      try {
+        const search = await pagefind.search(query);
+        
+        if (search.results.length === 0) {
+          searchResults.innerHTML = `
+            <div class="p-4 text-center text-[var(--text-color-lighten)]">
+              「${query}」に一致する記事が見つかりませんでした
+            </div>
+          `;
+          searchResults.classList.add('visible');
+          return;
+        }
+        
+        // 検索結果を表示
+        let html = '';
+        for (const result of search.results.slice(0, 5)) {
+          const data = await result.data();
+          html += `
+            <a href="${data.url}" class="search-result-item">
+              <div>
+                <div class="search-result-title">${data.meta?.title || data.title || 'Untitled'}</div>
+                ${data.excerpt ? `<div class="search-result-description">${data.excerpt}</div>` : ''}
+              </div>
+            </a>
+          `;
+        }
+        
+        searchResults.innerHTML = html;
+        searchResults.classList.add('visible');
+      } catch (error) {
+        console.error('Search error:', error);
+        searchResults.innerHTML = `
+          <div class="p-4 text-center text-[var(--text-color-lighten)]">
+            検索中にエラーが発生しました
+          </div>
+        `;
+        searchResults.classList.add('visible');
+      }
+    }
+    
+    // デバウンス関数
+    function debounce(func: Function, delay: number) {
+      let timeoutId: NodeJS.Timeout;
+      return (...args: any[]) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(null, args), delay);
+      };
+    }
+    
+    const debouncedSearch = debounce(performSearch, 300);
+    
+    // イベントリスナー
+    searchInput.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      debouncedSearch(target.value);
     });
     
     document.addEventListener('click', (e) => {
-      if (e.target && !searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      const target = e.target as HTMLElement;
+      if (!searchInput.contains(target) && !searchResults.contains(target)) {
         searchResults.classList.remove('visible');
       }
     });
     
     searchInput.addEventListener('focus', () => {
-      const value = searchInput.value;
-      if (value && value.length >= 2) {
-        searchResults.classList.add('visible');
+      if (searchInput.value && searchInput.value.length >= 2) {
+        debouncedSearch(searchInput.value);
       }
     });
-  });
+  }
+  
+  // ページロード時に初期化
+  document.addEventListener('DOMContentLoaded', initializeSearch);
+  document.addEventListener('astro:page-load', initializeSearch);
 </script> 
