@@ -11,6 +11,43 @@ export interface Props {
 }
 
 const { posts } = Astro.props;
+
+// 記事の冒頭部分を抽出する関数
+function getExcerpt(body: string, maxLength: number = 150): string {
+  if (!body) return '';
+  
+  // Markdownの記法を簡単に除去
+  const plainText = body
+    .replace(/^#+\s+/gm, '') // 見出し
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // リンク
+    .replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, '$1') // 強調
+    .replace(/`([^`]+)`/g, '$1') // インラインコード
+    .replace(/```[\s\S]*?```/g, '') // コードブロック
+    .replace(/^>\s+/gm, '') // 引用
+    .replace(/^[-*+]\s+/gm, '') // リスト
+    .replace(/\n{2,}/g, ' ') // 複数改行
+    .replace(/\n/g, ' ') // 改行
+    .trim();
+  
+  // 指定文字数で切り取り
+  if (plainText.length <= maxLength) {
+    return plainText;
+  }
+  
+  // 文の区切りで自然に切る
+  const truncated = plainText.substring(0, maxLength);
+  const lastPeriod = truncated.lastIndexOf('。');
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  let cutIndex = maxLength;
+  if (lastPeriod > maxLength * 0.8) {
+    cutIndex = lastPeriod + 1;
+  } else if (lastSpace > maxLength * 0.8) {
+    cutIndex = lastSpace;
+  }
+  
+  return plainText.substring(0, cutIndex) + '...';
+}
 ---
 
 <div class="featured-carousel-container">
@@ -28,6 +65,7 @@ const { posts } = Astro.props;
       {posts.map((post, index) => {
         const entryID = IdToSlug(post.id);
         const contentUrl = `/posts/${entryID}`;
+        const excerpt = getExcerpt(post.body);
         return (
           <div class="carousel-slide">
             <a href={contentUrl} class="slide-content">
@@ -56,6 +94,9 @@ const { posts } = Astro.props;
                   <h3 class="slide-title">{post.data.title}</h3>
                   {post.data.description && (
                     <p class="slide-description">{post.data.description}</p>
+                  )}
+                  {excerpt && (
+                    <p class="slide-excerpt">{excerpt}</p>
                   )}
                   <div class="slide-read-more">
                     <span>続きを読む</span>
@@ -87,6 +128,12 @@ const { posts } = Astro.props;
     height: 400px;
   }
   
+  @media (min-width: 768px) {
+    .featured-carousel-container {
+      height: 450px;
+    }
+  }
+  
   .carousel-track-container {
     @apply w-full h-full overflow-hidden;
   }
@@ -100,11 +147,24 @@ const { posts } = Astro.props;
   }
   
   .slide-content {
-    @apply block w-full h-full relative overflow-hidden;
+    @apply flex w-full h-full relative overflow-hidden bg-[var(--card-color)];
+    flex-direction: column;
+  }
+  
+  @media (min-width: 768px) {
+    .slide-content {
+      flex-direction: row;
+    }
   }
   
   .slide-image-container {
-    @apply relative w-full h-full;
+    @apply relative w-full h-1/2 overflow-hidden;
+  }
+  
+  @media (min-width: 768px) {
+    .slide-image-container {
+      @apply w-1/2 h-full;
+    }
   }
   
   .slide-image {
@@ -116,12 +176,18 @@ const { posts } = Astro.props;
   }
   
   .slide-overlay {
-    @apply absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white;
-    @apply flex flex-col gap-2;
+    @apply p-6 bg-[var(--card-color)] text-[var(--text-color)];
+    @apply flex flex-col gap-3 h-1/2;
+  }
+  
+  @media (min-width: 768px) {
+    .slide-overlay {
+      @apply w-1/2 h-full justify-center;
+    }
   }
   
   .slide-meta {
-    @apply flex flex-wrap gap-3 text-sm;
+    @apply flex flex-wrap gap-3 text-sm text-[var(--text-color-lighten)];
   }
   
   .slide-date, .slide-category {
@@ -133,16 +199,33 @@ const { posts } = Astro.props;
   }
   
   .slide-title {
-    @apply text-2xl font-bold line-clamp-2;
+    @apply text-xl font-bold line-clamp-2 text-[var(--text-color)];
     font-family: var(--primary-font);
   }
   
+  @media (min-width: 768px) {
+    .slide-title {
+      @apply text-2xl;
+    }
+  }
+  
   .slide-description {
-    @apply text-sm opacity-90 line-clamp-2;
+    @apply text-sm line-clamp-2 text-[var(--text-color-lighten)];
+  }
+  
+  .slide-excerpt {
+    @apply text-sm text-[var(--text-color)] line-clamp-3 mt-2 flex-grow;
+  }
+  
+  @media (min-width: 768px) {
+    .slide-excerpt {
+      @apply line-clamp-4;
+    }
   }
   
   .slide-read-more {
-    @apply flex items-center gap-1 text-sm mt-2 opacity-80 hover:opacity-100 transition-opacity;
+    @apply flex items-center gap-1 text-sm mt-auto text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] transition-colors;
+    @apply font-medium;
   }
   
   .read-more-icon {
@@ -154,8 +237,9 @@ const { posts } = Astro.props;
   }
   
   .control-button {
-    @apply flex items-center justify-center w-10 h-10 rounded-full bg-black/30 text-white backdrop-blur-sm;
-    @apply transform transition-all duration-300 hover:scale-110 hover:bg-black/50;
+    @apply flex items-center justify-center w-10 h-10 rounded-full bg-[var(--card-color)] text-[var(--text-color)] shadow-lg;
+    @apply transform transition-all duration-300 hover:scale-110 hover:shadow-xl;
+    border: 1px solid var(--border-color);
   }
   
   .control-icon {
@@ -167,11 +251,12 @@ const { posts } = Astro.props;
   }
   
   .indicator {
-    @apply w-2.5 h-2.5 rounded-full bg-white/50 transition-all duration-300;
+    @apply w-2.5 h-2.5 rounded-full bg-[var(--text-color-lighten)] transition-all duration-300;
+    @apply cursor-pointer hover:bg-[var(--text-color)];
   }
   
   .indicator.active {
-    @apply bg-white w-6;
+    @apply bg-[var(--primary-color)] w-6;
   }
 </style>
 
