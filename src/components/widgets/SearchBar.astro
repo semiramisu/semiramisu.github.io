@@ -51,25 +51,57 @@ import I18nKeys from "../../locales/keys";
     transform: translateY(0);
   }
 
-  .search-result-item {
-    @apply flex items-center p-3 cursor-pointer hover:bg-[var(--primary-color-lighten)];
-    @apply border-b border-[var(--border-color)];
+  .search-results-list {
+    @apply max-h-96 overflow-y-auto;
   }
 
-  .search-result-item:last-child {
-    @apply border-b-0;
+  .search-result-item {
+    @apply flex items-center justify-between p-4 cursor-pointer;
+    @apply hover:bg-[var(--primary-color-lighten)] transition-colors duration-200;
+    @apply border-b border-[var(--border-color)] last:border-b-0;
+  }
+
+  .search-result-content {
+    @apply flex-1 min-w-0;
   }
 
   .search-result-title {
-    @apply text-[var(--text-color)] font-medium truncate;
+    @apply text-[var(--text-color)] font-medium text-base mb-1;
+    @apply truncate;
   }
 
-  .search-result-description {
-    @apply text-[var(--text-color-lighten)] text-sm truncate;
+  .search-result-tags {
+    @apply flex flex-wrap gap-1.5;
+  }
+
+  .search-result-tag {
+    @apply inline-block px-2 py-0.5 text-xs rounded-full;
+    @apply bg-[var(--primary-color-lighten)] text-[var(--primary-color)];
+  }
+
+  .search-result-arrow {
+    @apply w-5 h-5 text-[var(--text-color-lighten)] flex-shrink-0 ml-3;
   }
 
   .search-highlight {
-    @apply bg-[var(--primary-color-lighten)] px-1 rounded;
+    @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded;
+  }
+
+  /* スクロールバーのスタイル */
+  .search-results-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .search-results-list::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .search-results-list::-webkit-scrollbar-thumb {
+    @apply bg-[var(--border-color)] rounded-full;
+  }
+
+  .search-results-list::-webkit-scrollbar-thumb:hover {
+    @apply bg-[var(--text-color-lighten)];
   }
 </style>
 
@@ -141,18 +173,48 @@ import I18nKeys from "../../locales/keys";
         }
         
         // 検索結果を表示
-        let html = '';
-        for (const result of search.results.slice(0, 5)) {
+        let html = '<div class="search-results-list">';
+        for (const result of search.results.slice(0, 8)) {
           const data = await result.data();
+          const title = data.meta?.title || data.title || 'Untitled';
+          
+          // メタデータからタグとカテゴリを抽出
+          let tags = [];
+          
+          // Pagefindのメタデータは文字列として保存されている場合があるので処理
+          if (data.meta?.tag) {
+            // 単一のタグまたはカンマ区切りのタグ
+            tags = typeof data.meta.tag === 'string' 
+              ? data.meta.tag.split(',').map((t: string) => t.trim())
+              : [data.meta.tag];
+          } else if (data.meta?.tags) {
+            tags = typeof data.meta.tags === 'string'
+              ? data.meta.tags.split(',').map((t: string) => t.trim())
+              : data.meta.tags;
+          }
+          
+          // カテゴリも含める
+          if (data.meta?.category) {
+            tags.unshift(data.meta.category);
+          }
+          
+          const tagsHtml = tags.length > 0 
+            ? tags.slice(0, 3).map((tag: string) => `<span class="search-result-tag">${tag}</span>`).join('')
+            : '';
+          
           html += `
             <a href="${data.url}" class="search-result-item">
-              <div>
-                <div class="search-result-title">${data.meta?.title || data.title || 'Untitled'}</div>
-                ${data.excerpt ? `<div class="search-result-description">${data.excerpt}</div>` : ''}
+              <div class="search-result-content">
+                <div class="search-result-title">${title}</div>
+                ${tagsHtml ? `<div class="search-result-tags">${tagsHtml}</div>` : ''}
               </div>
+              <svg class="search-result-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </a>
           `;
         }
+        html += '</div>';
         
         searchResults.innerHTML = html;
         searchResults.classList.add('visible');
