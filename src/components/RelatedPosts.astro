@@ -6,9 +6,10 @@ import { IdToSlug } from "../utils/hash";
 export interface Props {
   currentPost: CollectionEntry<"posts">;
   maxPosts?: number;
+  isCompact?: boolean;
 }
 
-const { currentPost, maxPosts = 3 } = Astro.props;
+const { currentPost, maxPosts = 3, isCompact = false } = Astro.props;
 
 // すべての公開済み記事を取得
 const allPosts = await getCollection("posts", ({ data }) => {
@@ -63,35 +64,60 @@ const finalPosts = relatedPosts.length < maxPosts
 ---
 
 {finalPosts.length > 0 && (
-  <div class="related-posts">
+  <div class={`related-posts ${isCompact ? 'compact' : ''}`}>
     <h2 class="related-posts-title">関連記事</h2>
-    <div class="related-posts-grid">
-      {finalPosts.map((post) => {
-        // 記事の本文から読み時間を計算
-        const bodyText = post.body || '';
-        // 日本語の文字数をカウント（英語の単語数と日本語の文字数を組み合わせる）
-        const japaneseCharCount = (bodyText.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
-        const englishWords = bodyText.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
-        const wordCount = japaneseCharCount + englishWords.length;
-        // 日本語は1分あたり400文字、英語は1分あたり200単語として計算
-        const japaneseReadingTime = japaneseCharCount / 400;
-        const englishReadingTime = englishWords.length / 200;
-        const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
-        
-        return (
-          <PostCard
-            id={post.id}
-            title={post.data.title}
-            published={post.data.published}
-            category={post.data.category}
-            tags={post.data.tags}
-            description={post.data.description}
-            image={post.data.cover}
-            readingMetadata={{ time, wordCount }}
-          />
-        );
-      })}
-    </div>
+    {isCompact ? (
+      <div class="related-posts-list">
+        {finalPosts.map((post) => (
+          <a href={`/posts/${IdToSlug(post.id)}/`} class="related-post-item">
+            <div class="related-post-image">
+              <img 
+                src={post.data.cover || `/api/og/${post.id}.png`} 
+                alt={post.data.title}
+                loading="lazy"
+              />
+            </div>
+            <div class="related-post-content">
+              <h3 class="related-post-title">{post.data.title}</h3>
+              <div class="related-post-meta">
+                <time>{new Date(post.data.published).toLocaleDateString('ja-JP')}</time>
+                {post.data.category && (
+                  <span class="related-post-category">{post.data.category}</span>
+                )}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="related-posts-grid">
+        {finalPosts.map((post) => {
+          // 記事の本文から読み時間を計算
+          const bodyText = post.body || '';
+          // 日本語の文字数をカウント（英語の単語数と日本語の文字数を組み合わせる）
+          const japaneseCharCount = (bodyText.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
+          const englishWords = bodyText.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
+          const wordCount = japaneseCharCount + englishWords.length;
+          // 日本語は1分あたり400文字、英語は1分あたり200単語として計算
+          const japaneseReadingTime = japaneseCharCount / 400;
+          const englishReadingTime = englishWords.length / 200;
+          const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
+          
+          return (
+            <PostCard
+              id={post.id}
+              title={post.data.title}
+              published={post.data.published}
+              category={post.data.category}
+              tags={post.data.tags}
+              description={post.data.description}
+              image={post.data.cover}
+              readingMetadata={{ time, wordCount }}
+            />
+          );
+        })}
+      </div>
+    )}
   </div>
 )}
 
@@ -131,5 +157,87 @@ const finalPosts = relatedPosts.length < maxPosts
     .related-posts-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* コンパクトモード */
+  .related-posts.compact {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .related-posts.compact .related-posts-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .related-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .related-post-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+
+  .related-post-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .related-post-image {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 0.375rem;
+    overflow: hidden;
+  }
+
+  .related-post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .related-post-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .related-post-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .related-post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-color-lighten);
+  }
+
+  .related-post-category {
+    padding: 0.125rem 0.375rem;
+    background-color: var(--primary-color-lighten);
+    color: var(--primary-color);
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
   }
 </style>

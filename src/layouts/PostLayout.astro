@@ -66,14 +66,6 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
         )
       }
       {
-        currentPost && (
-          <RelatedPosts
-            currentPost={currentPost}
-            maxPosts={3}
-          />
-        )
-      }
-      {
         published && title && (
           <CopyRight
             title={title}
@@ -89,6 +81,17 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
     </article>
     <aside id="post-toc" class="post-toc">
       <EnhancedTableOfContents headings={headings} />
+      {
+        currentPost && (
+          <div class="related-posts-sidebar">
+            <RelatedPosts
+              currentPost={currentPost}
+              maxPosts={3}
+              isCompact={true}
+            />
+          </div>
+        )
+      }
     </aside>
   </div>
 </Main>
@@ -136,6 +139,10 @@ const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
     .post-toc {
       display: block !important;
     }
+  }
+
+  .related-posts-sidebar {
+    margin-top: 2rem;
   }
 </style>
 
