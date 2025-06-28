@@ -163,14 +163,17 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-overlay {
-    @apply absolute inset-0 p-6 bg-gradient-to-r from-black/90 via-black/80 to-transparent;
-    @apply flex flex-col justify-end text-white;
+    @apply absolute bottom-0 right-0 p-6 text-white;
+    @apply flex flex-col justify-end;
+    background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.85), transparent);
+    width: 100%;
   }
   
   @media (min-width: 768px) {
     .slide-overlay {
-      @apply bg-gradient-to-r from-black/90 via-black/70 to-transparent;
-      @apply w-3/4;
+      @apply bottom-auto top-0 h-full justify-center;
+      background: linear-gradient(to left, rgba(0,0,0,0.95), rgba(0,0,0,0.85) 40%, transparent 100%);
+      width: 60%;
     }
   }
   
@@ -187,13 +190,13 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   }
   
   .slide-title {
-    @apply text-xl font-bold line-clamp-2 text-white;
+    @apply text-xl font-bold line-clamp-2 text-white mb-2;
     font-family: var(--primary-font);
   }
   
   @media (min-width: 768px) {
     .slide-title {
-      @apply text-2xl;
+      @apply text-2xl mb-3;
     }
   }
   
@@ -207,13 +210,19 @@ function getExcerpt(body: string, maxLength: number = 150): string {
   
   @media (min-width: 768px) {
     .slide-excerpt {
-      @apply line-clamp-4;
+      @apply line-clamp-4 text-base;
     }
   }
   
   .slide-read-more {
-    @apply flex items-center gap-1 text-sm mt-2 text-white hover:text-white/80 transition-colors;
+    @apply flex items-center gap-1 text-sm mt-3 text-white hover:text-white/80 transition-colors;
     @apply font-medium;
+  }
+  
+  @media (min-width: 768px) {
+    .slide-read-more {
+      @apply mt-4;
+    }
   }
   
   .read-more-icon {
