@@ -4,6 +4,7 @@ import PostCard from "../components/PostCard.astro";
 import I18nKeys from "../locales/keys";
 import { i18n } from "../locales/translation";
 import { type Archive } from "../utils/content";
+import { Icon } from 'astro-icon/components';
 
 export interface Props {
   archiveMap: Map<number, Array<Archive>>;
@@ -18,13 +19,19 @@ const allPosts = [...archiveMap.values()].flat();
 
 <MainLayout title={title || i18n(I18nKeys.pages_archive_archive)} isHome={false}>
   <div class="archives">
-    <div class="mb-8 flex flex-row items-center space-x-2 pb-6 border-b border-[var(--border-color)]">
-      <span class="text-3xl font-bold text-[var(--text-color)]">
-        {title || i18n(I18nKeys.pages_archive_archive)}
-      </span>
-      <span class="text-xl text-[var(--text-color-lighten)]">
-        ({allPosts.length} 記事)
-      </span>
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-[var(--border-color)]">
+      <div class="flex items-center space-x-2 mb-4 sm:mb-0">
+        <span class="text-3xl font-bold text-[var(--text-color)]">
+          {title || i18n(I18nKeys.pages_archive_archive)}
+        </span>
+        <span class="text-xl text-[var(--text-color-lighten)]">
+          ({allPosts.length} 記事)
+        </span>
+      </div>
+      <a href="/admin/dashboard" class="dashboard-link inline-flex items-center gap-2">
+        <Icon name="mdi:chart-line" class="w-5 h-5" />
+        <span>統計ダッシュボード</span>
+      </a>
     </div>
 
     <div class="posts-grid">
@@ -52,6 +59,13 @@ const allPosts = [...archiveMap.values()].flat();
   .archives {
     @apply w-full flex flex-col rounded-2xl bg-[var(--card-color)] px-5 py-5 md:px-8 lg:px-10 lg:py-10;
     max-width: 100%;
+  }
+
+  .dashboard-link {
+    @apply px-4 py-2 bg-[var(--primary-color-lighten)] text-[var(--primary-color)] rounded-lg;
+    @apply font-medium transition-all duration-200;
+    @apply hover:bg-[var(--primary-color)] hover:text-white hover:shadow-md hover:-translate-y-0.5;
+    text-decoration: none;
   }
 
   .posts-grid {
