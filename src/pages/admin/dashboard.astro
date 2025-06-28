@@ -1,0 +1,362 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import { analyzeContent, generateContentSuggestions } from "../../utils/content-analytics";
+import { Icon } from "astro-icon/components";
+
+// 認証チェック（本番環境では適切な認証を実装してください）
+if (import.meta.env.PROD) {
+  // return Astro.redirect('/');
+}
+
+const analytics = await analyzeContent();
+const suggestions = generateContentSuggestions(analytics);
+---
+
+<MainLayout title="コンテンツ分析ダッシュボード">
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">
+        <Icon name="mdi:chart-line" class="inline-block w-8 h-8 mr-2" />
+        コンテンツ分析ダッシュボード
+      </h1>
+      <p class="dashboard-subtitle">ブログの統計情報と分析</p>
+    </div>
+
+    <!-- メトリクスカード -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon">
+          <Icon name="mdi:file-document-multiple" class="w-6 h-6" />
+        </div>
+        <div class="metric-content">
+          <h3 class="metric-label">総記事数</h3>
+          <p class="metric-value">{analytics.totalPosts}</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">
+          <Icon name="mdi:calendar-month" class="w-6 h-6" />
+        </div>
+        <div class="metric-content">
+          <h3 class="metric-label">今月の投稿</h3>
+          <p class="metric-value">{analytics.monthlyPosts}</p>
+          <p class={`metric-change ${analytics.postsGrowth >= 0 ? 'positive' : 'negative'}`}>
+            {analytics.postsGrowth >= 0 ? '+' : ''}{analytics.postsGrowth.toFixed(1)}%
+          </p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">
+          <Icon name="mdi:clock-outline" class="w-6 h-6" />
+        </div>
+        <div class="metric-content">
+          <h3 class="metric-label">平均読了時間</h3>
+          <p class="metric-value">{analytics.avgReadingTime}分</p>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon">
+          <Icon name="mdi:text" class="w-6 h-6" />
+        </div>
+        <div class="metric-content">
+          <h3 class="metric-label">平均単語数</h3>
+          <p class="metric-value">{analytics.avgWordCount.toLocaleString()}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 投稿頻度グラフ -->
+    <div class="chart-section">
+      <h2 class="section-title">投稿頻度（過去30日）</h2>
+      <div class="frequency-chart">
+        {analytics.postFrequency.map((day) => (
+          <div class="frequency-bar-container" title={`${day.date}: ${day.count}記事`}>
+            <div 
+              class="frequency-bar" 
+              style={`height: ${day.count > 0 ? Math.max(20, day.count * 40) : 4}px`}
+              data-count={day.count}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- タグとカテゴリ分析 -->
+    <div class="analysis-grid">
+      <div class="analysis-section">
+        <h2 class="section-title">人気タグ TOP10</h2>
+        <div class="tag-list">
+          {analytics.topTags.map((tag, index) => (
+            <div class="tag-item">
+              <span class="tag-rank">#{index + 1}</span>
+              <span class="tag-name">{tag.tag}</span>
+              <span class="tag-count">{tag.count}記事</span>
+              <div class="tag-bar" style={`width: ${(tag.count / analytics.topTags[0].count) * 100}%`} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="analysis-section">
+        <h2 class="section-title">カテゴリ別投稿数</h2>
+        <div class="category-list">
+          {analytics.topCategories.map((category) => (
+            <div class="category-item">
+              <span class="category-name">{category.category}</span>
+              <span class="category-count">{category.count}記事</span>
+              <div class="category-progress">
+                <div 
+                  class="category-bar" 
+                  style={`width: ${(category.count / analytics.totalPosts) * 100}%`}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- 月別統計 -->
+    <div class="monthly-stats">
+      <h2 class="section-title">月別統計（過去6ヶ月）</h2>
+      <div class="stats-table">
+        <div class="stats-header">
+          <div>月</div>
+          <div>投稿数</div>
+          <div>総単語数</div>
+          <div>総読了時間</div>
+        </div>
+        {analytics.monthlyStats.map((stat) => (
+          <div class="stats-row">
+            <div>{stat.month}</div>
+            <div>{stat.posts}記事</div>
+            <div>{stat.words.toLocaleString()}語</div>
+            <div>{stat.readingTime}分</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 改善提案 -->
+    {suggestions.length > 0 && (
+      <div class="suggestions-section">
+        <h2 class="section-title">
+          <Icon name="mdi:lightbulb" class="inline-block w-6 h-6 mr-2" />
+          改善提案
+        </h2>
+        <ul class="suggestions-list">
+          {suggestions.map((suggestion) => (
+            <li class="suggestion-item">
+              <Icon name="mdi:information" class="w-5 h-5 text-blue-500" />
+              <span>{suggestion}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- 投稿間隔情報 -->
+    <div class="gap-info">
+      <h2 class="section-title">投稿間隔分析</h2>
+      <div class="gap-metrics">
+        <div class="gap-metric">
+          <span class="gap-label">最長投稿間隔</span>
+          <span class="gap-value">{analytics.gaps.longestGap}日</span>
+        </div>
+        <div class="gap-metric">
+          <span class="gap-label">平均投稿間隔</span>
+          <span class="gap-value">{analytics.gaps.avgGap}日</span>
+        </div>
+        <div class="gap-metric">
+          <span class="gap-label">最終投稿から</span>
+          <span class="gap-value">{analytics.gaps.lastPostDays}日</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .dashboard-container {
+    @apply max-w-7xl mx-auto p-6 space-y-8;
+  }
+
+  .dashboard-header {
+    @apply text-center mb-8;
+  }
+
+  .dashboard-title {
+    @apply text-3xl font-bold text-[var(--text-color)] flex items-center justify-center;
+  }
+
+  .dashboard-subtitle {
+    @apply text-lg text-[var(--text-color-lighten)] mt-2;
+  }
+
+  .metrics-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+
+  .metric-card {
+    @apply bg-[var(--card-color)] rounded-xl p-6 shadow-md flex items-center gap-4;
+  }
+
+  .metric-icon {
+    @apply w-12 h-12 rounded-lg bg-[var(--primary-color-lighten)] flex items-center justify-center text-[var(--primary-color)];
+  }
+
+  .metric-content {
+    @apply flex-1;
+  }
+
+  .metric-label {
+    @apply text-sm text-[var(--text-color-lighten)] mb-1;
+  }
+
+  .metric-value {
+    @apply text-2xl font-bold text-[var(--text-color)];
+  }
+
+  .metric-change {
+    @apply text-sm font-medium mt-1;
+  }
+
+  .metric-change.positive {
+    @apply text-green-500;
+  }
+
+  .metric-change.negative {
+    @apply text-red-500;
+  }
+
+  .chart-section {
+    @apply bg-[var(--card-color)] rounded-xl p-6 shadow-md;
+  }
+
+  .section-title {
+    @apply text-xl font-bold text-[var(--text-color)] mb-4;
+  }
+
+  .frequency-chart {
+    @apply flex items-end justify-between h-32 gap-1;
+  }
+
+  .frequency-bar-container {
+    @apply flex-1 relative;
+  }
+
+  .frequency-bar {
+    @apply w-full bg-[var(--primary-color)] rounded-t transition-all duration-300 hover:bg-[var(--primary-color-darken)];
+  }
+
+  .analysis-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+  }
+
+  .analysis-section {
+    @apply bg-[var(--card-color)] rounded-xl p-6 shadow-md;
+  }
+
+  .tag-list {
+    @apply space-y-3;
+  }
+
+  .tag-item {
+    @apply relative flex items-center gap-2;
+  }
+
+  .tag-rank {
+    @apply text-sm text-[var(--text-color-lighten)] w-8;
+  }
+
+  .tag-name {
+    @apply font-medium text-[var(--text-color)] flex-1;
+  }
+
+  .tag-count {
+    @apply text-sm text-[var(--text-color-lighten)];
+  }
+
+  .tag-bar {
+    @apply absolute bottom-0 left-0 h-0.5 bg-[var(--primary-color)] opacity-20;
+  }
+
+  .category-list {
+    @apply space-y-4;
+  }
+
+  .category-item {
+    @apply space-y-2;
+  }
+
+  .category-name {
+    @apply font-medium text-[var(--text-color)];
+  }
+
+  .category-count {
+    @apply text-sm text-[var(--text-color-lighten)] float-right;
+  }
+
+  .category-progress {
+    @apply w-full h-2 bg-[var(--border-color)] rounded-full overflow-hidden;
+  }
+
+  .category-bar {
+    @apply h-full bg-[var(--primary-color)] transition-all duration-500;
+  }
+
+  .monthly-stats {
+    @apply bg-[var(--card-color)] rounded-xl p-6 shadow-md;
+  }
+
+  .stats-table {
+    @apply overflow-x-auto;
+  }
+
+  .stats-header {
+    @apply grid grid-cols-4 gap-4 pb-3 border-b border-[var(--border-color)] font-semibold text-[var(--text-color)];
+  }
+
+  .stats-row {
+    @apply grid grid-cols-4 gap-4 py-3 border-b border-[var(--border-color)] text-[var(--text-color)];
+  }
+
+  .stats-row:last-child {
+    @apply border-b-0;
+  }
+
+  .suggestions-section {
+    @apply bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6;
+  }
+
+  .suggestions-list {
+    @apply space-y-3;
+  }
+
+  .suggestion-item {
+    @apply flex items-start gap-3 text-[var(--text-color)];
+  }
+
+  .gap-info {
+    @apply bg-[var(--card-color)] rounded-xl p-6 shadow-md;
+  }
+
+  .gap-metrics {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+  }
+
+  .gap-metric {
+    @apply text-center;
+  }
+
+  .gap-label {
+    @apply block text-sm text-[var(--text-color-lighten)] mb-2;
+  }
+
+  .gap-value {
+    @apply block text-2xl font-bold text-[var(--text-color)];
+  }
+</style>

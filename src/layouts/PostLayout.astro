@@ -7,6 +7,7 @@ import ReadingProgress from "../components/ReadingProgress.astro";
 import ShareButtons from "../components/ShareButtons.astro";
 import RelatedPosts from "../components/RelatedPosts.astro";
 import Comments from "../components/Comments.astro";
+import StructuredData from "../components/StructuredData.astro";
 
 interface Props {
   title?: string;
@@ -26,6 +27,8 @@ interface Props {
   }[];
   slug?: string;
   currentPost?: any; // 関連記事用
+  wordCount?: number;
+  readingTime?: number;
 }
 
 const {
@@ -39,14 +42,35 @@ const {
   headings = [],
   slug,
   currentPost,
+  wordCount,
+  readingTime,
 } = Astro.props;
 
 // 記事のURLを構築
 const siteUrl = Astro.site?.toString() || '';
 const postUrl = slug ? `${siteUrl}posts/${slug}/` : Astro.url.toString();
+
+// パンくずリスト用のデータ
+const breadcrumbs = [
+  { name: 'ホーム', url: '/' },
+  { name: 'ブログ', url: '/all-posts' },
+  { name: title || 'Post', url: postUrl }
+];
 ---
 
 <Main title={title} subTitle={subTitle} bannerImage={bannerImage} isHome={false}>
+  {/* 構造化データ */}
+  {currentPost && (
+    <Fragment slot="head">
+      <StructuredData 
+        type="article" 
+        post={currentPost} 
+        breadcrumbs={breadcrumbs}
+        wordCount={wordCount}
+        readingTime={readingTime}
+      />
+    </Fragment>
+  )}
   <ReadingProgress />
   <div id="post-content-wrapper" class="post-content-wrapper">
     <article id="post-article" class="post-article">

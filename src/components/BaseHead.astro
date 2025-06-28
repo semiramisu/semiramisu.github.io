@@ -7,10 +7,16 @@ import AsyncStyles from "./AsyncStyles.astro";
 import ResourcePreload from "./ResourcePreload.astro";
 import AnimationController from "./AnimationController.astro";
 import ServiceWorkerSetup from "./ServiceWorkerSetup.astro";
+import StructuredData from "./StructuredData.astro";
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const isHomePage = Astro.url.pathname === '/' || 
                    Astro.url.pathname === '/index.html';
+
+// 動的OGP画像のURLを生成
+const ogImageUrl = Astro.url.pathname.startsWith('/posts/') 
+  ? new URL(`/og${Astro.url.pathname.replace(/\/$/, '')}.png`, Astro.site).toString()
+  : undefined;
 ---
 
 <!-- Global Metadata -->
@@ -36,14 +42,14 @@ const isHomePage = Astro.url.pathname === '/' ||
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={YukinaConfig.title} />
 <meta property="og:description" content={YukinaConfig.description} />
-<!-- <meta property="og:image" content={new URL(image, Astro.url)} /> -->
+{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={YukinaConfig.title} />
 <meta property="twitter:description" content={YukinaConfig.description} />
-<!-- <meta property="twitter:image" content={new URL(image, Astro.url)} /> -->
+{ogImageUrl && <meta property="twitter:image" content={ogImageUrl} />}
 
 <!-- RSS AutoDiscovery -->
 <link
@@ -106,6 +112,9 @@ const isHomePage = Astro.url.pathname === '/' ||
 <ScriptSetup />
 <AnimationController />
 <ServiceWorkerSetup />
+
+<!-- ホームページ用の構造化データ -->
+{isHomePage && <StructuredData type="website" />}
 
 <!-- カスタムスタイル追加：レイアウトに基づく条件付きスタイリング -->
 <style is:global>

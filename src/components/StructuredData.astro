@@ -1,0 +1,50 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { 
+  generateArticleSchema, 
+  generateBreadcrumbSchema, 
+  generateWebSiteSchema,
+  generatePersonSchema
+} from '../utils/schema-generator';
+
+export interface Props {
+  type: 'article' | 'website' | 'person';
+  post?: CollectionEntry<'posts'>;
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  wordCount?: number;
+  readingTime?: number;
+}
+
+const { type, post, breadcrumbs, wordCount, readingTime } = Astro.props;
+const currentUrl = new URL(Astro.url.pathname, Astro.site).toString();
+
+let schema: any;
+
+switch (type) {
+  case 'article':
+    if (post) {
+      schema = generateArticleSchema(post, currentUrl, wordCount, readingTime);
+    }
+    break;
+  case 'website':
+    schema = generateWebSiteSchema();
+    break;
+  case 'person':
+    schema = generatePersonSchema();
+    break;
+}
+
+// パンくずリストの構造化データを追加
+let breadcrumbSchema;
+if (breadcrumbs && breadcrumbs.length > 0) {
+  breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
+}
+---
+
+{schema && (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+)}
+
+{breadcrumbSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+)}
