@@ -51,8 +51,12 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
     <div class="menu">
       {
         YukinaConfig.navigators.map((nav) => (
-          <a href={nav.href}>
-            <p>{i18n(nav.nameKey)}</p>
+          <a href={nav.href} title={i18n(nav.nameKey)}>
+            {nav.icon ? (
+              <Icon name={nav.icon} size={24} />
+            ) : (
+              <p>{i18n(nav.nameKey)}</p>
+            )}
           </a>
         ))
       }
@@ -165,7 +169,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .menu a {
-    @apply flex h-[3.25rem] items-center rounded-lg px-6 transition-all;
+    @apply flex h-[3.25rem] items-center rounded-lg px-4 transition-all;
     @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
     @apply active:scale-95;
   }

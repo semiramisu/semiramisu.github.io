@@ -16,6 +16,7 @@ const YukinaConfig: Configuration = {
     {
       nameKey: I18nKeys.nav_bar_home,
       href: "/",
+      icon: "heroicons:home",
     },
     {
       nameKey: I18nKeys.nav_bar_archive,
@@ -24,18 +25,22 @@ const YukinaConfig: Configuration = {
     {
       nameKey: I18nKeys.nav_bar_about,
       href: "/about",
+      icon: "heroicons:user",
     },
     {
       nameKey: I18nKeys.nav_bar_contact,
       href: "/contact",
+      icon: "heroicons:envelope",
     },
     {
       nameKey: I18nKeys.nav_bar_github,
       href: "https://github.com/semiramisu",  // GitHub アカウントページに直接リンク
+      icon: "line-md:github-loop",
     },
     {
       nameKey: I18nKeys.nav_bar_x,
       href: "https://x.com/semiramisuWeb3?ref_src=twsrc%5Etfw%7Ctwcamp%5Eembeddedtimeline%7Ctwterm%5Escreen-name%3AsemiramisuWeb3%7Ctwcon%5Es1",
+      icon: "line-md:twitter-x",
     },
   ],
 

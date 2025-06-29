@@ -11,7 +11,7 @@ interface Configuration {
 
   locale: "en" | "zh-CN";
 
-  navigators: { nameKey: I18nKeys; href: string }[];
+  navigators: { nameKey: I18nKeys; href: string; icon?: string }[];
 
   username: string;
   sign: string;
