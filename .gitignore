@@ -159,3 +159,9 @@ src/pages/ja
 # twitter post tracking - DO NOT ignore this!
 # .github/tweeted/
 
+# Revenue and private files
+REVENUE_SETUP.md
+revenue-data/
+paypay-qr.png
+.revenue-backup/
+
