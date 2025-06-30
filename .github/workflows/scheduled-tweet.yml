@@ -1,0 +1,176 @@
+name: Scheduled Tweet for Reserved Posts
+
+on:
+  schedule:
+    # 毎日日本時間12時（UTC 3:00）に実行
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  tweet-scheduled:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Check and tweet scheduled posts
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+        run: |
+          npm install twitter-api-v2 front-matter glob
+          
+          cat > scheduled-tweet.mjs << 'EOF'
+          import { TwitterApi } from 'twitter-api-v2';
+          import fs from 'fs';
+          import fm from 'front-matter';
+          import path from 'path';
+          import crypto from 'crypto';
+          import { glob } from 'glob';
+          
+          // Initialize Twitter client
+          console.log('Initializing Twitter client for scheduled posts...');
+          
+          const client = new TwitterApi({
+            appKey: process.env.TWITTER_API_KEY,
+            appSecret: process.env.TWITTER_API_SECRET,
+            accessToken: process.env.TWITTER_ACCESS_TOKEN,
+            accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+          });
+          
+          const rwClient = client.readWrite;
+          
+          // Check if a post should be published today based on filename
+          function shouldPublishToday(filename) {
+            const match = filename.match(/(\d{4})_(\d{2})_(\d{2})/);
+            if (!match) return false;
+            
+            const [, year, month, day] = match;
+            const postDate = new Date(`${year}-${month}-${day}T12:00:00`);
+            const now = new Date();
+            
+            // Check if today is the post date
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const postDay = new Date(postDate.getFullYear(), postDate.getMonth(), postDate.getDate());
+            
+            return today.getTime() === postDay.getTime();
+          }
+          
+          async function tweetScheduledPosts() {
+            // Find all markdown files
+            const files = await glob('src/contents/posts/*.md');
+            
+            for (const file of files) {
+              const basename = path.basename(file);
+              
+              // Skip if not scheduled for today
+              if (!shouldPublishToday(basename)) {
+                continue;
+              }
+              
+              console.log(`Found scheduled post for today: ${basename}`);
+              
+              try {
+                // Read the markdown file
+                const content = fs.readFileSync(file, 'utf8');
+                const { attributes } = fm(content);
+                
+                // Skip drafts
+                if (attributes.draft) {
+                  console.log(`Skipping draft: ${attributes.title}`);
+                  continue;
+                }
+                
+                // Check if already tweeted
+                const tweetedFile = `.github/tweeted/${basename}.tweeted`;
+                if (fs.existsSync(tweetedFile)) {
+                  console.log(`Already tweeted: ${attributes.title}`);
+                  continue;
+                }
+                
+                // Generate tweet content
+                const postTitle = attributes.title || 'ブログを更新しました';
+                const description = attributes.description || '';
+                const tags = attributes.tags ? attributes.tags.slice(0, 3).map(tag => `#${tag}`).join(' ') : '';
+                
+                // Generate slug
+                const fileName = path.basename(file, '.md');
+                const slug = crypto.createHash('sha256').update(fileName).digest('hex').substring(0, 8);
+                const postUrl = `https://semiramisu.com/posts/${slug}`;
+                
+                // Compose tweet
+                let tweetText = `📝 本日公開！\n\n「${postTitle}」\n`;
+                if (description) {
+                  tweetText += `\n${description.substring(0, 100)}${description.length > 100 ? '...' : ''}\n`;
+                }
+                tweetText += `\n${tags}\n\n続きはこちら👇\n${postUrl}`;
+                
+                // Ensure tweet is within character limit
+                if (tweetText.length > 280) {
+                  const availableSpace = 280 - postUrl.length - tags.length - 50;
+                  const truncatedTitle = postTitle.substring(0, Math.min(postTitle.length, availableSpace / 2));
+                  const truncatedDesc = description.substring(0, Math.min(description.length, availableSpace / 2));
+                  
+                  tweetText = `📝 本日公開！\n\n「${truncatedTitle}${postTitle.length > truncatedTitle.length ? '...' : ''}」\n`;
+                  if (truncatedDesc) {
+                    tweetText += `\n${truncatedDesc}...\n`;
+                  }
+                  tweetText += `\n${tags}\n\n${postUrl}`;
+                }
+                
+                // Send tweet
+                console.log('Tweeting scheduled post:', tweetText);
+                let tweet;
+                try {
+                  tweet = await rwClient.v2.tweet(tweetText);
+                  console.log('Tweet sent successfully via v2:', tweet.data.id);
+                } catch (v2Error) {
+                  console.log('v2 API failed, trying v1.1...');
+                  tweet = await rwClient.v1.tweet(tweetText);
+                  console.log('Tweet sent successfully via v1.1:', tweet.id_str);
+                }
+                
+                // Mark as tweeted
+                fs.mkdirSync(path.dirname(tweetedFile), { recursive: true });
+                fs.writeFileSync(tweetedFile, JSON.stringify({
+                  tweetId: tweet.data?.id || tweet.id_str,
+                  timestamp: new Date().toISOString(),
+                  file: file,
+                  title: postTitle,
+                  scheduled: true
+                }, null, 2));
+                
+                console.log(`Successfully tweeted scheduled post: ${postTitle}`);
+                
+              } catch (error) {
+                console.error(`Error processing ${file}:`, error);
+                // Continue with other posts even if one fails
+              }
+            }
+          }
+          
+          tweetScheduledPosts().catch(console.error);
+          EOF
+          
+          node scheduled-tweet.mjs
+      
+      - name: Commit tweet markers
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [ -d ".github/tweeted" ]; then
+            git add .github/tweeted
+            git commit -m "chore: Mark scheduled posts as tweeted [skip-tweet]" || echo "No tweet markers to commit"
+            git push || echo "No changes to push"
+          fi

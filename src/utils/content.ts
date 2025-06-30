@@ -2,6 +2,23 @@ import { getCollection } from "astro:content";
 import { IdToSlug } from "./hash";
 
 /**
+ * Extracts date from filename pattern (e.g., "2025_07_01.md")
+ * and determines if the post should be published
+ */
+function shouldPublishPost(filename: string): boolean {
+  // Extract date from filename pattern YYYY_MM_DD
+  const match = filename.match(/(\d{4})_(\d{2})_(\d{2})/)
+  if (!match) return true; // If no date pattern, publish by default
+  
+  const [, year, month, day] = match;
+  const postDate = new Date(`${year}-${month}-${day}T12:00:00`); // Set to noon
+  const now = new Date();
+  
+  // Post should be published if it's past noon on the post date
+  return now >= postDate;
+}
+
+/**
  * Represents an archive item with a title, slug, date, and optional tags.
  */
 export interface Archive {
@@ -43,10 +60,11 @@ export interface Category {
  * @returns A promise that resolves to an array of sorted blog posts with navigation properties.
  */
 export async function GetSortedPosts(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data }) => {
+  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
     const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
     const isLangFiltered = (data.lang || "ja") === lang;
-    return isDraftFiltered && isLangFiltered;
+    const isPublishTimeReached = shouldPublishPost(id);
+    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
   });
   const sorted = allBlogPosts.sort((a, b) => {
     const dateA = new Date(a.data.published);
@@ -78,10 +96,11 @@ export async function GetSortedPosts(lang: "ja" | "en" = "ja") {
  * @returns A promise that resolves to a map of archives grouped by year.
  */
 export async function GetArchives(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data }) => {
+  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
     const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
     const isLangFiltered = (data.lang || "ja") === lang;
-    return isDraftFiltered && isLangFiltered;
+    const isPublishTimeReached = shouldPublishPost(id);
+    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
   });
 
   const archives = new Map<number, Archive[]>();
@@ -137,10 +156,11 @@ export async function GetArchives(lang: "ja" | "en" = "ja") {
  * @returns A promise that resolves to a map of tags. Each key is a tag slug, and the value is an object containing the tag's name, slug, and associated posts.
  */
 export async function GetTags(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data }) => {
+  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
     const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
     const isLangFiltered = (data.lang || "ja") === lang;
-    return isDraftFiltered && isLangFiltered;
+    const isPublishTimeReached = shouldPublishPost(id);
+    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
   });
 
   const tags = new Map<string, Tag>();
@@ -197,10 +217,11 @@ export async function GetAllTags(lang: "ja" | "en" = "ja") {
  * @returns A promise that resolves to a map of categories, where each category contains its name, slug, and associated posts.
  */
 export async function GetCategories(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data }) => {
+  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
     const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
     const isLangFiltered = (data.lang || "ja") === lang;
-    return isDraftFiltered && isLangFiltered;
+    const isPublishTimeReached = shouldPublishPost(id);
+    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
   });
 
   const categories = new Map<string, Category>();
