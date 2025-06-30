@@ -1,0 +1,167 @@
+---
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  faqs: FAQ[];
+}
+
+const { faqs } = Astro.props;
+---
+
+{faqs.length > 0 && (
+  <section class="faq-section">
+    <h2>よくある質問</h2>
+    <div class="faq-list">
+      {faqs.map((faq, index) => (
+        <details class="faq-item" open={index === 0}>
+          <summary class="faq-question">
+            <span class="faq-icon">Q</span>
+            {faq.question}
+          </summary>
+          <div class="faq-answer">
+            <span class="faq-icon answer">A</span>
+            <div class="answer-content" set:html={faq.answer} />
+          </div>
+        </details>
+      ))}
+    </div>
+  </section>
+)}
+
+<!-- 構造化データ -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(faq => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer.replace(/<[^>]*>/g, '') // HTMLタグを除去
+    }
+  }))
+})} />
+
+<style>
+  .faq-section {
+    @apply mt-12 mb-8;
+    @apply bg-[var(--card-color)] rounded-xl p-6;
+  }
+
+  .faq-section h2 {
+    @apply text-2xl font-bold mb-6 text-[var(--text-color)];
+    @apply flex items-center gap-2;
+  }
+
+  .faq-section h2::before {
+    content: "❓";
+    @apply text-3xl;
+  }
+
+  .faq-list {
+    @apply space-y-4;
+  }
+
+  .faq-item {
+    @apply border border-[var(--border-color)] rounded-lg;
+    @apply overflow-hidden;
+    @apply transition-all duration-300;
+  }
+
+  .faq-item[open] {
+    @apply border-[var(--primary-color)];
+    @apply shadow-md;
+  }
+
+  .faq-question {
+    @apply p-4 cursor-pointer;
+    @apply flex items-start gap-3;
+    @apply text-[var(--text-color)] font-medium;
+    @apply hover:bg-[var(--background-color)];
+    @apply transition-colors duration-200;
+    @apply select-none;
+  }
+
+  .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-question::after {
+    content: "▼";
+    @apply ml-auto text-sm text-[var(--text-color-lighten)];
+    @apply transition-transform duration-300;
+  }
+
+  .faq-item[open] .faq-question::after {
+    @apply transform rotate-180;
+  }
+
+  .faq-icon {
+    @apply flex-shrink-0 w-8 h-8;
+    @apply bg-[var(--primary-color)] text-white;
+    @apply rounded-full flex items-center justify-center;
+    @apply font-bold text-sm;
+  }
+
+  .faq-icon.answer {
+    @apply bg-[var(--primary-color-lighten)] text-[var(--primary-color)];
+  }
+
+  .faq-answer {
+    @apply px-4 pb-4 pt-2;
+    @apply flex gap-3;
+    @apply text-[var(--text-color-lighten)];
+    @apply animate-fadeIn;
+  }
+
+  .answer-content {
+    @apply flex-1;
+    @apply leading-relaxed;
+  }
+
+  .answer-content p {
+    @apply mb-2;
+  }
+
+  .answer-content ul {
+    @apply list-disc list-inside mb-2;
+  }
+
+  .answer-content code {
+    @apply bg-[var(--background-color)] px-1 py-0.5 rounded;
+    @apply text-sm font-mono;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  /* モバイル対応 */
+  @media (max-width: 768px) {
+    .faq-section {
+      @apply p-4;
+    }
+
+    .faq-question {
+      @apply text-sm;
+    }
+
+    .faq-icon {
+      @apply w-7 h-7 text-xs;
+    }
+  }
+</style>

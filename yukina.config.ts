@@ -71,7 +71,7 @@ const YukinaConfig: Configuration = {
     "/IMG_4345.jpg",
   ],
 
-  slugMode: "HASH", // 'RAW' | 'HASH'
+  slugMode: "RAW", // 'RAW' | 'HASH' - RAWに変更してSEO向上
 
   license: {
     name: "CC BY-NC-SA 4.0",
