@@ -149,24 +149,29 @@ const breadcrumbs = [
   }
   
   .post-actions {
-    @apply flex flex-wrap items-center gap-4 mt-8 pt-8;
-    @apply border-t border-[var(--border-color)];
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
   }
 
   .post-toc {
     width: 220px !important;
     flex-shrink: 0 !important;
     display: none !important;
-    position: sticky !important;
-    top: 5rem !important;
-    height: fit-content !important;
-    max-height: calc(100vh - 6rem) !important;
-    overflow-y: auto !important;
   }
 
   @media (min-width: 1024px) {
     .post-toc {
       display: block !important;
+      position: sticky !important;
+      top: 5rem !important;
+      height: fit-content !important;
+      max-height: calc(100vh - 6rem) !important;
+      overflow-y: auto !important;
     }
   }
 
