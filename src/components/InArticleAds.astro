@@ -113,9 +113,7 @@ const { slot, interval = 5 } = Astro.props;
 
   .ad-dev-placeholder {
     background-color: #e5e7eb;
-    dark:background-color: #374151;
     border: 2px dashed #9ca3af;
-    dark:border-color: #4b5563;
     border-radius: 0.5rem;
     padding: 2rem;
     text-align: center;
@@ -127,9 +125,20 @@ const { slot, interval = 5 } = Astro.props;
 
   .ad-dev-placeholder p {
     color: #6b7280;
-    dark:color: #9ca3af;
     font-weight: 600;
     margin: 0;
+  }
+
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .ad-dev-placeholder {
+      background-color: #374151;
+      border-color: #4b5563;
+    }
+    
+    .ad-dev-placeholder p {
+      color: #9ca3af;
+    }
   }
 
   /* モバイル対応 */
