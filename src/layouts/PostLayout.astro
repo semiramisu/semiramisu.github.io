@@ -12,6 +12,7 @@ import ReadingDepthTracker from "../components/ReadingDepthTracker.astro";
 import DonationBox from "../components/DonationBox.astro";
 import InArticleAds from "../components/InArticleAds.astro";
 import OGPTags from "../components/OGPTags.astro";
+import WritingAssistant from "../components/WritingAssistant.astro";
 
 interface Props {
   title?: string;
@@ -133,6 +134,7 @@ const breadcrumbs = [
       }
     </aside>
   </div>
+  {import.meta.env.DEV && <WritingAssistant />}
 </Main>
 
 <style is:global>
