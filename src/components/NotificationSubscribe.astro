@@ -1,0 +1,189 @@
+---
+// Web Push通知の購読コンポーネント
+---
+
+<div class="notification-subscribe">
+  <div class="subscribe-card">
+    <div class="subscribe-header">
+      <h3>🔔 新着記事の通知を受け取る</h3>
+      <p>ブラウザ通知で最新記事をお知らせします</p>
+    </div>
+    
+    <div class="subscribe-content">
+      <button id="subscribe-button" class="subscribe-button">
+        <span class="button-icon">🔔</span>
+        <span class="button-text">通知を有効にする</span>
+      </button>
+      
+      <div class="subscribe-status" id="subscribe-status" style="display: none;">
+        <span class="status-icon">✅</span>
+        <span class="status-text">通知を受け取る設定になっています</span>
+      </div>
+      
+      <div class="subscribe-benefits">
+        <h4>通知を有効にすると：</h4>
+        <ul>
+          <li>新着記事を即座にお知らせ</li>
+          <li>人気記事の更新情報</li>
+          <li>月1回の記事まとめ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .notification-subscribe {
+    @apply my-8;
+  }
+
+  .subscribe-card {
+    @apply bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20;
+    @apply rounded-xl p-6 border-2 border-purple-200 dark:border-purple-800;
+  }
+
+  .subscribe-header h3 {
+    @apply text-xl font-bold mb-2 text-gray-800 dark:text-gray-200;
+  }
+
+  .subscribe-header p {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .subscribe-content {
+    @apply mt-4 space-y-4;
+  }
+
+  .subscribe-button {
+    @apply w-full py-3 px-6 rounded-lg;
+    @apply bg-gradient-to-r from-purple-600 to-pink-600;
+    @apply text-white font-semibold;
+    @apply flex items-center justify-center gap-2;
+    @apply transition-all duration-300;
+    @apply hover:shadow-lg hover:scale-[1.02];
+  }
+
+  .subscribe-button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .button-icon {
+    @apply text-xl;
+  }
+
+  .subscribe-status {
+    @apply flex items-center gap-2;
+    @apply text-green-600 dark:text-green-400;
+    @apply bg-green-50 dark:bg-green-900/20;
+    @apply py-2 px-4 rounded-lg;
+  }
+
+  .subscribe-benefits {
+    @apply mt-4 pt-4 border-t border-purple-200 dark:border-purple-800;
+  }
+
+  .subscribe-benefits h4 {
+    @apply text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300;
+  }
+
+  .subscribe-benefits ul {
+    @apply space-y-1;
+  }
+
+  .subscribe-benefits li {
+    @apply text-sm text-gray-600 dark:text-gray-400;
+    @apply flex items-start gap-2;
+  }
+
+  .subscribe-benefits li::before {
+    content: "✨";
+    @apply flex-shrink-0 mt-0.5;
+  }
+</style>
+
+<script>
+  // Service Workerの登録と通知購読
+  async function initNotifications() {
+    const button = document.getElementById('subscribe-button') as HTMLButtonElement;
+    const status = document.getElementById('subscribe-status') as HTMLElement;
+    
+    if (!button || !status) return;
+    
+    // 通知がサポートされているかチェック
+    if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      button.textContent = '通知はサポートされていません';
+      button.disabled = true;
+      return;
+    }
+    
+    // 現在の通知許可状態をチェック
+    if (Notification.permission === 'granted') {
+      button.style.display = 'none';
+      status.style.display = 'flex';
+    }
+    
+    // ボタンクリック時の処理
+    button.addEventListener('click', async () => {
+      try {
+        // 通知許可をリクエスト
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'granted') {
+          // Service Workerを登録
+          const registration = await navigator.serviceWorker.register('/sw.js');
+          
+          // Push通知を購読
+          const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(
+              'YOUR_VAPID_PUBLIC_KEY' // 実際のVAPIDキーに置き換える
+            )
+          });
+          
+          // サーバーに購読情報を送信
+          await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(subscription)
+          });
+          
+          // UIを更新
+          button.style.display = 'none';
+          status.style.display = 'flex';
+          
+          // テスト通知を送信
+          new Notification('セミラミスの庭', {
+            body: '通知の設定が完了しました！',
+            icon: '/icon.jpg',
+            badge: '/icon.jpg'
+          });
+        }
+      } catch (error) {
+        console.error('通知の設定に失敗しました:', error);
+        alert('通知の設定に失敗しました。後でもう一度お試しください。');
+      }
+    });
+  }
+  
+  // Base64 URLをUint8Arrayに変換
+  function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+    
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+  
+  // 初期化
+  document.addEventListener('astro:page-load', initNotifications);
+  document.addEventListener('DOMContentLoaded', initNotifications);
+</script>

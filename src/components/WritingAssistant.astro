@@ -1,0 +1,317 @@
+---
+// 記事執筆支援ツール
+interface Props {
+  postContent?: string;
+}
+
+const { postContent = '' } = Astro.props;
+---
+
+<div class="writing-assistant" id="writing-assistant">
+  <h3>執筆アシスタント</h3>
+  
+  <div class="assistant-sections">
+    <!-- SEOスコア -->
+    <div class="assistant-section">
+      <h4>📊 SEOスコア</h4>
+      <div class="seo-metrics">
+        <div class="metric">
+          <span class="metric-label">文字数:</span>
+          <span class="metric-value" id="char-count">0</span>
+          <span class="metric-target">/ 1,500文字以上推奨</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">見出し数:</span>
+          <span class="metric-value" id="heading-count">0</span>
+          <span class="metric-target">/ 3つ以上推奨</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">画像数:</span>
+          <span class="metric-value" id="image-count">0</span>
+          <span class="metric-target">/ 2つ以上推奨</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">内部リンク:</span>
+          <span class="metric-value" id="internal-link-count">0</span>
+          <span class="metric-target">/ 3つ以上推奨</span>
+        </div>
+      </div>
+      <div class="seo-score">
+        <div class="score-bar">
+          <div class="score-fill" id="seo-score-fill"></div>
+        </div>
+        <span class="score-text" id="seo-score-text">0/100</span>
+      </div>
+    </div>
+
+    <!-- 推奨キーワード -->
+    <div class="assistant-section">
+      <h4>🔑 推奨キーワード</h4>
+      <div class="keyword-suggestions" id="keyword-suggestions">
+        <div class="keyword-chip">Python データ分析</div>
+        <div class="keyword-chip">pandas 使い方</div>
+        <div class="keyword-chip">機械学習 入門</div>
+      </div>
+    </div>
+
+    <!-- 読みやすさスコア -->
+    <div class="assistant-section">
+      <h4>📖 読みやすさ</h4>
+      <div class="readability-metrics">
+        <div class="metric">
+          <span class="metric-label">平均文長:</span>
+          <span class="metric-value" id="avg-sentence-length">0</span>
+          <span class="metric-status">文字</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">難読漢字:</span>
+          <span class="metric-value" id="difficult-kanji">0</span>
+          <span class="metric-status">個</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- チェックリスト -->
+    <div class="assistant-section">
+      <h4>✅ 投稿前チェックリスト</h4>
+      <div class="checklist">
+        <label class="checklist-item">
+          <input type="checkbox" />
+          <span>タイトルにキーワードを含む</span>
+        </label>
+        <label class="checklist-item">
+          <input type="checkbox" />
+          <span>メタディスクリプションを設定</span>
+        </label>
+        <label class="checklist-item">
+          <input type="checkbox" />
+          <span>アイキャッチ画像を設定</span>
+        </label>
+        <label class="checklist-item">
+          <input type="checkbox" />
+          <span>カテゴリとタグを適切に設定</span>
+        </label>
+        <label class="checklist-item">
+          <input type="checkbox" />
+          <span>内部リンクを3つ以上追加</span>
+        </label>
+        <label class="checklist-item">
+          <input type="checkbox" />
+          <span>誤字脱字をチェック</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <button class="assistant-toggle" id="assistant-toggle">
+    <span class="toggle-icon">📝</span>
+  </button>
+</div>
+
+<style>
+  .writing-assistant {
+    @apply fixed right-4 top-20 z-40;
+    @apply bg-[var(--card-color)] rounded-lg shadow-xl;
+    @apply w-80 max-h-[80vh] overflow-y-auto;
+    @apply transition-transform duration-300;
+    @apply transform translate-x-0;
+  }
+
+  .writing-assistant.collapsed {
+    @apply translate-x-[calc(100%+1rem)];
+  }
+
+  .writing-assistant h3 {
+    @apply text-lg font-bold p-4 border-b border-[var(--border-color)];
+    @apply sticky top-0 bg-[var(--card-color)] z-10;
+  }
+
+  .assistant-sections {
+    @apply p-4 space-y-4;
+  }
+
+  .assistant-section {
+    @apply border border-[var(--border-color)] rounded-lg p-3;
+  }
+
+  .assistant-section h4 {
+    @apply text-sm font-semibold mb-2 text-[var(--text-color)];
+  }
+
+  /* メトリクス */
+  .seo-metrics, .readability-metrics {
+    @apply space-y-2;
+  }
+
+  .metric {
+    @apply flex items-center text-sm;
+  }
+
+  .metric-label {
+    @apply text-[var(--text-color-lighten)] mr-2;
+  }
+
+  .metric-value {
+    @apply font-bold text-[var(--text-color)] mr-1;
+  }
+
+  .metric-target, .metric-status {
+    @apply text-xs text-[var(--text-color-lighten)];
+  }
+
+  /* SEOスコア */
+  .seo-score {
+    @apply mt-3 flex items-center gap-2;
+  }
+
+  .score-bar {
+    @apply flex-1 h-2 bg-[var(--border-color)] rounded-full overflow-hidden;
+  }
+
+  .score-fill {
+    @apply h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500;
+    @apply transition-all duration-500;
+    width: 0%;
+  }
+
+  .score-text {
+    @apply text-sm font-bold;
+  }
+
+  /* キーワード */
+  .keyword-suggestions {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .keyword-chip {
+    @apply px-2 py-1 text-xs rounded-full;
+    @apply bg-[var(--primary-color-lighten)] text-[var(--primary-color)];
+    @apply cursor-pointer transition-all duration-200;
+  }
+
+  .keyword-chip:hover {
+    @apply bg-[var(--primary-color)] text-white;
+  }
+
+  /* チェックリスト */
+  .checklist {
+    @apply space-y-2;
+  }
+
+  .checklist-item {
+    @apply flex items-center gap-2 text-sm cursor-pointer;
+    @apply text-[var(--text-color-lighten)];
+  }
+
+  .checklist-item input:checked + span {
+    @apply line-through text-[var(--text-color)];
+  }
+
+  /* トグルボタン */
+  .assistant-toggle {
+    @apply absolute -left-12 top-4;
+    @apply w-10 h-10 rounded-lg;
+    @apply bg-[var(--primary-color)] text-white;
+    @apply flex items-center justify-center;
+    @apply shadow-lg hover:shadow-xl;
+    @apply transition-all duration-300;
+  }
+
+  .assistant-toggle:hover {
+    @apply transform scale-110;
+  }
+
+  /* モバイル非表示 */
+  @media (max-width: 1024px) {
+    .writing-assistant {
+      @apply hidden;
+    }
+  }
+</style>
+
+<script>
+  function initWritingAssistant() {
+    const assistant = document.getElementById('writing-assistant');
+    const toggle = document.getElementById('assistant-toggle');
+    const article = document.querySelector('.post-article');
+    
+    if (!assistant || !toggle || !article) return;
+
+    // トグル機能
+    let isCollapsed = localStorage.getItem('writing-assistant-collapsed') === 'true';
+    if (isCollapsed) assistant.classList.add('collapsed');
+
+    toggle.addEventListener('click', () => {
+      isCollapsed = !isCollapsed;
+      assistant.classList.toggle('collapsed');
+      localStorage.setItem('writing-assistant-collapsed', isCollapsed.toString());
+    });
+
+    // コンテンツ分析
+    function analyzeContent() {
+      const content = article.textContent || '';
+      const html = article.innerHTML || '';
+
+      // 文字数
+      const charCount = content.length;
+      document.getElementById('char-count')!.textContent = charCount.toString();
+
+      // 見出し数
+      const headings = article.querySelectorAll('h2, h3').length;
+      document.getElementById('heading-count')!.textContent = headings.toString();
+
+      // 画像数
+      const images = article.querySelectorAll('img').length;
+      document.getElementById('image-count')!.textContent = images.toString();
+
+      // 内部リンク数
+      const internalLinks = article.querySelectorAll('a[href^="/"]').length;
+      document.getElementById('internal-link-count')!.textContent = internalLinks.toString();
+
+      // 平均文長
+      const sentences = content.split(/[。！？]/).filter(s => s.trim());
+      const avgLength = sentences.length > 0 
+        ? Math.round(sentences.reduce((sum, s) => sum + s.length, 0) / sentences.length)
+        : 0;
+      document.getElementById('avg-sentence-length')!.textContent = avgLength.toString();
+
+      // SEOスコア計算
+      let score = 0;
+      if (charCount >= 1500) score += 25;
+      else score += Math.floor((charCount / 1500) * 25);
+      
+      if (headings >= 3) score += 25;
+      else score += Math.floor((headings / 3) * 25);
+      
+      if (images >= 2) score += 25;
+      else score += Math.floor((images / 2) * 25);
+      
+      if (internalLinks >= 3) score += 25;
+      else score += Math.floor((internalLinks / 3) * 25);
+
+      // スコア表示
+      const scoreFill = document.getElementById('seo-score-fill') as HTMLElement;
+      const scoreText = document.getElementById('seo-score-text')!;
+      
+      scoreFill.style.width = `${score}%`;
+      scoreText.textContent = `${score}/100`;
+      
+      // スコアに応じて色を変更
+      if (score >= 80) scoreText.style.color = '#10b981';
+      else if (score >= 60) scoreText.style.color = '#f59e0b';
+      else scoreText.style.color = '#ef4444';
+    }
+
+    // 初回分析
+    analyzeContent();
+
+    // 定期的に再分析（編集中の場合）
+    if (window.location.pathname.includes('edit') || window.location.pathname.includes('new')) {
+      setInterval(analyzeContent, 5000);
+    }
+  }
+
+  // 初期化
+  document.addEventListener('astro:page-load', initWritingAssistant);
+  document.addEventListener('DOMContentLoaded', initWritingAssistant);
+</script>
