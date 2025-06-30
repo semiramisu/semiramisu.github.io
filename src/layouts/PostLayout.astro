@@ -8,6 +8,9 @@ import ShareButtons from "../components/ShareButtons.astro";
 import RelatedPosts from "../components/RelatedPosts.astro";
 import Comments from "../components/Comments.astro";
 import StructuredData from "../components/StructuredData.astro";
+import ReadingDepthTracker from "../components/ReadingDepthTracker.astro";
+import DonationBox from "../components/DonationBox.astro";
+import InArticleAds from "../components/InArticleAds.astro";
 
 interface Props {
   title?: string;
@@ -72,6 +75,8 @@ const breadcrumbs = [
     </Fragment>
   )}
   <ReadingProgress />
+  <ReadingDepthTracker />
+  <InArticleAds slot="XXXXXXXXXX" interval={5} />
   <div id="post-content-wrapper" class="post-content-wrapper">
     <article id="post-article" class="post-article">
       <div class="article-inner">
@@ -100,6 +105,7 @@ const breadcrumbs = [
           />
         )
       }
+      <DonationBox />
       <Comments lang="ja" />
     </div>
     </article>

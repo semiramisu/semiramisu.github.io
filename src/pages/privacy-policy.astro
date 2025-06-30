@@ -1,0 +1,182 @@
+---
+import Main from "../layouts/MainLayout.astro";
+import YukinaConfig from "../../yukina.config";
+
+const lastUpdated = new Date('2024-12-27');
+---
+
+<Main title="プライバシーポリシー" subTitle="Privacy Policy">
+  <div class="privacy-policy-container">
+    <article class="privacy-content">
+      <h1>プライバシーポリシー</h1>
+      <p class="last-updated">最終更新日: {lastUpdated.toLocaleDateString('ja-JP')}</p>
+
+      <section>
+        <h2>はじめに</h2>
+        <p>
+          {YukinaConfig.title}（以下、「当サイト」）は、訪問者のプライバシーを尊重し、個人情報の保護に努めています。
+          本プライバシーポリシーは、当サイトにおける個人情報の取り扱いについて説明します。
+        </p>
+      </section>
+
+      <section>
+        <h2>収集する情報</h2>
+        
+        <h3>1. アクセス解析ツール</h3>
+        <p>
+          当サイトでは、Google Analyticsを使用してアクセス情報を収集しています。
+          Google Analyticsはトラフィックデータの収集のためにCookieを使用しています。
+          このデータは匿名で収集されており、個人を特定するものではありません。
+        </p>
+        <p>
+          収集される情報には以下が含まれます：
+        </p>
+        <ul>
+          <li>アクセス元の地域情報</li>
+          <li>使用しているブラウザ・デバイス情報</li>
+          <li>サイト内での行動履歴（ページビュー、滞在時間、読了率など）</li>
+          <li>リファラー情報</li>
+        </ul>
+        <p>
+          この機能はCookieを無効にすることで収集を拒否することができます。
+          Cookieの無効化についてはお使いのブラウザの設定をご確認ください。
+        </p>
+
+        <h3>2. お問い合わせフォーム</h3>
+        <p>
+          当サイトのお問い合わせフォームでは、以下の情報を収集することがあります：
+        </p>
+        <ul>
+          <li>お名前（ハンドルネーム可）</li>
+          <li>メールアドレス</li>
+          <li>お問い合わせ内容</li>
+        </ul>
+        <p>
+          これらの情報は、お問い合わせへの返信のみに使用し、他の目的では使用しません。
+        </p>
+
+        <h3>3. コメント機能</h3>
+        <p>
+          当サイトでは、GitHub Discussionsを利用したコメント機能を提供しています。
+          コメント投稿時にはGitHubアカウントが必要となり、GitHubのプライバシーポリシーが適用されます。
+        </p>
+      </section>
+
+      <section>
+        <h2>広告について</h2>
+        
+        <h3>Google AdSense</h3>
+        <p>
+          当サイトでは、第三者配信の広告サービス「Google AdSense」を利用する予定です。
+          Google AdSenseは、ユーザーの興味に応じた広告を表示するためにCookieを使用することがあります。
+        </p>
+        <p>
+          Cookieを無効にする方法やGoogleアドセンスに関する詳細は
+          <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">
+            Googleの広告ポリシー
+          </a>
+          をご覧ください。
+        </p>
+
+        <h3>アフィリエイトプログラム</h3>
+        <p>
+          当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムである、Amazonアソシエイト・プログラムの参加者です。
+        </p>
+        <p>
+          また、楽天アフィリエイト、もしもアフィリエイトなどのアフィリエイトプログラムを利用しています。
+        </p>
+      </section>
+
+      <section>
+        <h2>個人情報の第三者への開示</h2>
+        <p>
+          当サイトでは、個人情報は適切に管理し、以下に該当する場合を除いて第三者に開示することはありません：
+        </p>
+        <ul>
+          <li>本人の同意がある場合</li>
+          <li>法令に基づく場合</li>
+          <li>人の生命、身体または財産の保護のために必要がある場合</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>プライバシーポリシーの変更</h2>
+        <p>
+          当サイトは、必要に応じて本プライバシーポリシーを変更することがあります。
+          変更した場合には、本ページにて通知いたします。
+        </p>
+      </section>
+
+      <section>
+        <h2>免責事項</h2>
+        <p>
+          当サイトに掲載されている情報は、可能な限り正確な情報を提供するよう努めていますが、
+          正確性や安全性を保証するものではありません。
+        </p>
+        <p>
+          当サイトの利用によって生じた損害等の一切の責任を負いかねますので、ご了承ください。
+        </p>
+        <p>
+          また、当サイトからリンクやバナーなどによって他のサイトに移動された場合、
+          移動先サイトで提供される情報、サービス等について一切の責任を負いません。
+        </p>
+      </section>
+
+      <section>
+        <h2>お問い合わせ</h2>
+        <p>
+          本プライバシーポリシーに関するお問い合わせは、
+          <a href="/contact">お問い合わせフォーム</a>
+          よりお願いいたします。
+        </p>
+      </section>
+    </article>
+  </div>
+</Main>
+
+<style>
+  .privacy-policy-container {
+    @apply max-w-4xl mx-auto px-4 py-8;
+  }
+
+  .privacy-content {
+    @apply bg-[var(--card-color)] rounded-xl p-6 md:p-10;
+  }
+
+  .privacy-content h1 {
+    @apply text-3xl font-bold mb-4 text-[var(--text-color)];
+  }
+
+  .last-updated {
+    @apply text-sm text-[var(--text-color-lighten)] mb-8;
+  }
+
+  .privacy-content h2 {
+    @apply text-2xl font-bold mt-8 mb-4 text-[var(--text-color)];
+    @apply border-b-2 border-[var(--primary-color)] pb-2;
+  }
+
+  .privacy-content h3 {
+    @apply text-xl font-semibold mt-6 mb-3 text-[var(--text-color)];
+  }
+
+  .privacy-content section {
+    @apply mb-8;
+  }
+
+  .privacy-content p {
+    @apply mb-4 leading-relaxed text-[var(--text-color-lighten)];
+  }
+
+  .privacy-content ul {
+    @apply list-disc list-inside mb-4 text-[var(--text-color-lighten)];
+  }
+
+  .privacy-content li {
+    @apply mb-2;
+  }
+
+  .privacy-content a {
+    @apply text-[var(--primary-color)] hover:underline;
+  }
+</style>

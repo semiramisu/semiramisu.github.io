@@ -1,0 +1,145 @@
+---
+// 記事内広告の自動挿入コンポーネント
+import GoogleAdSense from './GoogleAdSense.astro';
+
+interface Props {
+  slot: string;
+  interval?: number; // 何段落ごとに広告を挿入するか
+}
+
+const { slot, interval = 5 } = Astro.props;
+---
+
+<div class="in-article-ads" data-ad-slot={slot} data-ad-interval={interval}></div>
+
+<script define:vars={{ slot, interval }}>
+  // 記事内の適切な位置に広告を挿入
+  function insertInArticleAds() {
+    const article = document.querySelector('.article-inner');
+    if (!article) return;
+
+    // すべての段落要素を取得
+    const paragraphs = article.querySelectorAll('p, h2, h3');
+    if (paragraphs.length < interval * 2) return; // 記事が短すぎる場合は挿入しない
+
+    // 既存の広告を削除（ページ遷移時の重複防止）
+    article.querySelectorAll('.in-article-ad-wrapper').forEach(ad => ad.remove());
+
+    // 広告を挿入する位置を計算
+    const adPositions = [];
+    for (let i = interval; i < paragraphs.length - interval; i += interval) {
+      adPositions.push(i);
+    }
+
+    // 最大3つまでに制限
+    const limitedPositions = adPositions.slice(0, 3);
+
+    // 広告を挿入
+    limitedPositions.forEach((position, index) => {
+      const targetElement = paragraphs[position];
+      if (!targetElement) return;
+
+      // 広告コンテナを作成
+      const adWrapper = document.createElement('div');
+      adWrapper.className = 'in-article-ad-wrapper';
+      adWrapper.innerHTML = `
+        <div class="in-article-ad-container">
+          <ins class="adsbygoogle"
+               style="display:block; text-align:center;"
+               data-ad-client="${import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || 'ca-pub-XXXXXXXXXX'}"
+               data-ad-slot="${slot}"
+               data-ad-format="fluid"
+               data-ad-layout="in-article"
+               data-full-width-responsive="true"></ins>
+        </div>
+      `;
+
+      // 要素の後に挿入
+      targetElement.parentNode.insertBefore(adWrapper, targetElement.nextSibling);
+
+      // 本番環境でのみAdSenseを初期化
+      if (import.meta.env.PROD) {
+        try {
+          // @ts-ignore
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          console.error('In-article ad initialization error:', e);
+        }
+      }
+    });
+
+    // 開発環境ではプレースホルダーを表示
+    if (import.meta.env.DEV) {
+      document.querySelectorAll('.in-article-ad-container ins').forEach((ins, index) => {
+        ins.outerHTML = `
+          <div class="ad-dev-placeholder">
+            <p>記事内広告 #${index + 1}（開発環境）</p>
+          </div>
+        `;
+      });
+    }
+  }
+
+  // ページロード時とページ遷移時に実行
+  document.addEventListener('astro:page-load', () => {
+    // 記事ページでのみ実行
+    if (document.querySelector('.post-article')) {
+      setTimeout(insertInArticleAds, 100);
+    }
+  });
+</script>
+
+<style is:global>
+  .in-article-ad-wrapper {
+    margin: 2.5rem 0;
+  }
+
+  .in-article-ad-container {
+    background-color: var(--card-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .in-article-ad-container::before {
+    content: 'スポンサーリンク';
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-color-lighten);
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .ad-dev-placeholder {
+    background-color: #e5e7eb;
+    dark:background-color: #374151;
+    border: 2px dashed #9ca3af;
+    dark:border-color: #4b5563;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ad-dev-placeholder p {
+    color: #6b7280;
+    dark:color: #9ca3af;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  /* モバイル対応 */
+  @media (max-width: 768px) {
+    .in-article-ad-wrapper {
+      margin: 2rem -1rem;
+    }
+
+    .in-article-ad-container {
+      border-radius: 0;
+    }
+  }
+</style>

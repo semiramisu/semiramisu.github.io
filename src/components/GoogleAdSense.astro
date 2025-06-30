@@ -1,0 +1,94 @@
+---
+interface Props {
+  slot: string;
+  format?: 'auto' | 'fluid' | 'rectangle' | 'horizontal' | 'vertical';
+  layout?: 'in-article' | 'in-feed';
+  responsive?: boolean;
+  className?: string;
+  style?: string;
+}
+
+const { 
+  slot, 
+  format = 'auto', 
+  layout,
+  responsive = true,
+  className = '',
+  style = ''
+} = Astro.props;
+
+// 本番環境でのみ広告を表示
+const showAds = import.meta.env.PROD;
+
+// AdSenseクライアントID（環境変数から取得）
+const adClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT || 'ca-pub-XXXXXXXXXX';
+---
+
+{showAds ? (
+  <div class={`ad-container ${className}`}>
+    <ins 
+      class="adsbygoogle"
+      style={`display:block;${style}`}
+      data-ad-client={adClient}
+      data-ad-slot={slot}
+      data-ad-format={format}
+      data-ad-layout={layout}
+      data-full-width-responsive={responsive}
+    ></ins>
+  </div>
+) : (
+  <div class="ad-placeholder">
+    <p>広告スペース（開発環境）</p>
+    <small>Slot: {slot} | Format: {format}</small>
+  </div>
+)}
+
+<style>
+  .ad-container {
+    @apply my-8 text-center;
+    @apply min-h-[100px];
+  }
+
+  .ad-placeholder {
+    @apply bg-gray-200 dark:bg-gray-800 rounded-lg p-8 my-8;
+    @apply border-2 border-dashed border-gray-400 dark:border-gray-600;
+    @apply text-center;
+  }
+
+  .ad-placeholder p {
+    @apply text-gray-600 dark:text-gray-400 font-semibold mb-2;
+  }
+
+  .ad-placeholder small {
+    @apply text-xs text-gray-500 dark:text-gray-500;
+  }
+
+  /* 広告の最小高さを確保 */
+  .adsbygoogle {
+    min-height: 100px;
+  }
+</style>
+
+<script>
+  // AdSenseスクリプトの読み込み
+  if (import.meta.env.PROD) {
+    // スクリプトが既に読み込まれているかチェック
+    if (!document.querySelector('script[src*="pagead2.googlesyndication.com"]')) {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+      script.crossOrigin = 'anonymous';
+      document.head.appendChild(script);
+    }
+
+    // 広告の初期化
+    document.addEventListener('astro:page-load', () => {
+      try {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.error('AdSense initialization error:', e);
+      }
+    });
+  }
+</script>

@@ -1,0 +1,228 @@
+---
+interface Props {
+  showPayPay?: boolean;
+  showBuyMeCoffee?: boolean;
+  payPayId?: string;
+  buyMeCoffeeUrl?: string;
+}
+
+const { 
+  showPayPay = true, 
+  showBuyMeCoffee = true,
+  payPayId = '@your-paypay-id',
+  buyMeCoffeeUrl = 'https://www.buymeacoffee.com/yourusername'
+} = Astro.props;
+---
+
+<div class="donation-container">
+  <div class="donation-header">
+    <h3>
+      <span class="icon">☕</span>
+      応援お待ちしています！
+    </h3>
+    <p class="donation-description">
+      もしこの記事が役に立ったら、コーヒー1杯分の支援をいただけると嬉しいです。
+      いただいた支援は、より良いコンテンツ作成のために使わせていただきます。
+    </p>
+  </div>
+
+  <div class="donation-methods">
+    {showPayPay && (
+      <div class="donation-method paypay">
+        <h4>PayPayで支援する</h4>
+        <div class="paypay-content">
+          <div class="qr-placeholder">
+            <p>QRコード</p>
+            <small>（PayPayアプリで読み取ってください）</small>
+          </div>
+          <div class="paypay-info">
+            <p class="paypay-id">PayPay ID: <strong>{payPayId}</strong></p>
+            <p class="paypay-note">
+              ※ PayPayアプリの「送る」から<br />
+              上記IDを検索してください
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {showBuyMeCoffee && (
+      <div class="donation-method buymeacoffee">
+        <h4>Buy Me a Coffeeで支援する</h4>
+        <a 
+          href={buyMeCoffeeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="bmc-button"
+        >
+          <img 
+            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+            alt="Buy Me A Coffee" 
+          />
+        </a>
+        <p class="bmc-note">
+          クレジットカードやPayPalで支援できます
+        </p>
+      </div>
+    )}
+  </div>
+
+  <div class="donation-footer">
+    <p class="disclaimer">
+      ※ いただいた支援は雑所得として適切に申告いたします<br />
+      ※ 支援は任意です。記事は無料でお読みいただけます
+    </p>
+  </div>
+</div>
+
+<style>
+  .donation-container {
+    @apply bg-[var(--card-color)] rounded-xl p-6 my-8;
+    @apply border-2 border-[var(--primary-color-lighten)];
+  }
+
+  .donation-header {
+    @apply text-center mb-6;
+  }
+
+  .donation-header h3 {
+    @apply text-2xl font-bold mb-3 text-[var(--text-color)];
+    @apply flex items-center justify-center gap-2;
+  }
+
+  .donation-header .icon {
+    @apply text-3xl;
+  }
+
+  .donation-description {
+    @apply text-[var(--text-color-lighten)] leading-relaxed;
+    @apply max-w-2xl mx-auto;
+  }
+
+  .donation-methods {
+    @apply grid md:grid-cols-2 gap-6 my-6;
+  }
+
+  .donation-method {
+    @apply bg-[var(--background-color)] rounded-lg p-5;
+    @apply border border-[var(--border-color)];
+    @apply transition-all duration-300;
+  }
+
+  .donation-method:hover {
+    @apply border-[var(--primary-color)];
+    @apply shadow-lg;
+  }
+
+  .donation-method h4 {
+    @apply text-lg font-semibold mb-4 text-[var(--text-color)];
+    @apply text-center;
+  }
+
+  /* PayPay */
+  .paypay-content {
+    @apply text-center;
+  }
+
+  .qr-placeholder {
+    @apply bg-gray-200 dark:bg-gray-700 rounded-lg p-8 mb-4;
+    @apply w-48 h-48 mx-auto;
+    @apply flex flex-col items-center justify-center;
+    @apply border-2 border-dashed border-gray-400 dark:border-gray-600;
+  }
+
+  .qr-placeholder p {
+    @apply text-gray-600 dark:text-gray-400 font-semibold;
+  }
+
+  .qr-placeholder small {
+    @apply text-xs text-gray-500 dark:text-gray-500 mt-2;
+  }
+
+  .paypay-info {
+    @apply space-y-2;
+  }
+
+  .paypay-id {
+    @apply text-lg text-[var(--text-color)];
+  }
+
+  .paypay-id strong {
+    @apply text-[var(--primary-color)] font-mono text-xl;
+  }
+
+  .paypay-note {
+    @apply text-sm text-[var(--text-color-lighten)];
+  }
+
+  /* Buy Me a Coffee */
+  .buymeacoffee {
+    @apply text-center;
+  }
+
+  .bmc-button {
+    @apply inline-block mb-3;
+    @apply transition-transform duration-300;
+  }
+
+  .bmc-button:hover {
+    @apply transform scale-105;
+  }
+
+  .bmc-button img {
+    @apply h-12 w-auto;
+  }
+
+  .bmc-note {
+    @apply text-sm text-[var(--text-color-lighten)];
+  }
+
+  /* Footer */
+  .donation-footer {
+    @apply mt-6 pt-4 border-t border-[var(--border-color)];
+    @apply text-center;
+  }
+
+  .disclaimer {
+    @apply text-xs text-[var(--text-color-lighten)];
+    @apply leading-relaxed;
+  }
+
+  /* Mobile optimization */
+  @media (max-width: 768px) {
+    .donation-methods {
+      @apply grid-cols-1;
+    }
+    
+    .qr-placeholder {
+      @apply w-40 h-40;
+    }
+  }
+</style>
+
+<script>
+  // PayPay IDのコピー機能
+  document.addEventListener('astro:page-load', () => {
+    const payPayIdElement = document.querySelector('.paypay-id strong');
+    if (payPayIdElement) {
+      payPayIdElement.style.cursor = 'pointer';
+      payPayIdElement.title = 'クリックしてコピー';
+      
+      payPayIdElement.addEventListener('click', () => {
+        const id = payPayIdElement.textContent;
+        if (id) {
+          navigator.clipboard.writeText(id).then(() => {
+            const originalText = payPayIdElement.textContent;
+            payPayIdElement.textContent = 'コピーしました！';
+            payPayIdElement.style.color = '#22c55e';
+            
+            setTimeout(() => {
+              payPayIdElement.textContent = originalText;
+              payPayIdElement.style.color = '';
+            }, 2000);
+          });
+        }
+      });
+    }
+  });
+</script>

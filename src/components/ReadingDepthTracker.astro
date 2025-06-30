@@ -1,0 +1,175 @@
+---
+// 読了率トラッキングコンポーネント
+---
+
+<script>
+  // 読了率トラッキング機能
+  function initReadingDepthTracker() {
+    // トラッキングするマイルストーン（%）
+    const milestones = [10, 25, 50, 75, 90, 100];
+    const reachedMilestones = new Set();
+    
+    // 記事本文の要素を取得
+    const articleElement = document.querySelector('.post-article');
+    if (!articleElement) return;
+    
+    // スクロール時間の計測
+    let scrollStartTime = Date.now();
+    let totalReadingTime = 0;
+    let isReading = true;
+    
+    // デバウンス用のタイマー
+    let scrollTimer: NodeJS.Timeout;
+    let idleTimer: NodeJS.Timeout;
+    
+    // 現在のスクロール深度を計算
+    function calculateScrollDepth() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      
+      // スクロール可能な高さ
+      const scrollableHeight = documentHeight - windowHeight;
+      
+      // スクロールの割合（0-100）
+      const scrollPercentage = scrollableHeight > 0 
+        ? Math.min(100, Math.round((scrollTop / scrollableHeight) * 100))
+        : 0;
+        
+      return scrollPercentage;
+    }
+    
+    // Google Analyticsにイベントを送信
+    function sendAnalyticsEvent(eventName: string, parameters: any) {
+      // @ts-ignore
+      if (typeof gtag !== 'undefined') {
+        // @ts-ignore
+        gtag('event', eventName, parameters);
+      }
+      
+      // デバッグ用（開発環境）
+      if (import.meta.env.DEV) {
+        console.log(`📊 Analytics Event: ${eventName}`, parameters);
+      }
+    }
+    
+    // 読了深度のトラッキング
+    function trackReadingDepth() {
+      const currentDepth = calculateScrollDepth();
+      
+      // 到達したマイルストーンをチェック
+      milestones.forEach(milestone => {
+        if (currentDepth >= milestone && !reachedMilestones.has(milestone)) {
+          reachedMilestones.add(milestone);
+          
+          // 記事のメタデータを取得
+          const pageTitle = document.querySelector('h1')?.textContent || 'Unknown';
+          const currentUrl = window.location.pathname;
+          
+          // イベントを送信
+          sendAnalyticsEvent('reading_depth', {
+            'percent_scrolled': milestone,
+            'page_title': pageTitle,
+            'page_location': currentUrl,
+            'reading_time_seconds': Math.round(totalReadingTime / 1000)
+          });
+          
+          // 100%到達時は読了イベントも送信
+          if (milestone === 100) {
+            sendAnalyticsEvent('article_read_complete', {
+              'page_title': pageTitle,
+              'page_location': currentUrl,
+              'total_reading_time_seconds': Math.round(totalReadingTime / 1000)
+            });
+          }
+        }
+      });
+    }
+    
+    // アイドル状態の検出
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      
+      if (!isReading) {
+        isReading = true;
+        scrollStartTime = Date.now();
+      }
+      
+      idleTimer = setTimeout(() => {
+        // 30秒間操作がなければ読書を中断とみなす
+        if (isReading) {
+          totalReadingTime += Date.now() - scrollStartTime;
+          isReading = false;
+        }
+      }, 30000);
+    }
+    
+    // スクロールイベントハンドラー
+    function handleScroll() {
+      clearTimeout(scrollTimer);
+      resetIdleTimer();
+      
+      // デバウンス処理（100ms）
+      scrollTimer = setTimeout(() => {
+        trackReadingDepth();
+      }, 100);
+    }
+    
+    // ページ離脱時の処理
+    function handlePageExit() {
+      if (isReading) {
+        totalReadingTime += Date.now() - scrollStartTime;
+      }
+      
+      const finalDepth = calculateScrollDepth();
+      const pageTitle = document.querySelector('h1')?.textContent || 'Unknown';
+      const currentUrl = window.location.pathname;
+      
+      // 離脱時のデータを送信
+      sendAnalyticsEvent('reading_session_end', {
+        'final_scroll_depth': finalDepth,
+        'page_title': pageTitle,
+        'page_location': currentUrl,
+        'total_reading_time_seconds': Math.round(totalReadingTime / 1000),
+        'milestones_reached': Array.from(reachedMilestones).join(',')
+      });
+    }
+    
+    // イベントリスナーの設定
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('beforeunload', handlePageExit);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        handlePageExit();
+      } else {
+        scrollStartTime = Date.now();
+        isReading = true;
+      }
+    });
+    
+    // 初期化時にもチェック
+    trackReadingDepth();
+    resetIdleTimer();
+    
+    // クリーンアップ関数
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('beforeunload', handlePageExit);
+      clearTimeout(scrollTimer);
+      clearTimeout(idleTimer);
+    };
+  }
+  
+  // ページロード時に初期化
+  document.addEventListener('astro:page-load', () => {
+    // 記事ページでのみ実行
+    if (document.querySelector('.post-article')) {
+      initReadingDepthTracker();
+    }
+  });
+  
+  // 初回ロード時
+  if (document.querySelector('.post-article')) {
+    initReadingDepthTracker();
+  }
+</script>
