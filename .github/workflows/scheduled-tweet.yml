@@ -35,7 +35,6 @@ jobs:
           import fs from 'fs';
           import fm from 'front-matter';
           import path from 'path';
-          import crypto from 'crypto';
           import { glob } from 'glob';
           
           // Initialize Twitter client
@@ -103,10 +102,9 @@ jobs:
                 const description = attributes.description || '';
                 const tags = attributes.tags ? attributes.tags.slice(0, 3).map(tag => `#${tag}`).join(' ') : '';
                 
-                // Generate slug
+                // Generate URL using raw filename (matching blog's RAW mode)
                 const fileName = path.basename(file, '.md');
-                const slug = crypto.createHash('sha256').update(fileName).digest('hex').substring(0, 8);
-                const postUrl = `https://semiramisu.com/posts/${slug}`;
+                const postUrl = `https://semiramisu.com/posts/${fileName}`;
                 
                 // Compose tweet
                 let tweetText = `📝 本日公開！\n\n「${postTitle}」\n`;

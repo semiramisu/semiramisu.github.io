@@ -53,7 +53,6 @@ jobs:
           import fs from 'fs';
           import fm from 'front-matter';
           import path from 'path';
-          import crypto from 'crypto';
           
           // Initialize Twitter client
           console.log('Initializing Twitter client...');
@@ -121,10 +120,9 @@ jobs:
                 const description = attributes.description || '';
                 const tags = attributes.tags ? attributes.tags.slice(0, 3).map(tag => `#${tag}`).join(' ') : '';
                 
-                // Generate slug using SHA256 (same as the blog's hash logic)
+                // Generate URL using raw filename (matching blog's RAW mode)
                 const fileName = path.basename(file, '.md');
-                const slug = crypto.createHash('sha256').update(fileName).digest('hex').substring(0, 8);
-                const postUrl = `https://semiramisu.com/posts/${slug}`;
+                const postUrl = `https://semiramisu.com/posts/${fileName}`;
                 
                 // Compose tweet (280 character limit)
                 let tweetText = `📝 ブログを更新しました！\n\n「${postTitle}」\n`;
