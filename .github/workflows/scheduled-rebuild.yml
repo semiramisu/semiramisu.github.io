@@ -1,0 +1,39 @@
+name: Scheduled Rebuild for Posts
+
+on:
+  schedule:
+    # 毎日日本時間12:00（UTC 3:00）に実行
+    - cron: '0 3 * * *'
+  workflow_dispatch: # 手動実行も可能
+
+jobs:
+  trigger-rebuild:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Trigger Netlify Build
+        run: |
+          # Netlifyのビルドフックを使用して再ビルドをトリガー
+          if [ -n "${{ secrets.NETLIFY_BUILD_HOOK_URL }}" ]; then
+            echo "Triggering Netlify rebuild..."
+            curl -X POST ${{ secrets.NETLIFY_BUILD_HOOK_URL }}
+            echo "Netlify rebuild triggered successfully"
+          else
+            echo "NETLIFY_BUILD_HOOK_URL secret is not set"
+            echo "Please add your Netlify build hook URL to GitHub secrets"
+            exit 1
+          fi
+      
+      - name: Alternative - Trigger via empty commit
+        if: failure()
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create empty commit
+        if: failure()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit --allow-empty -m "chore: scheduled rebuild for posts [skip-tweet]"
+          git push
