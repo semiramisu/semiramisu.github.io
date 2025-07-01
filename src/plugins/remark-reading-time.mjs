@@ -1,13 +1,11 @@
 import { toString as mdastToString } from "mdast-util-to-string";
-import getReadingTime from "reading-time";
+// 共通の読了時間計算ロジックを使用
+import { calculateReadingTime } from "../utils/reading-time.ts";
 
 export function remarkReadingTime() {
   return (tree, { data }) => {
     const textOnPage = mdastToString(tree);
-    const readingTime = getReadingTime(textOnPage);
-    data.astro.frontmatter.readingMetadata = {
-      time: Math.max(1, Math.round(readingTime.minutes)),
-      wordCount: readingTime.words,
-    };
+    const readingMetadata = calculateReadingTime(textOnPage);
+    data.astro.frontmatter.readingMetadata = readingMetadata;
   };
 }

@@ -1,5 +1,6 @@
 import { getCollection } from "astro:content";
 import { IdToSlug } from "./hash";
+import { calculateReadingTimeFromContent } from "./reading-time";
 
 /**
  * Extracts date from filename pattern (e.g., "2025_07_01.md")
@@ -112,18 +113,8 @@ export async function GetArchives(lang: "ja" | "en" = "ja") {
       archives.set(year, []);
     }
 
-    // 日本語と英語の混在テキストに対応した読み時間計算
-    const japaneseCharCount = (post.body.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
-    const englishWords = post.body.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
-    const wordCount = japaneseCharCount + englishWords.length;
-    const japaneseReadingTime = japaneseCharCount / 400;
-    const englishReadingTime = englishWords.length / 200;
-    const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
-    
-    const readingMetadata = {
-      time,
-      wordCount
-    };
+    // 共通の読了時間計算ロジックを使用
+    const readingMetadata = calculateReadingTimeFromContent(post.body);
 
     archives.get(year)!.push({
       title: post.data.title,
@@ -238,18 +229,8 @@ export async function GetCategories(lang: "ja" | "en" = "ja") {
       });
     }
 
-    // 日本語と英語の混在テキストに対応した読み時間計算
-    const japaneseCharCount = (post.body.match(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g) || []).length;
-    const englishWords = post.body.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, ' ').split(/\s+/).filter(word => word.length > 0);
-    const wordCount = japaneseCharCount + englishWords.length;
-    const japaneseReadingTime = japaneseCharCount / 400;
-    const englishReadingTime = englishWords.length / 200;
-    const time = Math.max(1, Math.ceil(japaneseReadingTime + englishReadingTime));
-    
-    const readingMetadata = {
-      time,
-      wordCount
-    };
+    // 共通の読了時間計算ロジックを使用
+    const readingMetadata = calculateReadingTimeFromContent(post.body);
 
     categories.get(categorySlug)!.posts.push({
       title: post.data.title,
