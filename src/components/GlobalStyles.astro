@@ -1,11 +1,19 @@
 ---
 // スタイルはlink要素で非同期読み込みする
+import "../styles/mobile-typography.css";
+import "../styles/mobile-performance.css";
 ---
 
 <style is:global>
   /* テーマの基本設定 */
   :root {
     --hue: 240;
+    
+    /* アクセントカラー（より鮮やかで目立つ色） */
+    --accent-hue: 340;
+    --success-hue: 140;
+    --warning-hue: 45;
+    --error-hue: 10;
 
     /* ライトモードとダークモードの両方で使う共通変数 */
     --primary-font: "Noto Sans SC", sans-serif;
@@ -21,35 +29,47 @@
     --transition-speed: 0.3s;
     --transition-timing: ease;
     
-    /* ライトモード用の色設定 */
-    --light-primary-color: oklch(60% 0.18 var(--hue));
-    --light-primary-color-lighten: oklch(90% 0.05 var(--hue));
-    --light-primary-color-darken: oklch(40% 0.22 var(--hue));
-    --light-primary-color-hover: oklch(85% 0.035 var(--hue));
-    --light-primary-color-transparent: oklch(60% 0.18 var(--hue) / 15%);
-    --light-text-color: oklch(25% 0 0);
-    --light-text-color-lighten: oklch(45% 0 0);
+    /* ライトモード用の色設定（コントラスト比改善） */
+    --light-primary-color: oklch(55% 0.22 var(--hue));
+    --light-primary-color-lighten: oklch(92% 0.05 var(--hue));
+    --light-primary-color-darken: oklch(35% 0.25 var(--hue));
+    --light-primary-color-hover: oklch(88% 0.035 var(--hue));
+    --light-primary-color-transparent: oklch(55% 0.22 var(--hue) / 15%);
+    --light-text-color: oklch(15% 0 0);
+    --light-text-color-lighten: oklch(40% 0 0);
     --light-card-color: oklch(100% 0 0);
-    --light-card-color-transparent: oklch(100% 0 0 / 85%);
-    --light-background-color: oklch(98% 0.01 var(--hue));
-    --light-border-color: oklch(90% 0.02 var(--hue));
-    --light-title-color: oklch(100% 0 0 / 95%);
-    --light-subtitle-color: oklch(100% 0 0 / 85%);
+    --light-card-color-transparent: oklch(100% 0 0 / 90%);
+    --light-background-color: oklch(98% 0.005 var(--hue));
+    --light-border-color: oklch(92% 0.015 var(--hue));
+    --light-title-color: oklch(100% 0 0 / 98%);
+    --light-subtitle-color: oklch(100% 0 0 / 90%);
     
-    /* ダークモード用の色設定 */
-    --dark-primary-color: oklch(65% 0.15 var(--hue));
-    --dark-primary-color-lighten: oklch(40% 0.06 var(--hue));
-    --dark-primary-color-darken: oklch(50% 0.22 var(--hue));
-    --dark-primary-color-hover: oklch(30% 0.04 var(--hue));
-    --dark-text-color: oklch(95% 0.002 var(--hue));
-    --dark-text-color-lighten: oklch(85% 0.002 var(--hue));
-    --dark-card-color: oklch(20% 0.02 var(--hue));
-    --dark-card-color-lighten: oklch(35% 0.04 var(--hue));
-    --dark-card-color-transparent: oklch(25% 0.025 var(--hue) / 85%);
-    --dark-background-color: oklch(15% 0.015 var(--hue));
-    --dark-border-color: oklch(30% 0.03 var(--hue));
-    --dark-title-color: oklch(100% 0 0 / 95%);
-    --dark-subtitle-color: oklch(100% 0 0 / 85%);
+    /* アクセントカラー（ライトモード） */
+    --light-accent-color: oklch(60% 0.25 var(--accent-hue));
+    --light-success-color: oklch(55% 0.18 var(--success-hue));
+    --light-warning-color: oklch(65% 0.15 var(--warning-hue));
+    --light-error-color: oklch(55% 0.22 var(--error-hue));
+    
+    /* ダークモード用の色設定（より良いコントラスト） */
+    --dark-primary-color: oklch(70% 0.18 var(--hue));
+    --dark-primary-color-lighten: oklch(35% 0.06 var(--hue));
+    --dark-primary-color-darken: oklch(55% 0.25 var(--hue));
+    --dark-primary-color-hover: oklch(25% 0.04 var(--hue));
+    --dark-text-color: oklch(98% 0.002 var(--hue));
+    --dark-text-color-lighten: oklch(88% 0.002 var(--hue));
+    --dark-card-color: oklch(18% 0.015 var(--hue));
+    --dark-card-color-lighten: oklch(28% 0.03 var(--hue));
+    --dark-card-color-transparent: oklch(20% 0.02 var(--hue) / 90%);
+    --dark-background-color: oklch(12% 0.01 var(--hue));
+    --dark-border-color: oklch(25% 0.025 var(--hue));
+    --dark-title-color: oklch(100% 0 0 / 98%);
+    --dark-subtitle-color: oklch(100% 0 0 / 90%);
+    
+    /* アクセントカラー（ダークモード） */
+    --dark-accent-color: oklch(75% 0.22 var(--accent-hue));
+    --dark-success-color: oklch(70% 0.16 var(--success-hue));
+    --dark-warning-color: oklch(75% 0.18 var(--warning-hue));
+    --dark-error-color: oklch(70% 0.20 var(--error-hue));
     
     /* デフォルトはライトモード */
     --primary-color: var(--light-primary-color);
@@ -65,6 +85,14 @@
     --border-color: var(--light-border-color);
     --title-color: var(--light-title-color);
     --subtitle-color: var(--light-subtitle-color);
+    --accent-color: var(--light-accent-color);
+    --success-color: var(--light-success-color);
+    --warning-color: var(--light-warning-color);
+    --error-color: var(--light-error-color);
+    
+    /* RGBバージョン（透明度操作用） */
+    --primary-color-rgb: 88, 104, 255;
+    --accent-color-rgb: 255, 64, 129;
   }
 
   /* ダークモード設定 */
@@ -82,6 +110,31 @@
     --border-color: var(--dark-border-color);
     --title-color: var(--dark-title-color);
     --subtitle-color: var(--dark-subtitle-color);
+    --accent-color: var(--dark-accent-color);
+    --success-color: var(--dark-success-color);
+    --warning-color: var(--dark-warning-color);
+    --error-color: var(--dark-error-color);
+    
+    /* RGBバージョン（透明度操作用） */
+    --primary-color-rgb: 139, 157, 255;
+    --accent-color-rgb: 255, 119, 170;
+  }
+  
+  /* 読書モード（暖色系） */
+  :root.reading-mode {
+    --hue: 35;
+    --background-color: oklch(96% 0.02 var(--hue));
+    --text-color: oklch(20% 0.02 var(--hue));
+    --card-color: oklch(98% 0.01 var(--hue));
+    --primary-color: oklch(50% 0.15 var(--hue));
+  }
+  
+  :root.dark.reading-mode {
+    --hue: 35;
+    --background-color: oklch(15% 0.02 var(--hue));
+    --text-color: oklch(92% 0.01 var(--hue));
+    --card-color: oklch(20% 0.015 var(--hue));
+    --primary-color: oklch(65% 0.12 var(--hue));
   }
 
   /* HTML属性でデータテーマを指定した場合の対応 */

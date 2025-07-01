@@ -1,0 +1,287 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<!-- Reading Mode Toggle Button -->
+<button 
+  id="reading-mode-toggle" 
+  class="reading-mode-toggle"
+  aria-label="読書モード切替"
+  title="読書モード切替"
+>
+  <Icon name="mingcute:book-2-line" width={20} height={20} class="icon-normal" />
+  <Icon name="mingcute:book-2-fill" width={20} height={20} class="icon-active" />
+</button>
+
+<!-- Enhanced Reading Progress -->
+<div class="enhanced-reading-progress" id="enhanced-reading-progress">
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+    <div class="progress-text" id="progress-text">0%</div>
+  </div>
+  <div class="reading-stats">
+    <span class="reading-time" id="reading-time-left">約5分</span>
+    <span class="word-count" id="word-count">0文字</span>
+  </div>
+</div>
+
+<style>
+  /* Reading Mode Toggle */
+  .reading-mode-toggle {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--card-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+    color: var(--text-color-lighten);
+  }
+
+  .reading-mode-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .reading-mode-toggle:active {
+    transform: translateY(0);
+  }
+
+  .reading-mode-toggle .icon-normal {
+    display: block;
+  }
+
+  .reading-mode-toggle .icon-active {
+    display: none;
+  }
+
+  :root.reading-mode .reading-mode-toggle {
+    background: var(--accent-color);
+    color: white;
+  }
+
+  :root.reading-mode .reading-mode-toggle .icon-normal {
+    display: none;
+  }
+
+  :root.reading-mode .reading-mode-toggle .icon-active {
+    display: block;
+  }
+
+  /* Enhanced Reading Progress */
+  .enhanced-reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--border-color);
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all 0.3s ease;
+  }
+
+  .enhanced-reading-progress.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .enhanced-reading-progress {
+      height: 6px;
+    }
+
+    .enhanced-reading-progress.visible {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .progress-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transition: width 0.2s ease;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .progress-text {
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color);
+    background: var(--card-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.3s ease;
+  }
+
+  .enhanced-reading-progress.visible .progress-text {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reading-stats {
+    position: absolute;
+    left: 16px;
+    top: 8px;
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-color-lighten);
+    background: var(--card-color);
+    padding: 2px 8px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.3s ease;
+  }
+
+  .enhanced-reading-progress.visible .reading-stats {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Desktop adjustments */
+  @media (min-width: 768px) {
+    .reading-mode-toggle {
+      bottom: 100px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+    }
+
+    .progress-text,
+    .reading-stats {
+      top: 12px;
+      font-size: 14px;
+    }
+  }
+
+  /* Hide on very small screens in landscape */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .reading-mode-toggle {
+      display: none;
+    }
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .reading-mode-toggle,
+    .enhanced-reading-progress,
+    .progress-bar,
+    .progress-text,
+    .reading-stats {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Reading Mode Toggle
+  const readingModeToggle = document.getElementById('reading-mode-toggle');
+  const root = document.documentElement;
+  
+  // Load saved reading mode preference
+  const savedReadingMode = localStorage.getItem('readingMode');
+  if (savedReadingMode === 'true') {
+    root.classList.add('reading-mode');
+  }
+
+  readingModeToggle?.addEventListener('click', () => {
+    const isReadingMode = root.classList.toggle('reading-mode');
+    localStorage.setItem('readingMode', isReadingMode.toString());
+    
+    // Haptic feedback on mobile
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+  });
+
+  // Enhanced Reading Progress
+  const progressBar = document.getElementById('progress-bar') as HTMLElement;
+  const progressText = document.getElementById('progress-text') as HTMLElement;
+  const progressContainer = document.getElementById('enhanced-reading-progress') as HTMLElement;
+  const readingTimeLeft = document.getElementById('reading-time-left') as HTMLElement;
+  const wordCountEl = document.getElementById('word-count') as HTMLElement;
+  
+  // Calculate reading metrics
+  const articleContent = document.querySelector('.article-inner, .post-article .markdown-content');
+  if (articleContent) {
+    const text = articleContent.textContent || '';
+    const wordCount = text.trim().split(/\s+/).length;
+    const charCount = text.length;
+    const readingSpeed = 250; // words per minute
+    const totalReadingTime = Math.ceil(wordCount / readingSpeed);
+    
+    // Update word count
+    wordCountEl.textContent = `${charCount.toLocaleString()}文字`;
+    
+    let lastScrollY = 0;
+    let ticking = false;
+    
+    function updateProgress() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrolled = window.scrollY;
+      const progress = Math.min((scrolled / documentHeight) * 100, 100);
+      
+      // Update progress bar
+      progressBar.style.width = `${progress}%`;
+      progressText.textContent = `${Math.round(progress)}%`;
+      
+      // Calculate remaining reading time
+      const remainingProgress = (100 - progress) / 100;
+      const remainingTime = Math.ceil(totalReadingTime * remainingProgress);
+      readingTimeLeft.textContent = `約${remainingTime}分`;
+      
+      // Show/hide progress bar based on scroll
+      if (scrolled > 100) {
+        progressContainer.classList.add('visible');
+      } else {
+        progressContainer.classList.remove('visible');
+      }
+      
+      ticking = false;
+    }
+    
+    function requestTick() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateProgress);
+        ticking = true;
+      }
+    }
+    
+    // Throttled scroll event
+    window.addEventListener('scroll', requestTick, { passive: true });
+    
+    // Initial update
+    updateProgress();
+  }
+
+  // Hide reading mode toggle on non-article pages
+  const isArticlePage = document.querySelector('.post-article, .article-inner');
+  if (!isArticlePage && readingModeToggle) {
+    readingModeToggle.style.display = 'none';
+  }
+</script>

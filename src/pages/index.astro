@@ -1,6 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import PostCard from "../components/PostCard.astro";
+import MobilePostCard from "../components/MobilePostCard.astro";
 import AnimatedHeading from "../components/widgets/AnimatedHeading.astro";
 import FeaturedPostsCarousel from "../components/FeaturedPostsCarousel.astro";
 import TagCloud from "../components/widgets/TagCloud.astro";
@@ -41,7 +42,8 @@ const allTags = await GetAllTags(lang);
     <!-- Recent Posts -->
     <section class="recent-posts">
       <h2 class="section-title mb-6">{i18n(I18nKeys.recent_posts)}</h2>
-      <div class="posts-grid">
+      <!-- Desktop Grid -->
+      <div class="posts-grid desktop-only">
         {recentPosts.map((entry, index) => (
           <div 
             class="post-card-animation"
@@ -57,6 +59,29 @@ const allTags = await GetAllTags(lang);
               image={entry.data.cover}
               readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
               lang={lang}
+            />
+          </div>
+        ))}
+      </div>
+      
+      <!-- Mobile List -->
+      <div class="mobile-posts-list mobile-only">
+        {recentPosts.map((entry, index) => (
+          <div 
+            class="post-card-animation"
+            style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
+          >
+            <MobilePostCard
+              id={entry.id}
+              title={entry.data.title}
+              published={entry.data.published}
+              category={entry.data.category}
+              tags={entry.data.tags}
+              description={entry.data.description}
+              image={entry.data.cover}
+              readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
+              lang={lang}
+              isCompact={index > 0}
             />
           </div>
         ))}
@@ -119,6 +144,29 @@ const allTags = await GetAllTags(lang);
     @apply h-full;
     animation: fadeIn 0.6s ease-out forwards;
     opacity: 0;
+  }
+
+  /* Responsive visibility */
+  .desktop-only {
+    display: block;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+  
+  @media (max-width: 768px) {
+    .desktop-only {
+      display: none;
+    }
+    
+    .mobile-only {
+      display: block;
+    }
+  }
+  
+  .mobile-posts-list {
+    @apply space-y-0;
   }
 
   .posts-grid {

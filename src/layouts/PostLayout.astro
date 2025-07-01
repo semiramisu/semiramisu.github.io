@@ -14,6 +14,7 @@ import InArticleAds from "../components/InArticleAds.astro";
 import OGPTags from "../components/OGPTags.astro";
 import WritingAssistant from "../components/WritingAssistant.astro";
 import SwipeNavigation from "../components/SwipeNavigation.astro";
+import ReadingModeToggle from "../components/ReadingModeToggle.astro";
 
 interface Props {
   title?: string;
@@ -88,6 +89,7 @@ const breadcrumbs = [
   <ReadingProgress />
   <ReadingDepthTracker />
   {slug && <SwipeNavigation currentSlug={slug} />}
+  <ReadingModeToggle />
   <InArticleAds slot="XXXXXXXXXX" interval={5} />
   <div id="post-content-wrapper" class="post-content-wrapper">
     <article id="post-article" class="post-article">

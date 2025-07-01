@@ -1,0 +1,266 @@
+/* Mobile Performance Optimizations */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile-specific animation adjustments */
+@media (max-width: 768px) {
+  /* Simplify animations on mobile */
+  .onload-animation {
+    animation-duration: 0.4s;
+  }
+
+  .fade-in-up {
+    animation-duration: 0.6s;
+  }
+
+  .post-card-animation {
+    animation-duration: 0.3s;
+  }
+
+  /* Disable hover effects on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .post-card:hover,
+    .mobile-post-card:hover,
+    .mobile-post-card-compact:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    button:hover,
+    a:hover {
+      transform: none;
+    }
+  }
+
+  /* Optimize scroll performance */
+  .mobile-posts-list,
+  .posts-grid,
+  .sticky-sidebar {
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;
+  }
+
+  /* Reduce box shadows for better performance */
+  .mobile-post-card,
+  .mobile-post-card-compact,
+  .mobile-bottom-nav,
+  .smart-header {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Use GPU acceleration for transforms */
+  .nav-item,
+  .menu-toggle,
+  .theme-toggle,
+  .reading-mode-toggle {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* Optimize image rendering */
+  img {
+    image-rendering: crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+  }
+
+  /* Reduce backdrop filter complexity on low-end devices */
+  @supports not (backdrop-filter: blur(10px)) {
+    .mobile-bottom-nav,
+    .smart-header {
+      background: var(--card-color);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+
+  /* Disable animations for very low-end devices */
+  @media (max-device-memory: 2) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* Touch target optimization */
+@media (pointer: coarse) {
+  /* Ensure all interactive elements have proper touch targets */
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  .nav-item,
+  .tag-badge,
+  .meta-badge {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Add padding to small interactive elements */
+  .tag-badge,
+  .meta-badge {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Battery saving mode */
+@media (prefers-reduced-data: reduce) {
+  /* Disable non-essential animations */
+  .fade-in-up,
+  .post-card-animation,
+  .onload-animation {
+    animation: none;
+    opacity: 1;
+  }
+
+  /* Simplify gradients */
+  .text-gradient,
+  .progress-bar {
+    background: var(--primary-color);
+  }
+
+  /* Remove decorative shadows */
+  .mobile-post-card,
+  .mobile-post-card-compact {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Optimize for slow connections */
+@media (prefers-reduced-data: reduce), (connection: slow-2g), (connection: 2g) {
+  /* Use system fonts */
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Disable web fonts */
+  @font-face {
+    font-display: optional;
+  }
+}
+
+/* Intersection Observer fallback styles */
+.lazy-load {
+  background: var(--border-color);
+  min-height: 200px;
+}
+
+.lazy-load.loaded {
+  background: none;
+  min-height: 0;
+}
+
+/* Virtual scrolling placeholder */
+.virtual-scroll-placeholder {
+  height: 100px;
+  background: linear-gradient(
+    to right,
+    var(--border-color) 0%,
+    var(--card-color) 50%,
+    var(--border-color) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Memory optimization for long pages */
+@media (max-width: 768px) {
+  /* Limit animation complexity */
+  .enhanced-reading-progress,
+  .progress-bar {
+    will-change: auto;
+  }
+
+  /* Remove complex filters on scroll */
+  .scrolling .mobile-bottom-nav,
+  .scrolling .smart-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--card-color);
+  }
+}
+
+/* Force hardware acceleration for critical animations */
+.swipe-indicator,
+.mobile-menu-transition,
+.theme-transition {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+/* Optimize paint performance */
+.mobile-post-card-compact,
+.mobile-post-card {
+  contain: layout style paint;
+}
+
+/* Reduce reflows during scroll */
+.sticky-sidebar,
+.smart-header,
+.mobile-bottom-nav {
+  contain: layout;
+}
+
+/* Progressive enhancement for modern browsers */
+@supports (contain: layout style paint) {
+  .post-article,
+  .article-inner {
+    contain: layout style paint;
+  }
+}
+
+@supports (overscroll-behavior: contain) {
+  .mobile-posts-list,
+  .sticky-sidebar {
+    overscroll-behavior: contain;
+  }
+}
+
+/* iOS-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  /* Disable tap highlight */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Smooth momentum scrolling */
+  .mobile-posts-list,
+  .sticky-sidebar,
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix position: fixed issues */
+  .mobile-bottom-nav,
+  .smart-header {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Android-specific optimizations */
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  /* Optimize for high DPI screens */
+  img {
+    image-rendering: high-quality;
+  }
+}

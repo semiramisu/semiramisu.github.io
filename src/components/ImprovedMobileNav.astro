@@ -1,0 +1,298 @@
+---
+import { Icon } from "astro-icon/components";
+
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { href: "/", icon: "mingcute:home-4-fill", label: "ホーム" },
+  { href: "/all-posts", icon: "mingcute:search-3-fill", label: "検索" },
+  { href: "/categories", icon: "mingcute:grid-fill", label: "カテゴリ" },
+  { href: "/archive", icon: "mingcute:calendar-fill", label: "アーカイブ" },
+  { href: "#top", icon: "mingcute:arrow-up-fill", label: "トップへ", isAction: true }
+];
+
+const isActive = (href: string) => {
+  if (href === "/") return currentPath === href;
+  return currentPath.startsWith(href);
+};
+---
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <div class="nav-container">
+    {navItems.map((item) => (
+      item.isAction ? (
+        <button
+          class="nav-item"
+          data-action="scroll-top"
+          aria-label={item.label}
+        >
+          <Icon name={item.icon} width={24} height={24} />
+          <span class="nav-label">{item.label}</span>
+        </button>
+      ) : (
+        <a
+          href={item.href}
+          class={`nav-item ${isActive(item.href) ? 'active' : ''}`}
+          aria-label={item.label}
+        >
+          <Icon name={item.icon} width={24} height={24} />
+          <span class="nav-label">{item.label}</span>
+        </a>
+      )
+    ))}
+  </div>
+</nav>
+
+<!-- Smart Sticky Header -->
+<div class="smart-header" id="smart-header">
+  <div class="header-content">
+    <button class="menu-toggle" id="mobile-menu-toggle" aria-label="メニュー">
+      <Icon name="mingcute:menu-fill" width={24} height={24} />
+    </button>
+    <div class="header-title">
+      <a href="/" class="site-title">Semiramisu Blog</a>
+    </div>
+    <button class="theme-toggle" id="mobile-theme-toggle" aria-label="テーマ切替">
+      <Icon name="mingcute:sun-fill" width={24} height={24} class="light-icon" />
+      <Icon name="mingcute:moon-fill" width={24} height={24} class="dark-icon" />
+    </button>
+  </div>
+</div>
+
+<style>
+  /* Mobile Bottom Navigation */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--card-color);
+    border-top: 1px solid var(--border-color);
+    padding-bottom: env(safe-area-inset-bottom);
+    display: none;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  @media (max-width: 768px) {
+    .mobile-bottom-nav {
+      display: block;
+    }
+  }
+
+  .nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 56px;
+    padding: 0 0.5rem;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    text-decoration: none;
+    color: var(--text-color-lighten);
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .nav-item:active {
+    transform: scale(0.95);
+  }
+
+  .nav-item.active {
+    color: var(--primary-color);
+  }
+
+  .nav-item.active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: var(--primary-color);
+    border-radius: 0 0 2px 2px;
+  }
+
+  .nav-label {
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Smart Sticky Header */
+  .smart-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: var(--card-color-transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    display: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  @media (max-width: 768px) {
+    .smart-header {
+      display: block;
+    }
+  }
+
+  .smart-header.visible {
+    transform: translateY(0);
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 1rem;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .menu-toggle,
+  .theme-toggle {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .menu-toggle:active,
+  .theme-toggle:active {
+    background: var(--primary-color-transparent);
+    transform: scale(0.95);
+  }
+
+  .header-title {
+    flex: 1;
+    text-align: center;
+  }
+
+  .site-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color);
+    text-decoration: none;
+    font-family: var(--brand-font);
+  }
+
+  /* Theme toggle icons */
+  :root .light-icon {
+    display: block;
+  }
+
+  :root .dark-icon {
+    display: none;
+  }
+
+  :root.dark .light-icon {
+    display: none;
+  }
+
+  :root.dark .dark-icon {
+    display: block;
+  }
+
+  /* Add padding to body to account for bottom nav */
+  @media (max-width: 768px) {
+    body {
+      padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    }
+  }
+</style>
+
+<script>
+  // Smart Header Scroll Behavior
+  const smartHeader = document.getElementById('smart-header');
+  let lastScrollY = window.scrollY;
+  let scrollDirection = 'up';
+  let scrollTimeout: number;
+
+  function updateHeader() {
+    const currentScrollY = window.scrollY;
+    
+    if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      scrollDirection = 'down';
+    } else {
+      scrollDirection = 'up';
+    }
+    
+    if (scrollDirection === 'up' || currentScrollY < 100) {
+      smartHeader?.classList.add('visible');
+    } else {
+      smartHeader?.classList.remove('visible');
+    }
+    
+    lastScrollY = currentScrollY;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (scrollTimeout) {
+      window.cancelAnimationFrame(scrollTimeout);
+    }
+    
+    scrollTimeout = window.requestAnimationFrame(updateHeader);
+  }, { passive: true });
+
+  // Scroll to top functionality
+  document.querySelector('[data-action="scroll-top"]')?.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
+  // Theme toggle
+  const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+  mobileThemeToggle?.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  });
+
+  // Menu toggle (for future implementation)
+  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+  mobileMenuToggle?.addEventListener('click', () => {
+    // Future: Toggle mobile menu
+    console.log('Menu toggle clicked');
+  });
+
+  // Haptic feedback (if supported)
+  function provideHapticFeedback() {
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+  }
+
+  // Add haptic feedback to all interactive elements
+  document.querySelectorAll('.nav-item, .menu-toggle, .theme-toggle').forEach(element => {
+    element.addEventListener('touchstart', provideHapticFeedback, { passive: true });
+  });
+</script>

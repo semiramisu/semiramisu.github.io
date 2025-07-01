@@ -1,0 +1,282 @@
+/* Mobile-First Typography System */
+
+/* Base font sizes for mobile devices */
+@media (max-width: 768px) {
+  /* Root font size for better scalability */
+  :root {
+    font-size: 16px;
+    --mobile-text-base: 1rem;
+    --mobile-text-sm: 0.875rem;
+    --mobile-text-xs: 0.75rem;
+    --mobile-text-lg: 1.125rem;
+    --mobile-text-xl: 1.25rem;
+    --mobile-text-2xl: 1.5rem;
+    --mobile-text-3xl: 1.875rem;
+    --mobile-text-4xl: 2.25rem;
+    
+    /* Line heights for optimal readability */
+    --mobile-line-height-tight: 1.4;
+    --mobile-line-height-normal: 1.75;
+    --mobile-line-height-relaxed: 2;
+    
+    /* Letter spacing for better legibility */
+    --mobile-letter-spacing-tight: -0.01em;
+    --mobile-letter-spacing-normal: 0.02em;
+    --mobile-letter-spacing-wide: 0.05em;
+    
+    /* Optimized spacing */
+    --mobile-spacing-xs: 0.5rem;
+    --mobile-spacing-sm: 0.75rem;
+    --mobile-spacing-md: 1rem;
+    --mobile-spacing-lg: 1.5rem;
+    --mobile-spacing-xl: 2rem;
+  }
+
+  /* Article content optimization */
+  .article-inner,
+  .post-article .markdown-content {
+    font-size: var(--mobile-text-base);
+    line-height: var(--mobile-line-height-normal);
+    letter-spacing: var(--mobile-letter-spacing-normal);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* Headings with better hierarchy */
+  .article-inner h1,
+  .markdown-content h1 {
+    font-size: var(--mobile-text-3xl);
+    line-height: var(--mobile-line-height-tight);
+    letter-spacing: var(--mobile-letter-spacing-tight);
+    margin-top: var(--mobile-spacing-xl);
+    margin-bottom: var(--mobile-spacing-lg);
+    font-weight: 700;
+  }
+
+  .article-inner h2,
+  .markdown-content h2 {
+    font-size: var(--mobile-text-2xl);
+    line-height: var(--mobile-line-height-tight);
+    letter-spacing: var(--mobile-letter-spacing-tight);
+    margin-top: var(--mobile-spacing-lg);
+    margin-bottom: var(--mobile-spacing-md);
+    font-weight: 600;
+  }
+
+  .article-inner h3,
+  .markdown-content h3 {
+    font-size: var(--mobile-text-xl);
+    line-height: var(--mobile-line-height-tight);
+    margin-top: var(--mobile-spacing-lg);
+    margin-bottom: var(--mobile-spacing-sm);
+    font-weight: 600;
+  }
+
+  .article-inner h4,
+  .markdown-content h4 {
+    font-size: var(--mobile-text-lg);
+    line-height: var(--mobile-line-height-tight);
+    margin-top: var(--mobile-spacing-md);
+    margin-bottom: var(--mobile-spacing-sm);
+    font-weight: 500;
+  }
+
+  /* Paragraph spacing */
+  .article-inner p,
+  .markdown-content p {
+    margin-bottom: var(--mobile-spacing-md);
+    text-align: justify;
+    text-justify: inter-character;
+  }
+
+  /* List optimization */
+  .article-inner ul,
+  .article-inner ol,
+  .markdown-content ul,
+  .markdown-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: var(--mobile-spacing-md);
+  }
+
+  .article-inner li,
+  .markdown-content li {
+    margin-bottom: var(--mobile-spacing-xs);
+    line-height: var(--mobile-line-height-normal);
+  }
+
+  /* Code blocks */
+  .article-inner pre,
+  .markdown-content pre {
+    font-size: var(--mobile-text-sm);
+    padding: var(--mobile-spacing-md);
+    margin: var(--mobile-spacing-md) -1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .article-inner code,
+  .markdown-content code {
+    font-size: var(--mobile-text-sm);
+    padding: 0.125rem 0.25rem;
+  }
+
+  /* Blockquotes */
+  .article-inner blockquote,
+  .markdown-content blockquote {
+    font-size: var(--mobile-text-base);
+    line-height: var(--mobile-line-height-relaxed);
+    padding-left: var(--mobile-spacing-md);
+    margin: var(--mobile-spacing-md) 0;
+    border-left-width: 4px;
+  }
+
+  /* Tables - make them responsive */
+  .article-inner table,
+  .markdown-content table {
+    font-size: var(--mobile-text-sm);
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: var(--mobile-spacing-md) 0;
+  }
+
+  /* Post card typography */
+  .post-card-title {
+    font-size: var(--mobile-text-lg);
+    line-height: var(--mobile-line-height-tight);
+    font-weight: 600;
+    margin-bottom: var(--mobile-spacing-xs);
+  }
+
+  .post-card-description {
+    font-size: var(--mobile-text-sm);
+    line-height: var(--mobile-line-height-normal);
+    color: var(--text-color-lighten);
+  }
+
+  .post-card-meta {
+    font-size: var(--mobile-text-xs);
+    line-height: var(--mobile-line-height-tight);
+  }
+
+  /* Navigation typography */
+  .nav-item,
+  .mobile-nav-item {
+    font-size: var(--mobile-text-base);
+    font-weight: 500;
+  }
+
+  /* Button and interactive elements */
+  button,
+  .button,
+  .btn {
+    font-size: var(--mobile-text-base);
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md);
+    min-height: 48px; /* Touch target minimum */
+    min-width: 48px;
+  }
+
+  /* Form elements */
+  input,
+  textarea,
+  select {
+    font-size: var(--mobile-text-base);
+    padding: var(--mobile-spacing-sm);
+    min-height: 48px;
+  }
+
+  /* Footer text */
+  footer {
+    font-size: var(--mobile-text-sm);
+  }
+
+  /* Tag and category labels */
+  .tag,
+  .category-label {
+    font-size: var(--mobile-text-xs);
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Reading time and date */
+  .reading-time,
+  .post-date {
+    font-size: var(--mobile-text-sm);
+    color: var(--text-color-lighten);
+  }
+
+  /* Search results */
+  .search-result-title {
+    font-size: var(--mobile-text-base);
+    font-weight: 600;
+  }
+
+  .search-result-excerpt {
+    font-size: var(--mobile-text-sm);
+    line-height: var(--mobile-line-height-normal);
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  :root {
+    font-size: 14px;
+  }
+  
+  .article-inner,
+  .post-article .markdown-content {
+    font-size: 0.9375rem;
+  }
+}
+
+/* Small device adjustments */
+@media (max-width: 375px) {
+  :root {
+    font-size: 15px;
+  }
+}
+
+/* Large mobile devices (tablets in portrait) */
+@media (min-width: 481px) and (max-width: 768px) {
+  :root {
+    font-size: 17px;
+  }
+  
+  .article-inner,
+  .post-article .markdown-content {
+    font-size: 1.0625rem;
+  }
+}
+
+/* Accessibility: Respect user font size preferences */
+@media (prefers-contrast: high) {
+  .article-inner,
+  .post-article .markdown-content {
+    letter-spacing: 0.03em;
+    font-weight: 400;
+  }
+  
+  .article-inner strong,
+  .markdown-content strong {
+    font-weight: 700;
+  }
+}
+
+/* Dark mode adjustments for better readability */
+@media (max-width: 768px) {
+  :root:has(body.dark-mode),
+  :root[data-theme="dark"] {
+    --mobile-letter-spacing-normal: 0.03em;
+  }
+  
+  .dark-mode .article-inner,
+  .dark-mode .post-article .markdown-content {
+    font-weight: 300;
+    letter-spacing: var(--mobile-letter-spacing-normal);
+  }
+  
+  .dark-mode .article-inner strong,
+  .dark-mode .markdown-content strong {
+    font-weight: 600;
+  }
+}
