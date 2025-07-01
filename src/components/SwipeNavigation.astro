@@ -1,0 +1,240 @@
+---
+import { getCollection } from 'astro:content';
+import { IdToSlug } from '../utils/hash';
+
+export interface Props {
+  currentSlug: string;
+}
+
+const { currentSlug } = Astro.props;
+
+// 全ての記事を取得してソート
+const allPosts = await getCollection('posts');
+const sortedPosts = allPosts
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+// 現在の記事のインデックスを取得
+const currentIndex = sortedPosts.findIndex(post => IdToSlug(post.id) === currentSlug);
+
+// 前後の記事を取得
+const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+
+// URLを生成
+const prevUrl = prevPost ? `/posts/${IdToSlug(prevPost.id)}/` : null;
+const nextUrl = nextPost ? `/posts/${IdToSlug(nextPost.id)}/` : null;
+---
+
+<div class="swipe-navigation" data-prev-url={prevUrl} data-next-url={nextUrl}>
+  <div class="swipe-indicator left-indicator">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </div>
+  <div class="swipe-indicator right-indicator">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  </div>
+</div>
+
+<style>
+  .swipe-navigation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  .swipe-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(var(--accent-color-rgb), 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+  }
+
+  .swipe-indicator.active {
+    opacity: 1;
+  }
+
+  .left-indicator {
+    left: -30px;
+    transform: translateY(-50%) translateX(-100%);
+  }
+
+  .left-indicator.active {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .right-indicator {
+    right: -30px;
+    transform: translateY(-50%) translateX(100%);
+  }
+
+  .right-indicator.active {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .swipe-indicator svg {
+    width: 32px;
+    height: 32px;
+    color: var(--accent-color);
+  }
+
+  /* デスクトップでは非表示 */
+  @media (min-width: 768px) {
+    .swipe-navigation {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  class SwipeNavigation {
+    private element: HTMLElement;
+    private prevUrl: string | null;
+    private nextUrl: string | null;
+    private touchStartX: number = 0;
+    private touchStartY: number = 0;
+    private touchEndX: number = 0;
+    private touchEndY: number = 0;
+    private isSwiping: boolean = false;
+    private swipeThreshold: number = 50;
+    private velocityThreshold: number = 0.3;
+    private touchStartTime: number = 0;
+
+    constructor(element: HTMLElement) {
+      this.element = element;
+      this.prevUrl = element.dataset.prevUrl || null;
+      this.nextUrl = element.dataset.nextUrl || null;
+      
+      this.init();
+    }
+
+    private init() {
+      // タッチイベントのリスナーを追加
+      document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+      document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+      document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+    }
+
+    private handleTouchStart(e: TouchEvent) {
+      this.touchStartX = e.touches[0].clientX;
+      this.touchStartY = e.touches[0].clientY;
+      this.touchStartTime = Date.now();
+      this.isSwiping = false;
+    }
+
+    private handleTouchMove(e: TouchEvent) {
+      if (!this.touchStartX || !this.touchStartY) return;
+
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = currentX - this.touchStartX;
+      const diffY = currentY - this.touchStartY;
+
+      // 水平方向のスワイプを検出
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+        this.isSwiping = true;
+        
+        // スクロールを防ぐ
+        if (Math.abs(diffX) > 50) {
+          e.preventDefault();
+        }
+
+        // インジケーターを表示
+        const leftIndicator = this.element.querySelector('.left-indicator');
+        const rightIndicator = this.element.querySelector('.right-indicator');
+
+        if (diffX > 50 && this.prevUrl) {
+          leftIndicator?.classList.add('active');
+          rightIndicator?.classList.remove('active');
+        } else if (diffX < -50 && this.nextUrl) {
+          rightIndicator?.classList.add('active');
+          leftIndicator?.classList.remove('active');
+        } else {
+          leftIndicator?.classList.remove('active');
+          rightIndicator?.classList.remove('active');
+        }
+      }
+
+      this.touchEndX = currentX;
+      this.touchEndY = currentY;
+    }
+
+    private handleTouchEnd(e: TouchEvent) {
+      if (!this.isSwiping) return;
+
+      const leftIndicator = this.element.querySelector('.left-indicator');
+      const rightIndicator = this.element.querySelector('.right-indicator');
+      leftIndicator?.classList.remove('active');
+      rightIndicator?.classList.remove('active');
+
+      const diffX = this.touchEndX - this.touchStartX;
+      const diffY = this.touchEndY - this.touchStartY;
+      const timeDiff = Date.now() - this.touchStartTime;
+      const velocity = Math.abs(diffX) / timeDiff;
+
+      // 水平スワイプのみを処理
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > this.swipeThreshold || velocity > this.velocityThreshold) {
+          // 右スワイプ - 前の記事へ
+          if (this.prevUrl) {
+            this.navigate(this.prevUrl);
+          }
+        } else if (diffX < -this.swipeThreshold || velocity > this.velocityThreshold) {
+          // 左スワイプ - 次の記事へ
+          if (this.nextUrl) {
+            this.navigate(this.nextUrl);
+          }
+        }
+      }
+
+      // リセット
+      this.touchStartX = 0;
+      this.touchStartY = 0;
+      this.touchEndX = 0;
+      this.touchEndY = 0;
+      this.isSwiping = false;
+    }
+
+    private navigate(url: string) {
+      // スムーズなトランジション効果
+      document.body.style.transition = 'opacity 0.3s ease';
+      document.body.style.opacity = '0';
+      
+      setTimeout(() => {
+        window.location.href = url;
+      }, 300);
+    }
+  }
+
+  // コンポーネントの初期化
+  document.addEventListener('DOMContentLoaded', () => {
+    const swipeNav = document.querySelector('.swipe-navigation');
+    if (swipeNav && swipeNav instanceof HTMLElement) {
+      new SwipeNavigation(swipeNav);
+    }
+  });
+
+  // View Transitionsのサポート
+  document.addEventListener('astro:page-load', () => {
+    const swipeNav = document.querySelector('.swipe-navigation');
+    if (swipeNav && swipeNav instanceof HTMLElement) {
+      new SwipeNavigation(swipeNav);
+    }
+  });
+</script>
