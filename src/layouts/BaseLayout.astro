@@ -1,7 +1,6 @@
 ---
 import YukinaConfig from "../../yukina.config";
 import BaseHead from "../components/BaseHead.astro";
-import SummerParticles from "../components/SummerParticles.astro";
 ---
 
 <html lang={YukinaConfig.locale}>
@@ -30,8 +29,6 @@ import SummerParticles from "../components/SummerParticles.astro";
     <slot name="head" />
   </head>
   <body>
-    <!-- 夏らしいパーティクルエフェクト -->
-    <SummerParticles />
     <!-- メインコンテンツ -->
     <slot />
   </body>
