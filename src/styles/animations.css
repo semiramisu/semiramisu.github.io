@@ -16,16 +16,11 @@
   animation-play-state: paused;
 }
 
-/* transform3dを使用してGPUレイヤーを強制 - 夏らしい弾むアニメーション */
+/* transform3dを使用してGPUレイヤーを強制 */
 @keyframes fade-in-up {
   0% {
-    transform: translate3d(0, 2rem, 0) scale3d(0.95, 0.95, 1);
+    transform: translate3d(0, 2rem, 0) scale3d(0.98, 0.98, 1);
     opacity: 0;
-  }
-
-  60% {
-    transform: translate3d(0, -0.5rem, 0) scale3d(1.02, 1.02, 1);
-    opacity: 0.8;
   }
 
   100% {
@@ -58,17 +53,14 @@
   perspective: 1000px; /* 3D変換のパフォーマンス向上 */
 }
 
-/* ポストカードのホバーエフェクト最適化 - 夏らしい弾む効果 */
+/* ポストカードのホバーエフェクト最適化 */
 .hover\:shadow-md {
-  transition: box-shadow 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
-              transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: box-shadow 0.2s ease-out, transform 0.2s ease-out;
   transform: translateZ(0);
 }
 
 .hover\:shadow-md:hover {
-  transform: translate3d(0, -8px, 0) scale3d(1.02, 1.02, 1);
-  box-shadow: 0 20px 25px -5px rgba(245, 158, 11, 0.1), 
-              0 10px 10px -5px rgba(245, 158, 11, 0.04);
+  transform: translate3d(0, -2px, 0);
 }
 
 /* スクロールアニメーションの最適化 */
@@ -86,63 +78,6 @@
 /* アニメーション終了後のクリーンアップ */
 .animation-finished {
   will-change: auto;
-}
-
-/* 夏らしいボタンとリンクのアニメーション */
-.summer-button, .summer-link {
-  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  position: relative;
-  overflow: hidden;
-}
-
-.summer-button:hover, .summer-link:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 25px -5px rgba(245, 158, 11, 0.3);
-}
-
-.summer-button:active, .summer-link:active {
-  transform: translateY(0) scale(0.98);
-}
-
-/* 夏らしい背景のグラデーション効果 */
-.summer-gradient {
-  background: linear-gradient(135deg, 
-    rgba(251, 191, 36, 0.1) 0%, 
-    rgba(245, 158, 11, 0.1) 25%, 
-    rgba(252, 211, 77, 0.1) 50%, 
-    rgba(251, 191, 36, 0.1) 75%, 
-    rgba(245, 158, 11, 0.1) 100%);
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* 夏らしいプルスエフェクト */
-.summer-pulse {
-  animation: summer-pulse 2s infinite;
-}
-
-@keyframes summer-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-  }
 }
 
 /* メディアクエリでモーション設定を尊重 */
