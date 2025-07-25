@@ -5,7 +5,8 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(node:*)",
-      "Bash(brew:*)"
+      "Bash(brew:*)",
+      "Bash(pnpm dev:*)"
     ],
     "deny": []
   }
