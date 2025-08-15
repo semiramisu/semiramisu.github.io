@@ -11,19 +11,19 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   <div class="cyber-container">
     <!-- Cyber Header -->
     <div class="cyber-header">
-      <h1 class="glitch" data-text="ABOUT.APP">ABOUT.APP</h1>
+      <h1 class="glitch" data-text="PROFILE.SYSTEM">PROFILE.SYSTEM</h1>
       <div class="system-info">
         <p>
-          <span class="prompt">></span> SYSTEM_USER: 
+          <span class="prompt">>></span> RESEARCHER_ID: 
           <span class="user-highlight">semiramisu</span>
         </p>
         <p>
-          <span class="prompt">></span> STATUS: 
-          <span class="status-online">ONLINE</span>
+          <span class="prompt">>></span> CONNECTION: 
+          <span class="status-online">ESTABLISHED</span>
         </p>
         <p>
-          <span class="prompt">></span> ROLE: 
-          <span class="role-highlight">RESEARCHER | ENGINEER | TECH_BLOGGER</span>
+          <span class="prompt">>></span> SPECIALIZATION: 
+          <span class="role-highlight">NLP | HEALTH_DATA | MACHINE_LEARNING</span>
         </p>
       </div>
     </div>
@@ -33,7 +33,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
       <!-- Left Terminal -->
       <div class="terminal-box">
         <div class="terminal-header">
-          <span class="terminal-prompt">user@terminal:~$</span>
+          <span class="terminal-prompt">semiramisu@research-lab:~$</span>
         </div>
         
         <div class="terminal-body">
@@ -41,36 +41,39 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
           
           <div class="terminal-commands">
             <div class="cmd-line">
-              <span class="cmd-prompt">$</span> whoami
-              <div class="cmd-output">semiramisu</div>
+              <span class="cmd-prompt">λ</span> whoami --full
+              <div class="cmd-output">Semiramisu | Born: 1999 | Japan</div>
             </div>
             
             <div class="cmd-line">
-              <span class="cmd-prompt">$</span> cat role.txt
+              <span class="cmd-prompt">λ</span> ls -la /research/
               <div class="cmd-output">
-                Natural_Language_Processing.app<br/>
-                Health_Data_Analysis.app
+                drwxr-xr-x  NLP_Research/<br/>
+                drwxr-xr-x  Health_Data_Analysis/<br/>
+                drwxr-xr-x  IEEE_Publications/<br/>
+                -rw-r--r--  philosophy.txt
               </div>
             </div>
           </div>
 
           <div class="status-grid">
             <div class="status-card">
-              <span class="status-label">RESEARCH</span>
-              <span class="status-value">ACTIVE</span>
+              <span class="status-label">PAPERS</span>
+              <span class="status-value">4 PUBLISHED</span>
             </div>
             <div class="status-card">
-              <span class="status-label">BLOG</span>
-              <span class="status-value">UPDATING</span>
+              <span class="status-label">STATUS</span>
+              <span class="status-value">RESEARCHING</span>
             </div>
           </div>
 
           <div class="terminal-commands">
             <div class="cmd-line">
-              <span class="cmd-prompt">$</span> netstat -connections
+              <span class="cmd-prompt">λ</span> ping research-network
               <div class="connections-list">
-                <div>tcp://github.com <span class="connected">[CONNECTED]</span></div>
-                <div>tcp://x.com <span class="connected">[CONNECTED]</span></div>
+                <div>ieee.org <span class="connected">[64 bytes: time=12ms]</span></div>
+                <div>github.com/semiramisu <span class="connected">[64 bytes: time=8ms]</span></div>
+                <div>x.com/semiramisuWeb3 <span class="connected">[64 bytes: time=15ms]</span></div>
               </div>
             </div>
           </div>
@@ -90,16 +93,16 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
       <!-- Right Panels -->
       <div class="right-panels">
-        <!-- Neural Interface -->
+        <!-- Research Interface -->
         <div class="neural-interface">
           <div class="neural-header">
-            <h3>⚡ NEURAL_INTERFACE.APP</h3>
-            <p class="code-comment">// Initialize quantum communication protocol</p>
+            <h3>🧬 RESEARCH_MATRIX.EXE</h3>
+            <p class="code-comment">// Synchronizing knowledge database...</p>
           </div>
           <div class="connection-status">
-            CONNECTION_ESTABLISHED
+            DATABASE_SYNCHRONIZED
           </div>
-          <div class="user-line">USER://</div>
+          <div class="user-line">RESEARCHER://semiramisu</div>
         </div>
 
         <!-- Skills and Config Grid -->
@@ -108,23 +111,23 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
           <div class="data-panel">
             <div class="panel-header">
               <Icon name="heroicons:cpu-chip" />
-              <h3>TECH_SKILLS.JSON</h3>
+              <h3>SKILLS.JSON</h3>
             </div>
             <div class="json-data">
               <div class="json-item">
-                <span class="json-arrow">></span>
-                <span class="json-key">"research":</span>
-                <span class="json-value">["NLP", "Health_Data", "ML"]</span>
+                <span class="json-arrow">→</span>
+                <span class="json-key">"expertise":</span>
+                <span class="json-value">["NLP", "健康データ分析"]</span>
               </div>
               <div class="json-item">
-                <span class="json-arrow">></span>
-                <span class="json-key">"languages":</span>
-                <span class="json-value">["Python", "JavaScript", "R"]</span>
+                <span class="json-arrow">→</span>
+                <span class="json-key">"tech_stack":</span>
+                <span class="json-value">["Python", "PyTorch", "Astro"]</span>
               </div>
               <div class="json-item">
-                <span class="json-arrow">></span>
+                <span class="json-arrow">→</span>
                 <span class="json-key">"publications":</span>
-                <span class="json-value">4</span>
+                <span class="json-value">{"IEEE": 3, "Journal": 1}</span>
               </div>
             </div>
           </div>
@@ -133,23 +136,23 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
           <div class="data-panel">
             <div class="panel-header">
               <Icon name="heroicons:cog-6-tooth" />
-              <h3>PERSONAL.CFG</h3>
+              <h3>LIFE.CONFIG</h3>
             </div>
             <div class="config-data">
               <div class="config-item">
-                <span class="config-symbol">$</span>
-                <span class="config-key">music:</span>
-                <span class="config-value">["Piano", "Guitar"]</span>
+                <span class="config-symbol">§</span>
+                <span class="config-key">instruments:</span>
+                <span class="config-value">["Piano", "Guitar", "Violin_soon"]</span>
               </div>
               <div class="config-item">
-                <span class="config-symbol">$</span>
-                <span class="config-key">sports:</span>
-                <span class="config-value">["Baseball", "Swimming"]</span>
+                <span class="config-symbol">§</span>
+                <span class="config-key">activities:</span>
+                <span class="config-value">["野球", "水泳", "演劇"]</span>
               </div>
               <div class="config-item">
-                <span class="config-symbol">$</span>
-                <span class="config-key">philosophy:</span>
-                <span class="config-value">"音楽は聞くものじゃなく自分でやるもの"</span>
+                <span class="config-symbol">§</span>
+                <span class="config-key">motto:</span>
+                <span class="config-value">"Ad Astra Per Aspera"</span>
               </div>
             </div>
           </div>
@@ -158,16 +161,19 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
         <!-- Access Portal -->
         <div class="access-portal">
           <div class="portal-header">
-            <span class="portal-prompt">></span> QUANTUM_PORTAL_INITIALIZED
+            <span class="portal-prompt">▶</span> NAVIGATION_SYSTEM
           </div>
-          <h3 class="access-granted">ACCESS_GRANTED</h3>
-          <p class="portal-comment">// Navigate through the digital matrix</p>
+          <h3 class="access-granted">PORTAL_ACTIVE</h3>
+          <p class="portal-comment">// Choose your destination...</p>
           <div class="portal-links">
             <a href="/" class="portal-btn">
-              <span>></span> HOME.APP
+              <span>▸</span> HOME.PAGE
             </a>
             <a href="/archive" class="portal-btn">
-              <span>></span> ARCHIVE.SH
+              <span>▸</span> BLOG.ARCHIVE
+            </a>
+            <a href="/contact" class="portal-btn">
+              <span>▸</span> CONTACT.FORM
             </a>
           </div>
         </div>
@@ -179,11 +185,10 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 <style>
   /* Base Styles */
   .cyber-container {
-    max-width: 1200px;
+    max-width: var(--max-width);
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2rem 1rem;
     font-family: 'Courier New', 'SF Mono', 'Monaco', monospace;
-    background: #0a0e1a;
     min-height: 100vh;
   }
 
@@ -192,11 +197,12 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
     text-align: center;
     margin-bottom: 3rem;
     padding: 2rem;
-    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 255, 136, 0.1));
-    border: 1px solid rgba(138, 43, 226, 0.3);
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
     position: relative;
     overflow: hidden;
+    backdrop-filter: blur(10px);
   }
 
   .cyber-header::before {
@@ -206,8 +212,8 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(138, 43, 226, 0.4), transparent);
-    animation: scan 3s infinite;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.4), transparent);
+    animation: scan 4s infinite;
   }
 
   @keyframes scan {
@@ -216,13 +222,13 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
   /* Glitch Effect */
   .glitch {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: bold;
     text-transform: uppercase;
     position: relative;
-    color: #00ff88;
-    letter-spacing: 0.2em;
-    animation: glitch-skew 1s infinite linear alternate-reverse;
+    color: #667eea;
+    letter-spacing: 0.3em;
+    animation: glitch-skew 2s infinite linear alternate-reverse;
   }
 
   .glitch::before,
@@ -235,14 +241,14 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .glitch::before {
-    animation: glitch-1 0.5s infinite;
-    color: #00ffff;
+    animation: glitch-1 0.8s infinite;
+    color: #764ba2;
     z-index: -1;
   }
 
   .glitch::after {
-    animation: glitch-2 0.5s infinite;
-    color: #ff00ff;
+    animation: glitch-2 0.8s infinite;
+    color: #f093fb;
     z-index: -2;
   }
 
@@ -283,7 +289,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .prompt {
-    color: #00ff88;
+    color: #667eea;
     font-weight: bold;
   }
 
@@ -294,7 +300,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .status-online {
-    color: #00ff88;
+    color: #4ade80;
     font-weight: bold;
     animation: pulse 2s infinite;
   }
@@ -305,7 +311,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .role-highlight {
-    color: #00ffff;
+    color: #a78bfa;
     font-weight: bold;
   }
 
@@ -318,21 +324,21 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
   /* Terminal Box */
   .terminal-box {
-    background: #0f1419;
-    border: 1px solid #2a2e3e;
-    border-radius: 8px;
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.2);
   }
 
   .terminal-header {
-    background: #1a1f29;
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid #2a2e3e;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .terminal-prompt {
-    color: #00ff88;
+    color: #667eea;
     font-size: 0.9rem;
     font-weight: bold;
   }
@@ -344,11 +350,11 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   .cyber-avatar {
     width: 120px;
     height: 120px;
-    border-radius: 8px;
-    border: 2px solid #00ff88;
+    border-radius: 12px;
+    border: 3px solid #667eea;
     margin-bottom: 1.5rem;
-    filter: saturate(0.8) contrast(1.2);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    filter: saturate(1.1) contrast(1.1);
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.4);
   }
 
   /* Terminal Commands */
@@ -361,9 +367,10 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .cmd-prompt {
-    color: #00ff88;
+    color: #667eea;
     font-weight: bold;
     margin-right: 0.5rem;
+    font-size: 1.1rem;
   }
 
   .cmd-output {
@@ -382,10 +389,10 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .status-card {
-    background: rgba(138, 43, 226, 0.1);
-    border: 1px solid rgba(138, 43, 226, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.3);
     padding: 0.75rem;
-    border-radius: 4px;
+    border-radius: 8px;
     text-align: center;
   }
 
@@ -399,7 +406,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   .status-value {
     display: block;
     font-size: 0.9rem;
-    color: #00ff88;
+    color: #4ade80;
     font-weight: bold;
   }
 
@@ -415,7 +422,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .connected {
-    color: #00ff88;
+    color: #4ade80;
     font-weight: bold;
   }
 
@@ -428,11 +435,11 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .social-btn {
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid rgba(0, 255, 136, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.3);
     padding: 0.75rem;
-    border-radius: 4px;
-    color: #00ff88;
+    border-radius: 8px;
+    color: #667eea;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -442,9 +449,10 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .social-btn:hover {
-    background: rgba(0, 255, 136, 0.2);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    color: #764ba2;
   }
 
   /* Right Panels */
@@ -456,9 +464,9 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
   /* Neural Interface */
   .neural-interface {
-    background: linear-gradient(135deg, #1a1f29, #0f1419);
-    border: 1px solid #2a2e3e;
-    border-radius: 8px;
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     padding: 1.5rem;
     position: relative;
     overflow: hidden;
@@ -470,9 +478,9 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #00ff88, transparent);
-    animation: scan-line 2s infinite;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    animation: scan-line 3s infinite;
   }
 
   @keyframes scan-line {
@@ -493,11 +501,11 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .connection-status {
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid rgba(0, 255, 136, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.3);
     padding: 0.5rem 1rem;
-    border-radius: 4px;
-    color: #00ff88;
+    border-radius: 8px;
+    color: #4ade80;
     font-weight: bold;
     text-align: center;
     margin: 1rem 0;
@@ -505,12 +513,12 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   @keyframes connection-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
-    50% { box-shadow: 0 0 20px 5px rgba(0, 255, 136, 0.4); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+    50% { box-shadow: 0 0 20px 5px rgba(102, 126, 234, 0.4); }
   }
 
   .user-line {
-    color: #00ffff;
+    color: #a78bfa;
     font-weight: bold;
     font-size: 1.1rem;
   }
@@ -524,23 +532,23 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
   /* Data Panel */
   .data-panel {
-    background: #0f1419;
-    border: 1px solid #2a2e3e;
-    border-radius: 8px;
+    background: var(--card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     overflow: hidden;
   }
 
   .panel-header {
-    background: #1a1f29;
+    background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
     padding: 0.75rem;
-    border-bottom: 1px solid #2a2e3e;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
   .panel-header h3 {
-    color: #00ff88;
+    color: #667eea;
     font-size: 0.85rem;
     margin: 0;
   }
@@ -562,7 +570,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .json-arrow {
-    color: #00ff88;
+    color: #667eea;
     margin-right: 0.5rem;
   }
 
@@ -575,7 +583,7 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .config-symbol {
-    color: #00ff88;
+    color: #667eea;
     margin-right: 0.5rem;
   }
 
@@ -589,15 +597,15 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
   /* Access Portal */
   .access-portal {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(138, 43, 226, 0.05));
-    border: 1px solid #2a2e3e;
-    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     padding: 1.5rem;
     text-align: center;
   }
 
   .portal-header {
-    color: #00ff88;
+    color: #667eea;
     font-size: 0.9rem;
     margin-bottom: 1rem;
   }
@@ -629,20 +637,21 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
   }
 
   .portal-btn {
-    background: rgba(138, 43, 226, 0.1);
-    border: 1px solid rgba(138, 43, 226, 0.3);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.3);
     padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    color: #00ff88;
+    border-radius: 8px;
+    color: #667eea;
     text-decoration: none;
     transition: all 0.3s;
     font-size: 0.9rem;
   }
 
   .portal-btn:hover {
-    background: rgba(138, 43, 226, 0.2);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    color: #764ba2;
   }
 
   .portal-btn span {
