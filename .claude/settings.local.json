@@ -9,7 +9,9 @@
       "Bash(pnpm dev:*)",
       "WebFetch(domain:azukiazusa.dev)",
       "Bash(git checkout:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_close"
     ],
     "deny": []
   }

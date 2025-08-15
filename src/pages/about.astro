@@ -5,623 +5,546 @@ import { Icon } from "astro-icon/components";
 // Get language from URL parameter
 const url = new URL(Astro.request.url);
 const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
-
-// Profile data
-const profile = {
-  name: "Semiramisu",
-  title: lang === 'ja' ? "研究者 / エンジニア" : "Researcher / Engineer",
-  bio: lang === 'ja' 
-    ? "自然言語処理と健康データ分析を専門とする研究者。技術と人間の健康の交差点で新しい価値を創造することに情熱を注いでいます。"
-    : "Researcher specializing in Natural Language Processing and Health Data Analysis. Passionate about creating new value at the intersection of technology and human health.",
-  location: lang === 'ja' ? "日本" : "Japan",
-  birthYear: "1999"
-};
-
-// Skills and Technologies
-const skills = {
-  research: ["自然言語処理", "健康データ分析", "機械学習", "深層学習"],
-  programming: ["Python", "JavaScript", "TypeScript", "R"],
-  frameworks: ["PyTorch", "TensorFlow", "Astro", "React", "Svelte"],
-  tools: ["Git", "Docker", "AWS", "Jupyter", "VSCode"],
-  databases: ["PostgreSQL", "MongoDB", "Redis"]
-};
-
-// Publications
-const publications = {
-  international: [
-    {
-      title: "Influence Analysis of the Screen Time on Daily Exercise Based on the Personal Activity Factor Model",
-      conference: "IEEE Conference",
-      year: "2022",
-      link: "https://ieeexplore.ieee.org/document/9929542"
-    },
-    {
-      title: "Improving Emotion Classification by a Combination of Personal Texts and Social Big Data Based on Naive Bayes",
-      conference: "IEEE Conference",
-      year: "2023",
-      link: "https://ieeexplore.ieee.org/document/10086337"
-    }
-  ],
-  journal: [
-    {
-      title: "Improving emotion estimation through a combination of ChatGPT and deep learning",
-      journal: "Taylor & Francis",
-      year: "2024",
-      link: "https://www.tandfonline.com/doi/abs/10.1080/12460125.2024.2440024"
-    }
-  ],
-  coauthor: [
-    {
-      title: "Comparative Analysis of Relaxation Effects through Natural Experiences Using a VR Device",
-      conference: "IEEE Conference",
-      year: "2024",
-      link: "https://ieeexplore.ieee.org/document/10505450"
-    }
-  ]
-};
-
-// Hobbies and interests
-const interests = {
-  sports: ["野球", "水泳"],
-  music: ["ピアノ", "ギター", "ヴァイオリン（予定）"],
-  artists: ["ボーカロイド", "クラシック", "The Beatles", "甲本ヒロト", "宮本浩次", "井上陽水"],
-  activities: ["ボーイスカウト", "演劇"]
-};
-
-// Timeline data
-const timeline = [
-  { year: "1999", event: lang === 'ja' ? "誕生" : "Born" },
-  { year: "2022", event: lang === 'ja' ? "IEEE国際会議で初の論文発表" : "First paper at IEEE Conference" },
-  { year: "2023", event: lang === 'ja' ? "感情分類研究で成果発表" : "Emotion Classification Research Published" },
-  { year: "2024", event: lang === 'ja' ? "ChatGPTと深層学習の融合研究" : "ChatGPT + Deep Learning Research" }
-];
 ---
 
 <MainLayout title={lang === 'ja' ? "自己紹介" : "About Me"}>
-  <div class="about-container">
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="profile-card">
-        <div class="avatar-container">
-          <img src="/icon.jpg" alt="Profile" class="avatar" />
-          <div class="status-badge">
-            <span class="status-dot"></span>
-            {lang === 'ja' ? 'オンライン' : 'Online'}
-          </div>
-        </div>
-        <div class="profile-info">
-          <h1 class="profile-name">{profile.name}</h1>
-          <p class="profile-title">{profile.title}</p>
-          <p class="profile-bio">{profile.bio}</p>
-          <div class="profile-meta">
-            <span class="meta-item">
-              <Icon name="heroicons:map-pin" class="icon" />
-              {profile.location}
-            </span>
-            <span class="meta-item">
-              <Icon name="heroicons:cake" class="icon" />
-              Born {profile.birthYear}
-            </span>
-          </div>
-          <div class="social-links">
-            <a href="https://github.com/semiramisu" target="_blank" class="social-link">
-              <Icon name="line-md:github-loop" class="social-icon" />
-            </a>
-            <a href="https://x.com/semiramisuWeb3" target="_blank" class="social-link">
-              <Icon name="line-md:twitter-x" class="social-icon" />
-            </a>
-            <a href="mailto:semiramisuweb3@gmail.com" class="social-link">
-              <Icon name="heroicons:envelope" class="social-icon" />
-            </a>
-          </div>
+  <div class="terminal-container">
+    <!-- Terminal Header -->
+    <div class="terminal-header">
+      <div class="terminal-title">
+        <h1>ABOUT.APP</h1>
+        <div class="terminal-status">
+          <span class="status-line">> SYSTEM_USER: <span class="highlight">semiramisu</span></span>
+          <span class="status-line">> STATUS: <span class="status-online">ONLINE</span></span>
+          <span class="status-line">> ROLE: <span class="highlight">RESEARCHER | ENGINEER | TECH_BLOGGER</span></span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Skills Section -->
-    <section class="skills-section">
-      <h2 class="section-title">
-        <Icon name="heroicons:code-bracket" class="title-icon" />
-        {lang === 'ja' ? 'スキル & 技術スタック' : 'Skills & Tech Stack'}
-      </h2>
-      <div class="skills-grid">
-        <div class="skill-category">
-          <h3 class="category-title">{lang === 'ja' ? '研究分野' : 'Research'}</h3>
-          <div class="skill-tags">
-            {skills.research.map(skill => (
-              <span class="skill-tag research">{skill}</span>
-            ))}
+    <!-- Main Terminal Content -->
+    <div class="terminal-content">
+      <!-- Left Panel - Profile Terminal -->
+      <div class="terminal-panel main-panel">
+        <div class="terminal-window">
+          <div class="window-header">
+            <span class="prompt">user@semiramisu:~$</span>
           </div>
-        </div>
-        <div class="skill-category">
-          <h3 class="category-title">{lang === 'ja' ? 'プログラミング言語' : 'Programming'}</h3>
-          <div class="skill-tags">
-            {skills.programming.map(skill => (
-              <span class="skill-tag programming">{skill}</span>
-            ))}
-          </div>
-        </div>
-        <div class="skill-category">
-          <h3 class="category-title">{lang === 'ja' ? 'フレームワーク' : 'Frameworks'}</h3>
-          <div class="skill-tags">
-            {skills.frameworks.map(skill => (
-              <span class="skill-tag framework">{skill}</span>
-            ))}
-          </div>
-        </div>
-        <div class="skill-category">
-          <h3 class="category-title">{lang === 'ja' ? 'ツール' : 'Tools'}</h3>
-          <div class="skill-tags">
-            {skills.tools.map(skill => (
-              <span class="skill-tag tool">{skill}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Timeline Section -->
-    <section class="timeline-section">
-      <h2 class="section-title">
-        <Icon name="heroicons:clock" class="title-icon" />
-        {lang === 'ja' ? 'タイムライン' : 'Timeline'}
-      </h2>
-      <div class="timeline">
-        {timeline.map((item, index) => (
-          <div class="timeline-item">
-            <div class="timeline-dot"></div>
-            <div class="timeline-content">
-              <span class="timeline-year">{item.year}</span>
-              <p class="timeline-event">{item.event}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- Publications Section -->
-    <section class="publications-section">
-      <h2 class="section-title">
-        <Icon name="heroicons:academic-cap" class="title-icon" />
-        {lang === 'ja' ? '研究業績' : 'Publications'}
-      </h2>
-      
-      <div class="pub-category">
-        <h3 class="pub-title">{lang === 'ja' ? '筆頭論文 - 国際会議' : 'First Author - International Conferences'}</h3>
-        <div class="pub-list">
-          {publications.international.map(pub => (
-            <div class="pub-item">
-              <a href={pub.link} target="_blank" class="pub-link">
-                <h4 class="pub-name">{pub.title}</h4>
-                <div class="pub-meta">
-                  <span>{pub.conference}</span>
-                  <span class="pub-year">{pub.year}</span>
+          
+          <div class="profile-section">
+            <img src="/icon.jpg" alt="Profile" class="profile-image" />
+            
+            <div class="command-output">
+              <div class="command-line">
+                <span class="prompt">$</span> <span class="command">whoami</span>
+                <div class="output">semiramisu | 99年生まれ</div>
+              </div>
+              
+              <div class="command-line">
+                <span class="prompt">$</span> <span class="command">cat role.txt</span>
+                <div class="output">
+                  Natural_Language_Processing.app<br/>
+                  Health_Data_Analysis.app<br/>
+                  Machine_Learning_Engineer.app
                 </div>
+              </div>
+            </div>
+
+            <div class="status-badges">
+              <div class="badge badge-active">
+                <span class="badge-label">RESEARCH</span>
+                <span class="badge-value">ACTIVE</span>
+              </div>
+              <div class="badge badge-update">
+                <span class="badge-label">BLOG</span>
+                <span class="badge-value">UPDATING</span>
+              </div>
+            </div>
+
+            <div class="command-line">
+              <span class="prompt">$</span> <span class="command">netstat -connections</span>
+              <div class="connections">
+                <div class="connection-item">
+                  tcp://github.com <span class="connected">[CONNECTED]</span>
+                </div>
+                <div class="connection-item">
+                  tcp://x.com <span class="connected">[CONNECTED]</span>
+                </div>
+                <div class="connection-item">
+                  tcp://ieee.org <span class="connected">[CONNECTED]</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="social-links">
+              <a href="https://github.com/semiramisu" target="_blank" class="social-icon">
+                <Icon name="line-md:github-loop" />
+              </a>
+              <a href="https://x.com/semiramisuWeb3" target="_blank" class="social-icon">
+                <Icon name="line-md:twitter-x" />
+              </a>
+              <a href="mailto:semiramisuweb3@gmail.com" class="social-icon">
+                <Icon name="heroicons:envelope" />
               </a>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      <div class="pub-category">
-        <h3 class="pub-title">{lang === 'ja' ? 'ジャーナル（特別号）' : 'Journal Papers'}</h3>
-        <div class="pub-list">
-          {publications.journal.map(pub => (
-            <div class="pub-item">
-              <a href={pub.link} target="_blank" class="pub-link">
-                <h4 class="pub-name">{pub.title}</h4>
-                <div class="pub-meta">
-                  <span>{pub.journal}</span>
-                  <span class="pub-year">{pub.year}</span>
-                </div>
+      <!-- Right Panel - Skills & Info -->
+      <div class="terminal-panel side-panel">
+        <!-- Skills Terminal -->
+        <div class="terminal-window skills-window">
+          <div class="window-header">
+            <Icon name="heroicons:cpu-chip" class="header-icon" />
+            <h3>TECH_SKILLS.JSON</h3>
+          </div>
+          <div class="json-content">
+            <div class="json-line">
+              <span class="json-key">"research":</span> 
+              <span class="json-value">["NLP", "Health_Data", "ML", "DL"]</span>
+            </div>
+            <div class="json-line">
+              <span class="json-key">"languages":</span> 
+              <span class="json-value">["Python", "JavaScript", "TypeScript", "R"]</span>
+            </div>
+            <div class="json-line">
+              <span class="json-key">"frameworks":</span> 
+              <span class="json-value">["PyTorch", "TensorFlow", "Astro"]</span>
+            </div>
+            <div class="json-line">
+              <span class="json-key">"publications":</span> 
+              <span class="json-value">4</span>
+            </div>
+            <div class="json-line">
+              <span class="json-key">"ieee_papers":</span> 
+              <span class="json-value">true</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Config -->
+        <div class="terminal-window config-window">
+          <div class="window-header">
+            <Icon name="heroicons:cog" class="header-icon" />
+            <h3>PERSONAL.CFG</h3>
+          </div>
+          <div class="config-content">
+            <div class="config-line">
+              <span class="config-key">$</span> music: 
+              <span class="config-value">["Piano", "Guitar", "Violin_planned"]</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">$</span> sports: 
+              <span class="config-value">["Baseball", "Swimming"]</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">$</span> activities: 
+              <span class="config-value">["Boy_Scouts", "Theater"]</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">$</span> favorite_artists: 
+              <span class="config-value">["Vocaloid", "Classical", "Beatles"]</span>
+            </div>
+            <div class="config-line">
+              <span class="config-key">$</span> philosophy: 
+              <span class="config-value">"音楽は聞くものじゃなく自分でやるもの"</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Publications Terminal -->
+        <div class="terminal-window publications-window">
+          <div class="window-header">
+            <Icon name="heroicons:academic-cap" class="header-icon" />
+            <h3>PUBLICATIONS.LOG</h3>
+          </div>
+          <div class="log-content">
+            <div class="log-entry">
+              <span class="log-date">[2024]</span> 
+              <a href="https://www.tandfonline.com/doi/abs/10.1080/12460125.2024.2440024" target="_blank" class="log-link">
+                ChatGPT + Deep Learning Research
               </a>
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div class="pub-category">
-        <h3 class="pub-title">{lang === 'ja' ? '共著論文' : 'Co-authored Papers'}</h3>
-        <div class="pub-list">
-          {publications.coauthor.map(pub => (
-            <div class="pub-item">
-              <a href={pub.link} target="_blank" class="pub-link">
-                <h4 class="pub-name">{pub.title}</h4>
-                <div class="pub-meta">
-                  <span>{pub.conference}</span>
-                  <span class="pub-year">{pub.year}</span>
-                </div>
+            <div class="log-entry">
+              <span class="log-date">[2023]</span> 
+              <a href="https://ieeexplore.ieee.org/document/10086337" target="_blank" class="log-link">
+                Emotion Classification @ IEEE
               </a>
             </div>
-          ))}
+            <div class="log-entry">
+              <span class="log-date">[2022]</span> 
+              <a href="https://ieeexplore.ieee.org/document/9929542" target="_blank" class="log-link">
+                Screen Time Analysis @ IEEE
+              </a>
+            </div>
+            <div class="log-entry">
+              <span class="log-date">[2024]</span> 
+              <a href="https://ieeexplore.ieee.org/document/10505450" target="_blank" class="log-link">
+                VR Relaxation Study (Co-author)
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Interests Section -->
-    <section class="interests-section">
-      <h2 class="section-title">
-        <Icon name="heroicons:heart" class="title-icon" />
-        {lang === 'ja' ? '趣味・興味' : 'Hobbies & Interests'}
-      </h2>
-      <div class="interests-grid">
-        <div class="interest-card">
-          <h3 class="interest-title">
-            <Icon name="heroicons:trophy" class="interest-icon" />
-            {lang === 'ja' ? 'スポーツ' : 'Sports'}
-          </h3>
-          <p>{interests.sports.join('、')}</p>
-        </div>
-        <div class="interest-card">
-          <h3 class="interest-title">
-            <Icon name="heroicons:musical-note" class="interest-icon" />
-            {lang === 'ja' ? '音楽' : 'Music'}
-          </h3>
-          <p>{lang === 'ja' ? '演奏：' : 'Play: '}{interests.music.join('、')}</p>
-          <p class="mt-2">{lang === 'ja' ? '好きなアーティスト：' : 'Favorite Artists: '}</p>
-          <p class="text-sm">{interests.artists.join('、')}</p>
-        </div>
-        <div class="interest-card">
-          <h3 class="interest-title">
-            <Icon name="heroicons:user-group" class="interest-icon" />
-            {lang === 'ja' ? '活動' : 'Activities'}
-          </h3>
-          <p>{interests.activities.join('、')}</p>
-        </div>
-      </div>
-      <div class="music-quote">
-        <p>{lang === 'ja' ? '「音楽は聞くものじゃなく自分でやるもの」' : '"Music is not just for listening, but for playing yourself"'}</p>
-      </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact-section">
-      <h2 class="section-title">
-        <Icon name="heroicons:envelope" class="title-icon" />
-        {lang === 'ja' ? 'お問い合わせ' : 'Contact'}
-      </h2>
-      <div class="contact-content">
-        <p>{lang === 'ja' ? 'お気軽にご連絡ください！' : 'Feel free to reach out!'}</p>
-        <div class="contact-methods">
-          <a href="/contact" class="contact-button primary">
-            <Icon name="heroicons:chat-bubble-left-right" class="button-icon" />
-            {lang === 'ja' ? 'お問い合わせフォーム' : 'Contact Form'}
+    <!-- Bottom Access Panel -->
+    <div class="access-panel">
+      <div class="access-content">
+        <span class="access-prompt">></span> QUANTUM_PORTAL_INITIALIZED
+        <h3>ACCESS_GRANTED</h3>
+        <p>// Navigate through the digital matrix</p>
+        <div class="portal-links">
+          <a href="/" class="portal-link">
+            <span>></span> HOME.APP
           </a>
-          <a href="mailto:semiramisuweb3@gmail.com" class="contact-button secondary">
-            <Icon name="heroicons:envelope" class="button-icon" />
-            semiramisuweb3@gmail.com
+          <a href="/archive" class="portal-link">
+            <span>></span> ARCHIVE.SH
+          </a>
+          <a href="/contact" class="portal-link">
+            <span>></span> CONTACT.EXE
           </a>
         </div>
       </div>
-    </section>
-
-    <!-- Thanks Section -->
-    <section class="thanks-section">
-      <h2 class="section-title">
-        <Icon name="heroicons:sparkles" class="title-icon" />
-        Special Thanks
-      </h2>
-      <div class="thanks-list">
-        <div class="thanks-item">
-          <a href="https://github.com/amehime/hexo-theme-shoka" target="_blank">
-            Hexo Shoka theme - for design inspiration
-          </a>
-        </div>
-        <div class="thanks-item">
-          <a href="https://github.com/saicaca/fuwari" target="_blank">
-            Astro Fuwari template - for main design concept
-          </a>
-        </div>
-      </div>
-    </section>
+    </div>
   </div>
 </MainLayout>
 
 <style>
-  .about-container {
-    max-width: 1200px;
+  /* Terminal Container */
+  .terminal-container {
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem 1rem;
+    font-family: 'Courier New', monospace;
   }
 
-  /* Hero Section */
-  .hero-section {
-    margin-bottom: 4rem;
+  /* Terminal Header */
+  .terminal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 12px 12px 0 0;
+    margin-bottom: 2rem;
   }
 
-  .profile-card {
-    @apply flex flex-col md:flex-row items-center md:items-start gap-8 p-8 rounded-2xl;
-    background: var(--card-color);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  }
-
-  .avatar-container {
-    position: relative;
-  }
-
-  .avatar {
-    @apply w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4;
-    border-color: var(--primary-color);
-  }
-
-  .status-badge {
-    @apply absolute bottom-2 right-2 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1;
-    background: var(--primary-color);
+  .terminal-title h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
     color: white;
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
   }
 
-  .status-dot {
-    @apply w-2 h-2 rounded-full bg-white animate-pulse;
+  .terminal-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
-  .profile-info {
-    @apply flex-1 text-center md:text-left;
+  .status-line {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
   }
 
-  .profile-name {
-    @apply text-3xl md:text-4xl font-bold mb-2;
-    color: var(--text-color);
+  .highlight {
+    color: #ffd700;
+    font-weight: bold;
   }
 
-  .profile-title {
-    @apply text-xl text-[var(--text-color-lighten)] mb-4;
+  .status-online {
+    color: #00ff00;
+    font-weight: bold;
+    animation: blink 2s infinite;
   }
 
-  .profile-bio {
-    @apply text-base leading-relaxed mb-4;
-    color: var(--text-color);
+  /* Main Content */
+  .terminal-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
   }
 
-  .profile-meta {
-    @apply flex flex-wrap justify-center md:justify-start gap-4 mb-4;
+  /* Terminal Windows */
+  .terminal-window {
+    background: #1a1a2e;
+    border: 1px solid #16213e;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }
 
-  .meta-item {
-    @apply flex items-center gap-1 text-sm text-[var(--text-color-lighten)];
+  .window-header {
+    background: #0f3460;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #16213e;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
-  .icon {
-    @apply w-4 h-4;
+  .window-header h3 {
+    color: #00ff88;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0;
   }
 
+  .header-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: #00ff88;
+  }
+
+  .prompt {
+    color: #00ff88;
+    font-weight: bold;
+  }
+
+  /* Profile Section */
+  .profile-section {
+    padding: 1.5rem;
+  }
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    border: 3px solid #00ff88;
+    margin-bottom: 1.5rem;
+  }
+
+  .command-line {
+    margin-bottom: 1.5rem;
+  }
+
+  .command {
+    color: #ffd700;
+    margin-left: 0.5rem;
+  }
+
+  .output {
+    color: #ffffff;
+    margin-top: 0.5rem;
+    margin-left: 2rem;
+    line-height: 1.6;
+  }
+
+  /* Status Badges */
+  .status-badges {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .badge {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .badge-active {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid #00ff88;
+  }
+
+  .badge-update {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid #ffd700;
+  }
+
+  .badge-label {
+    font-size: 0.7rem;
+    color: #888;
+  }
+
+  .badge-value {
+    font-size: 0.9rem;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  /* Connections */
+  .connections {
+    margin-top: 0.5rem;
+    margin-left: 2rem;
+  }
+
+  .connection-item {
+    color: #888;
+    margin-bottom: 0.3rem;
+  }
+
+  .connected {
+    color: #00ff88;
+    font-weight: bold;
+  }
+
+  /* Social Links */
   .social-links {
-    @apply flex justify-center md:justify-start gap-3;
-  }
-
-  .social-link {
-    @apply p-2 rounded-full bg-[var(--bg-color)] hover:bg-[var(--primary-color)] transition-all;
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
   }
 
   .social-icon {
-    @apply w-6 h-6;
-    color: var(--text-color);
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    transition: all 0.3s;
   }
 
-  .social-link:hover .social-icon {
-    color: white;
-  }
-
-  /* Section Styles */
-  section {
-    margin-bottom: 4rem;
-  }
-
-  .section-title {
-    @apply text-2xl font-bold mb-6 flex items-center gap-2;
-    color: var(--text-color);
-  }
-
-  .title-icon {
-    @apply w-6 h-6;
-    color: var(--primary-color);
-  }
-
-  /* Skills Section */
-  .skills-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
-  }
-
-  .skill-category {
-    @apply p-6 rounded-xl;
-    background: var(--card-color);
-  }
-
-  .category-title {
-    @apply text-lg font-semibold mb-3;
-    color: var(--text-color);
-  }
-
-  .skill-tags {
-    @apply flex flex-wrap gap-2;
-  }
-
-  .skill-tag {
-    @apply px-3 py-1 rounded-full text-sm font-medium;
-  }
-
-  .skill-tag.research {
-    background: rgba(59, 130, 246, 0.1);
-    color: #3b82f6;
-  }
-
-  .skill-tag.programming {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-  }
-
-  .skill-tag.framework {
-    background: rgba(168, 85, 247, 0.1);
-    color: #a855f7;
-  }
-
-  .skill-tag.tool {
-    background: rgba(251, 146, 60, 0.1);
-    color: #fb923c;
-  }
-
-  /* Timeline Section */
-  .timeline {
-    position: relative;
-    padding-left: 2rem;
-  }
-
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.5rem;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--border-color);
-  }
-
-  .timeline-item {
-    position: relative;
-    margin-bottom: 2rem;
-  }
-
-  .timeline-dot {
-    position: absolute;
-    left: -1.5rem;
-    top: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background: var(--primary-color);
-    box-shadow: 0 0 0 4px var(--bg-color);
-  }
-
-  .timeline-content {
-    @apply p-4 rounded-lg;
-    background: var(--card-color);
-  }
-
-  .timeline-year {
-    @apply text-sm font-semibold text-[var(--primary-color)];
-  }
-
-  .timeline-event {
-    @apply mt-1 text-[var(--text-color)];
-  }
-
-  /* Publications Section */
-  .pub-category {
-    margin-bottom: 2rem;
-  }
-
-  .pub-title {
-    @apply text-lg font-semibold mb-3;
-    color: var(--text-color);
-  }
-
-  .pub-list {
-    @apply space-y-3;
-  }
-
-  .pub-item {
-    @apply p-4 rounded-lg border border-[var(--border-color)] hover:shadow-md transition-all;
-    background: var(--card-color);
-  }
-
-  .pub-link {
-    @apply block;
-  }
-
-  .pub-name {
-    @apply text-base font-medium mb-2 hover:text-[var(--primary-color)] transition-colors;
-    color: var(--text-color);
-  }
-
-  .pub-meta {
-    @apply flex justify-between text-sm text-[var(--text-color-lighten)];
-  }
-
-  .pub-year {
-    @apply font-semibold;
-  }
-
-  /* Interests Section */
-  .interests-grid {
-    @apply grid grid-cols-1 md:grid-cols-3 gap-4 mb-4;
-  }
-
-  .interest-card {
-    @apply p-6 rounded-xl;
-    background: var(--card-color);
-  }
-
-  .interest-title {
-    @apply text-lg font-semibold mb-3 flex items-center gap-2;
-    color: var(--text-color);
-  }
-
-  .interest-icon {
-    @apply w-5 h-5;
-    color: var(--primary-color);
-  }
-
-  .music-quote {
-    @apply text-center p-6 rounded-xl mt-4;
-    background: var(--card-color);
-    font-style: italic;
-    color: var(--text-color);
-  }
-
-  /* Contact Section */
-  .contact-content {
-    @apply text-center;
-  }
-
-  .contact-methods {
-    @apply flex flex-col md:flex-row gap-4 justify-center mt-4;
-  }
-
-  .contact-button {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium transition-all;
-  }
-
-  .button-icon {
-    @apply w-5 h-5;
-  }
-
-  .contact-button.primary {
-    background: var(--primary-color);
-    color: white;
-  }
-
-  .contact-button.primary:hover {
+  .social-icon:hover {
+    background: #00ff88;
+    color: #1a1a2e;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(var(--primary-color-rgb), 0.3);
   }
 
-  .contact-button.secondary {
-    background: var(--card-color);
-    color: var(--text-color);
-    border: 2px solid var(--border-color);
+  /* JSON Content */
+  .json-content, .config-content, .log-content {
+    padding: 1rem;
+    color: #fff;
   }
 
-  .contact-button.secondary:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+  .json-line, .config-line, .log-entry {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
   }
 
-  /* Thanks Section */
-  .thanks-list {
-    @apply space-y-2;
+  .json-key {
+    color: #ff79c6;
   }
 
-  .thanks-item a {
-    @apply text-[var(--primary-color)] hover:underline;
+  .json-value {
+    color: #50fa7b;
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .about-container {
+  .config-key {
+    color: #00ff88;
+  }
+
+  .config-value {
+    color: #8be9fd;
+  }
+
+  .log-date {
+    color: #ffd700;
+    margin-right: 0.5rem;
+  }
+
+  .log-link {
+    color: #8be9fd;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .log-link:hover {
+    color: #00ff88;
+    text-decoration: underline;
+  }
+
+  /* Access Panel */
+  .access-panel {
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .access-content {
+    color: #fff;
+  }
+
+  .access-prompt {
+    color: #00ff88;
+    font-size: 1.2rem;
+  }
+
+  .access-panel h3 {
+    color: #ffd700;
+    font-size: 1.8rem;
+    margin: 1rem 0;
+    letter-spacing: 0.2em;
+  }
+
+  .access-panel p {
+    color: #888;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+
+  .portal-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .portal-link {
+    padding: 0.75rem 1.5rem;
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid #00ff88;
+    border-radius: 4px;
+    color: #00ff88;
+    text-decoration: none;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .portal-link:hover {
+    background: #00ff88;
+    color: #1a1a2e;
+    transform: translateY(-2px);
+  }
+
+  .portal-link span {
+    font-weight: bold;
+  }
+
+  /* Animations */
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.5; }
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .terminal-content {
+      grid-template-columns: 1fr;
+    }
+
+    .terminal-title h1 {
+      font-size: 1.8rem;
+    }
+
+    .portal-links {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .terminal-container {
       padding: 1rem 0.5rem;
     }
 
-    section {
-      margin-bottom: 3rem;
+    .status-badges {
+      flex-direction: column;
+    }
+
+    .social-links {
+      justify-content: center;
     }
   }
 </style>
