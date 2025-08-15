@@ -6,7 +6,9 @@
       "Bash(git push:*)",
       "Bash(node:*)",
       "Bash(brew:*)",
-      "Bash(pnpm dev:*)"
+      "Bash(pnpm dev:*)",
+      "WebFetch(domain:azukiazusa.dev)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   }

@@ -10,6 +10,7 @@ import Archive from "../components/Archive.astro";
 import { GetSortedPosts, GetAllTags } from "../utils/content";
 import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
+import { getCollection } from "astro:content";
 
 // Get language from URL parameter
 const url = new URL(Astro.request.url);
@@ -17,59 +18,208 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 
 // Get all posts and tags
 const allPosts = await GetSortedPosts(lang);
-const recentPosts = allPosts.slice(0, 6);
+const recentPosts = allPosts.slice(0, 8);
+const popularPosts = allPosts.filter(post => 
+  post.data.tags?.includes(lang === 'ja' ? "仕事" : "Work") || 
+  post.data.tags?.includes(lang === 'ja' ? "AI" : "AI")
+).slice(0, 5);
 const featuredPosts = allPosts.filter(post => post.data.tags?.includes(lang === 'ja' ? "仕事" : "Work")).slice(0, 5);
 const allTags = await GetAllTags(lang);
+
+// Get recent shorts
+const allShorts = await getCollection("shorts");
+const recentShorts = allShorts
+  .filter(short => !short.data.draft && short.data.lang === lang)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime())
+  .slice(0, 4);
 ---
 
 <MainLayout isHome={true}>
   <meta name="page-type" content="home" slot="head" />
-  <div class="hero-section-simple mb-2">
-    <div class="fade-in-up flex flex-col items-center justify-center space-y-4 text-center py-3">
+  
+  <!-- Hero Section -->
+  <div class="hero-section-simple mb-8">
+    <div class="fade-in-up flex flex-col items-center justify-center space-y-4 text-center py-6">
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient">
         <AnimatedHeading text={lang === 'ja' ? "ようこそ！私のブログへ" : "Welcome to My Blog!"} />
       </h1>
+      <p class="text-lg text-[var(--text-color-lighten)] max-w-2xl mx-auto">
+        {lang === 'ja' ? 'IT、健康、仕事、趣味など様々なテーマについての考察や体験を共有' : 'Sharing insights and experiences on IT, health, work, hobbies and more'}
+      </p>
     </div>
   </div>
 
-  <div class="space-y-8">
-    <!-- Featured Posts Carousel -->
-    <section class="featured-posts">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.featured_posts)}</h2>
-      <FeaturedPostsCarousel posts={featuredPosts} lang={lang} />
-    </section>
+  <!-- Search Bar at Top -->
+  <div class="search-top mb-8 px-4">
+    <div class="max-w-2xl mx-auto">
+      <SearchBar />
+    </div>
+  </div>
 
-    <!-- Recent Posts -->
-    <section class="recent-posts">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.recent_posts)}</h2>
-      <!-- Desktop Grid -->
-      <div class="posts-grid desktop-only">
+  <!-- Three Column Layout for Desktop -->
+  <div class="three-column-layout desktop-only">
+    <!-- Left Column: Recent Posts -->
+    <div class="column-left">
+      <h2 class="column-title mb-4">
+        <span class="title-icon">📝</span>
+        {lang === 'ja' ? '最新記事' : 'Latest Articles'}
+      </h2>
+      <div class="posts-list">
         {recentPosts.map((entry, index) => (
-          <div 
-            class="post-card-animation"
-            style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
-          >
-            <PostCard
-              id={entry.id}
-              title={entry.data.title}
-              published={entry.data.published}
-              category={entry.data.category}
-              tags={entry.data.tags}
-              description={entry.data.description}
-              image={entry.data.cover}
-              readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
-              lang={lang}
-            />
-          </div>
+          <article class="post-item fade-in" style={`animation-delay: ${index * 0.1}s`}>
+            <div class="post-date">
+              {new Date(entry.data.published).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+              })}
+            </div>
+            <h3 class="post-title">
+              <a href={`/posts/${entry.id}${lang === 'en' ? '?lang=en' : ''}`}>
+                {entry.data.title}
+              </a>
+            </h3>
+            <p class="post-description">{entry.data.description}</p>
+            <div class="post-tags">
+              {entry.data.tags?.slice(0, 3).map(tag => (
+                <a href={`/tags/${tag}${lang === 'en' ? '?lang=en' : ''}`} class="tag-chip">
+                  {tag}
+                </a>
+              ))}
+            </div>
+          </article>
         ))}
       </div>
-      
-      <!-- Mobile List -->
-      <div class="mobile-posts-list mobile-only">
-        {recentPosts.map((entry, index) => (
+      <div class="mt-6">
+        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="view-all-link">
+          {lang === 'ja' ? 'すべての記事を見る →' : 'View All Articles →'}
+        </a>
+      </div>
+    </div>
+
+    <!-- Center Column: Popular Posts & Featured -->
+    <div class="column-center">
+      <!-- Popular Posts Section -->
+      <div class="popular-section mb-8">
+        <h2 class="column-title mb-4">
+          <span class="title-icon">🔥</span>
+          {lang === 'ja' ? '人気記事' : 'Popular Articles'}
+        </h2>
+        <div class="popular-posts">
+          {popularPosts.map((entry, index) => (
+            <div class="popular-post-card">
+              <span class="rank-badge">{index + 1}</span>
+              <div class="popular-post-content">
+                <h3 class="popular-post-title">
+                  <a href={`/posts/${entry.id}${lang === 'en' ? '?lang=en' : ''}`}>
+                    {entry.data.title}
+                  </a>
+                </h3>
+                <div class="popular-post-meta">
+                  <span class="category-badge">{entry.data.category}</span>
+                  <span class="read-time">
+                    {(entry.rendered!.metadata as any).frontmatter.readingMetadata?.readingTime || '5 min'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Featured Carousel -->
+      <div class="featured-section mb-8">
+        <h2 class="column-title mb-4">
+          <span class="title-icon">⭐</span>
+          {i18n(I18nKeys.featured_posts)}
+        </h2>
+        <FeaturedPostsCarousel posts={featuredPosts} lang={lang} />
+      </div>
+
+      <!-- Shorts Section -->
+      <div class="shorts-section">
+        <h2 class="column-title mb-4">
+          <span class="title-icon">⚡</span>
+          {lang === 'ja' ? 'Shorts' : 'Shorts'}
+        </h2>
+        <div class="shorts-list">
+          {recentShorts.map((short, index) => (
+            <div class="short-mini-card">
+              <h4 class="short-mini-title">{short.data.title}</h4>
+              <div class="short-mini-content" set:html={short.rendered?.html?.substring(0, 100) + '...'} />
+              <div class="short-mini-meta">
+                <time class="short-mini-date">
+                  {new Date(short.data.published).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </time>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a href={`/shorts${lang === 'en' ? '?lang=en' : ''}`} class="view-all-link mt-4">
+          {lang === 'ja' ? 'すべてのShortsを見る →' : 'View All Shorts →'}
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Tags & Archive -->
+    <div class="column-right">
+      <!-- Tag Cloud -->
+      <div class="sidebar-section mb-8">
+        <h2 class="column-title mb-4">
+          <span class="title-icon">🏷️</span>
+          {lang === 'ja' ? 'タグ' : 'Tags'}
+        </h2>
+        <div class="tag-cloud-container">
+          <TagCloud tags={allTags} />
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="sidebar-section mb-8">
+        <h2 class="column-title mb-4">
+          <span class="title-icon">📂</span>
+          {lang === 'ja' ? 'カテゴリー' : 'Categories'}
+        </h2>
+        <div class="categories-list">
+          {Array.from(new Set(allPosts.map(p => p.data.category))).filter(Boolean).slice(0, 8).map(category => (
+            <a href={`/categories/${category}${lang === 'en' ? '?lang=en' : ''}`} class="category-item">
+              <span class="category-name">{category}</span>
+              <span class="category-count">
+                {allPosts.filter(p => p.data.category === category).length}
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- Quick Archive -->
+      <div class="sidebar-section">
+        <h2 class="column-title mb-4">
+          <span class="title-icon">📅</span>
+          {lang === 'ja' ? 'アーカイブ' : 'Archive'}
+        </h2>
+        <div class="archive-mini">
+          <Archive posts={allPosts.slice(0, 10)} lang={lang} />
+        </div>
+        <a href={`/archive${lang === 'en' ? '?lang=en' : ''}`} class="view-all-link mt-4">
+          {lang === 'ja' ? 'すべて見る →' : 'View All →'}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Layout -->
+  <div class="mobile-layout mobile-only">
+    <!-- Recent Posts -->
+    <section class="recent-posts mb-8">
+      <h2 class="section-title mb-4">{i18n(I18nKeys.recent_posts)}</h2>
+      <div class="mobile-posts-list">
+        {recentPosts.slice(0, 6).map((entry, index) => (
           <div 
             class="post-card-animation"
-            style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
+            style={`animation-delay: ${index * 0.1}s;`}
           >
             <MobilePostCard
               id={entry.id}
@@ -86,8 +236,8 @@ const allTags = await GetAllTags(lang);
           </div>
         ))}
       </div>
-      <div class="mt-8 text-center">
-        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all transform hover:scale-105">
+      <div class="mt-6 text-center">
+        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all">
           {lang === 'ja' ? 'すべての記事を見る' : 'View All Posts'}
         </a>
       </div>
@@ -95,45 +245,188 @@ const allTags = await GetAllTags(lang);
 
     <!-- Tag Cloud -->
     <section class="tag-section">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.explore_tags)}</h2>
+      <h2 class="section-title mb-4">{i18n(I18nKeys.explore_tags)}</h2>
       <TagCloud tags={allTags} />
-    </section>
-
-    <!-- Archive Section -->
-    <section class="archive-section">
-      <Archive posts={allPosts} lang={lang} />
-    </section>
-    
-    <!-- Search Section -->
-    <section class="search-section py-14 mt-14">
-      <div class="search-container fade-in-up">
-        <h2 class="section-title mb-4 text-center">{lang === 'ja' ? '記事を検索' : 'Search Articles'}</h2>
-        <p class="max-w-2xl text-lg text-[var(--text-color-lighten)] text-center mx-auto mb-6">
-          {lang === 'ja' ? '日々の思いや発見、学びを共有する場所です。お楽しみください！' : 'A place to share daily thoughts, discoveries, and learnings. Enjoy!'}
-        </p>
-        <div class="w-full max-w-xl mx-auto px-4">
-          <SearchBar />
-        </div>
-      </div>
     </section>
   </div>
 </MainLayout>
 
 <style>
+  /* Hero Section */
   .hero-section-simple {
     @apply px-4;
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-color-darken));
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-darken));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
+  /* Search Bar */
+  .search-top {
+    position: sticky;
+    top: 60px;
+    z-index: 10;
+    background: rgba(var(--bg-color-rgb), 0.8);
+    backdrop-filter: blur(10px);
+    padding: 1rem 0;
+    margin: -1rem 0 1rem 0;
+  }
+
+  /* Three Column Layout */
+  .three-column-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 0.8fr;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* Column Titles */
+  .column-title {
+    @apply text-xl font-bold text-[var(--text-color)] flex items-center gap-2;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .title-icon {
+    font-size: 1.2em;
+  }
+
   .section-title {
     @apply text-2xl md:text-3xl font-bold text-[var(--text-color)];
-    font-family: var(--primary-font);
+  }
+
+  /* Left Column - Recent Posts */
+  .column-left {
+    @apply space-y-4;
+  }
+
+  .posts-list {
+    @apply space-y-4;
+  }
+
+  .post-item {
+    @apply p-4 rounded-lg border border-[var(--border-color)] hover:shadow-lg transition-all;
+    background: var(--bg-color);
+  }
+
+  .post-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+  }
+
+  .post-date {
+    @apply text-sm text-[var(--text-color-lighten)] mb-1;
+  }
+
+  .post-title {
+    @apply text-lg font-semibold mb-2;
+  }
+
+  .post-title a {
+    @apply text-[var(--text-color)] hover:text-[var(--primary-color)] transition-colors;
+  }
+
+  .post-description {
+    @apply text-sm text-[var(--text-color-lighten)] mb-2 line-clamp-2;
+  }
+
+  .post-tags {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .tag-chip {
+    @apply text-xs px-2 py-1 rounded-full bg-[var(--primary-color-lighten)] text-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white transition-all;
+  }
+
+  /* Center Column - Popular Posts */
+  .popular-posts {
+    @apply space-y-3;
+  }
+
+  .popular-post-card {
+    @apply flex items-start gap-3 p-3 rounded-lg border border-[var(--border-color)] hover:shadow-md transition-all;
+    background: var(--bg-color);
+  }
+
+  .popular-post-card:hover {
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+  }
+
+  .rank-badge {
+    @apply flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[var(--primary-color)] to-[var(--primary-color-darken)] text-white font-bold flex items-center justify-center text-sm;
+  }
+
+  .popular-post-content {
+    @apply flex-1;
+  }
+
+  .popular-post-title {
+    @apply text-base font-medium mb-1;
+  }
+
+  .popular-post-title a {
+    @apply text-[var(--text-color)] hover:text-[var(--primary-color)] transition-colors;
+  }
+
+  .popular-post-meta {
+    @apply flex items-center gap-2 text-xs;
+  }
+
+  .category-badge {
+    @apply px-2 py-1 rounded bg-[var(--bg-color-darken)] text-[var(--text-color-lighten)];
+  }
+
+  .read-time {
+    @apply text-[var(--text-color-lighten)];
+  }
+
+  /* Right Column - Sidebar */
+  .column-right {
+    @apply space-y-6;
+  }
+
+  .sidebar-section {
+    @apply p-4 rounded-lg border border-[var(--border-color)];
+    background: var(--bg-color);
+  }
+
+  .categories-list {
+    @apply space-y-2;
+  }
+
+  .category-item {
+    @apply flex items-center justify-between p-2 rounded hover:bg-[var(--bg-color-darken)] transition-colors;
+  }
+
+  .category-name {
+    @apply text-sm font-medium text-[var(--text-color)];
+  }
+
+  .category-count {
+    @apply text-xs px-2 py-1 rounded-full bg-[var(--bg-color-darken)] text-[var(--text-color-lighten)];
+  }
+
+  .archive-mini {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  /* View All Links */
+  .view-all-link {
+    @apply inline-block text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] font-medium transition-colors;
+  }
+
+  /* Animations */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+    opacity: 0;
   }
 
   .fade-in-up {
@@ -141,12 +434,11 @@ const allTags = await GetAllTags(lang);
   }
 
   .post-card-animation {
-    @apply h-full;
     animation: fadeIn 0.6s ease-out forwards;
     opacity: 0;
   }
 
-  /* Responsive visibility */
+  /* Responsive Design */
   .desktop-only {
     display: block;
   }
@@ -154,7 +446,17 @@ const allTags = await GetAllTags(lang);
   .mobile-only {
     display: none;
   }
-  
+
+  @media (max-width: 1200px) {
+    .three-column-layout {
+      grid-template-columns: 1.2fr 1fr;
+    }
+    
+    .column-right {
+      display: none;
+    }
+  }
+
   @media (max-width: 768px) {
     .desktop-only {
       display: none;
@@ -163,23 +465,17 @@ const allTags = await GetAllTags(lang);
     .mobile-only {
       display: block;
     }
+    
+    .search-top {
+      top: 50px;
+    }
   }
-  
+
   .mobile-posts-list {
     @apply space-y-0;
   }
 
-  .posts-grid {
-    @apply grid grid-cols-1 gap-6;
-    @apply md:grid-cols-2 md:gap-6;
-    @apply lg:grid-cols-3 lg:gap-6;
-  }
-  
-  .search-section {
-    background: radial-gradient(circle at center, var(--primary-color-lighten) 0%, transparent 70%);
-    border-radius: 1rem;
-  }
-
+  /* Animations */
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -199,4 +495,70 @@ const allTags = await GetAllTags(lang);
       opacity: 1;
     }
   }
-</style> 
+
+  /* Scrollbar styling for archive */
+  .archive-mini::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .archive-mini::-webkit-scrollbar-track {
+    background: var(--bg-color-darken);
+    border-radius: 2px;
+  }
+
+  .archive-mini::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 2px;
+  }
+
+  /* Shorts Section */
+  .shorts-section {
+    @apply mt-6;
+  }
+
+  .shorts-list {
+    @apply space-y-3;
+  }
+
+  .short-mini-card {
+    @apply p-3 rounded-lg border border-[var(--border-color)] hover:shadow-md transition-all;
+    background: var(--bg-color);
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .short-mini-card::before {
+    content: '⚡';
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    opacity: 0.5;
+  }
+
+  .short-mini-card:hover {
+    border-color: var(--primary-color);
+    transform: translateX(2px);
+  }
+
+  .short-mini-title {
+    @apply text-sm font-semibold mb-1 text-[var(--text-color)];
+  }
+
+  .short-mini-content {
+    @apply text-xs text-[var(--text-color-lighten)] mb-2 line-clamp-2;
+  }
+
+  .short-mini-content :global(p) {
+    display: inline;
+  }
+
+  .short-mini-meta {
+    @apply flex items-center gap-2;
+  }
+
+  .short-mini-date {
+    @apply text-xs text-[var(--text-color-lighten)];
+  }
+</style>

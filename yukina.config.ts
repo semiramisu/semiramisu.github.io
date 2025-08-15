@@ -23,6 +23,11 @@ const YukinaConfig: Configuration = {
       href: "/archive",
     },
     {
+      nameKey: "Shorts" as any,
+      href: "/shorts",
+      icon: "heroicons:bolt",
+    },
+    {
       nameKey: I18nKeys.nav_bar_about,
       href: "/about",
       icon: "heroicons:user",
