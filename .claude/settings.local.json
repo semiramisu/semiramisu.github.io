@@ -8,7 +8,8 @@
       "Bash(brew:*)",
       "Bash(pnpm dev:*)",
       "WebFetch(domain:azukiazusa.dev)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

@@ -10,7 +10,6 @@ import Archive from "../components/Archive.astro";
 import { GetSortedPosts, GetAllTags } from "../utils/content";
 import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
-import { getCollection } from "astro:content";
 
 // Get language from URL parameter
 const url = new URL(Astro.request.url);
@@ -25,13 +24,6 @@ const popularPosts = allPosts.filter(post =>
 ).slice(0, 5);
 const featuredPosts = allPosts.filter(post => post.data.tags?.includes(lang === 'ja' ? "仕事" : "Work")).slice(0, 5);
 const allTags = await GetAllTags(lang);
-
-// Get recent shorts
-const allShorts = await getCollection("shorts");
-const recentShorts = allShorts
-  .filter(short => !short.data.draft && short.data.lang === lang)
-  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime())
-  .slice(0, 4);
 ---
 
 <MainLayout isHome={true}>
@@ -127,39 +119,12 @@ const recentShorts = allShorts
       </div>
 
       <!-- Featured Carousel -->
-      <div class="featured-section mb-8">
+      <div class="featured-section">
         <h2 class="column-title mb-4">
           <span class="title-icon">⭐</span>
           {i18n(I18nKeys.featured_posts)}
         </h2>
         <FeaturedPostsCarousel posts={featuredPosts} lang={lang} />
-      </div>
-
-      <!-- Shorts Section -->
-      <div class="shorts-section">
-        <h2 class="column-title mb-4">
-          <span class="title-icon">⚡</span>
-          {lang === 'ja' ? 'Shorts' : 'Shorts'}
-        </h2>
-        <div class="shorts-list">
-          {recentShorts.map((short, index) => (
-            <div class="short-mini-card">
-              <h4 class="short-mini-title">{short.data.title}</h4>
-              <div class="short-mini-content" set:html={short.rendered?.html?.substring(0, 100) + '...'} />
-              <div class="short-mini-meta">
-                <time class="short-mini-date">
-                  {new Date(short.data.published).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </time>
-              </div>
-            </div>
-          ))}
-        </div>
-        <a href={`/shorts${lang === 'en' ? '?lang=en' : ''}`} class="view-all-link mt-4">
-          {lang === 'ja' ? 'すべてのShortsを見る →' : 'View All Shorts →'}
-        </a>
       </div>
     </div>
 
@@ -509,56 +474,5 @@ const recentShorts = allShorts
   .archive-mini::-webkit-scrollbar-thumb {
     background: var(--primary-color);
     border-radius: 2px;
-  }
-
-  /* Shorts Section */
-  .shorts-section {
-    @apply mt-6;
-  }
-
-  .shorts-list {
-    @apply space-y-3;
-  }
-
-  .short-mini-card {
-    @apply p-3 rounded-lg border border-[var(--border-color)] hover:shadow-md transition-all;
-    background: var(--bg-color);
-    position: relative;
-    padding-left: 1rem;
-  }
-
-  .short-mini-card::before {
-    content: '⚡';
-    position: absolute;
-    left: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.8rem;
-    opacity: 0.5;
-  }
-
-  .short-mini-card:hover {
-    border-color: var(--primary-color);
-    transform: translateX(2px);
-  }
-
-  .short-mini-title {
-    @apply text-sm font-semibold mb-1 text-[var(--text-color)];
-  }
-
-  .short-mini-content {
-    @apply text-xs text-[var(--text-color-lighten)] mb-2 line-clamp-2;
-  }
-
-  .short-mini-content :global(p) {
-    display: inline;
-  }
-
-  .short-mini-meta {
-    @apply flex items-center gap-2;
-  }
-
-  .short-mini-date {
-    @apply text-xs text-[var(--text-color-lighten)];
   }
 </style>
