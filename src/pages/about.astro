@@ -8,202 +8,168 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 ---
 
 <MainLayout title={lang === 'ja' ? "自己紹介" : "About Me"}>
-  <div class="terminal-container">
-    <!-- Terminal Header -->
-    <div class="terminal-header">
-      <div class="terminal-title">
-        <h1>ABOUT.APP</h1>
-        <div class="terminal-status">
-          <span class="status-line">> SYSTEM_USER: <span class="highlight">semiramisu</span></span>
-          <span class="status-line">> STATUS: <span class="status-online">ONLINE</span></span>
-          <span class="status-line">> ROLE: <span class="highlight">RESEARCHER | ENGINEER | TECH_BLOGGER</span></span>
-        </div>
+  <div class="cyber-container">
+    <!-- Cyber Header -->
+    <div class="cyber-header">
+      <h1 class="glitch" data-text="ABOUT.APP">ABOUT.APP</h1>
+      <div class="system-info">
+        <p>
+          <span class="prompt">></span> SYSTEM_USER: 
+          <span class="user-highlight">semiramisu</span>
+        </p>
+        <p>
+          <span class="prompt">></span> STATUS: 
+          <span class="status-online">ONLINE</span>
+        </p>
+        <p>
+          <span class="prompt">></span> ROLE: 
+          <span class="role-highlight">RESEARCHER | ENGINEER | TECH_BLOGGER</span>
+        </p>
       </div>
     </div>
 
-    <!-- Main Terminal Content -->
-    <div class="terminal-content">
-      <!-- Left Panel - Profile Terminal -->
-      <div class="terminal-panel main-panel">
-        <div class="terminal-window">
-          <div class="window-header">
-            <span class="prompt">user@semiramisu:~$</span>
-          </div>
+    <!-- Main Grid -->
+    <div class="cyber-grid">
+      <!-- Left Terminal -->
+      <div class="terminal-box">
+        <div class="terminal-header">
+          <span class="terminal-prompt">user@terminal:~$</span>
+        </div>
+        
+        <div class="terminal-body">
+          <img src="/icon.jpg" alt="Profile" class="cyber-avatar" />
           
-          <div class="profile-section">
-            <img src="/icon.jpg" alt="Profile" class="profile-image" />
+          <div class="terminal-commands">
+            <div class="cmd-line">
+              <span class="cmd-prompt">$</span> whoami
+              <div class="cmd-output">semiramisu</div>
+            </div>
             
-            <div class="command-output">
-              <div class="command-line">
-                <span class="prompt">$</span> <span class="command">whoami</span>
-                <div class="output">semiramisu | 99年生まれ</div>
-              </div>
-              
-              <div class="command-line">
-                <span class="prompt">$</span> <span class="command">cat role.txt</span>
-                <div class="output">
-                  Natural_Language_Processing.app<br/>
-                  Health_Data_Analysis.app<br/>
-                  Machine_Learning_Engineer.app
-                </div>
+            <div class="cmd-line">
+              <span class="cmd-prompt">$</span> cat role.txt
+              <div class="cmd-output">
+                Natural_Language_Processing.app<br/>
+                Health_Data_Analysis.app
               </div>
             </div>
+          </div>
 
-            <div class="status-badges">
-              <div class="badge badge-active">
-                <span class="badge-label">RESEARCH</span>
-                <span class="badge-value">ACTIVE</span>
-              </div>
-              <div class="badge badge-update">
-                <span class="badge-label">BLOG</span>
-                <span class="badge-value">UPDATING</span>
-              </div>
+          <div class="status-grid">
+            <div class="status-card">
+              <span class="status-label">RESEARCH</span>
+              <span class="status-value">ACTIVE</span>
             </div>
+            <div class="status-card">
+              <span class="status-label">BLOG</span>
+              <span class="status-value">UPDATING</span>
+            </div>
+          </div>
 
-            <div class="command-line">
-              <span class="prompt">$</span> <span class="command">netstat -connections</span>
-              <div class="connections">
-                <div class="connection-item">
-                  tcp://github.com <span class="connected">[CONNECTED]</span>
-                </div>
-                <div class="connection-item">
-                  tcp://x.com <span class="connected">[CONNECTED]</span>
-                </div>
-                <div class="connection-item">
-                  tcp://ieee.org <span class="connected">[CONNECTED]</span>
-                </div>
+          <div class="terminal-commands">
+            <div class="cmd-line">
+              <span class="cmd-prompt">$</span> netstat -connections
+              <div class="connections-list">
+                <div>tcp://github.com <span class="connected">[CONNECTED]</span></div>
+                <div>tcp://x.com <span class="connected">[CONNECTED]</span></div>
               </div>
             </div>
+          </div>
 
-            <div class="social-links">
-              <a href="https://github.com/semiramisu" target="_blank" class="social-icon">
-                <Icon name="line-md:github-loop" />
-              </a>
-              <a href="https://x.com/semiramisuWeb3" target="_blank" class="social-icon">
-                <Icon name="line-md:twitter-x" />
-              </a>
-              <a href="mailto:semiramisuweb3@gmail.com" class="social-icon">
-                <Icon name="heroicons:envelope" />
-              </a>
-            </div>
+          <div class="social-grid">
+            <a href="https://github.com/semiramisu" target="_blank" class="social-btn">
+              <Icon name="line-md:github-loop" />
+              <span>GitHub</span>
+            </a>
+            <a href="https://x.com/semiramisuWeb3" target="_blank" class="social-btn">
+              <Icon name="line-md:twitter-x" />
+              <span>X</span>
+            </a>
           </div>
         </div>
       </div>
 
-      <!-- Right Panel - Skills & Info -->
-      <div class="terminal-panel side-panel">
-        <!-- Skills Terminal -->
-        <div class="terminal-window skills-window">
-          <div class="window-header">
-            <Icon name="heroicons:cpu-chip" class="header-icon" />
-            <h3>TECH_SKILLS.JSON</h3>
+      <!-- Right Panels -->
+      <div class="right-panels">
+        <!-- Neural Interface -->
+        <div class="neural-interface">
+          <div class="neural-header">
+            <h3>⚡ NEURAL_INTERFACE.APP</h3>
+            <p class="code-comment">// Initialize quantum communication protocol</p>
           </div>
-          <div class="json-content">
-            <div class="json-line">
-              <span class="json-key">"research":</span> 
-              <span class="json-value">["NLP", "Health_Data", "ML", "DL"]</span>
+          <div class="connection-status">
+            CONNECTION_ESTABLISHED
+          </div>
+          <div class="user-line">USER://</div>
+        </div>
+
+        <!-- Skills and Config Grid -->
+        <div class="panels-grid">
+          <!-- Tech Skills -->
+          <div class="data-panel">
+            <div class="panel-header">
+              <Icon name="heroicons:cpu-chip" />
+              <h3>TECH_SKILLS.JSON</h3>
             </div>
-            <div class="json-line">
-              <span class="json-key">"languages":</span> 
-              <span class="json-value">["Python", "JavaScript", "TypeScript", "R"]</span>
+            <div class="json-data">
+              <div class="json-item">
+                <span class="json-arrow">></span>
+                <span class="json-key">"research":</span>
+                <span class="json-value">["NLP", "Health_Data", "ML"]</span>
+              </div>
+              <div class="json-item">
+                <span class="json-arrow">></span>
+                <span class="json-key">"languages":</span>
+                <span class="json-value">["Python", "JavaScript", "R"]</span>
+              </div>
+              <div class="json-item">
+                <span class="json-arrow">></span>
+                <span class="json-key">"publications":</span>
+                <span class="json-value">4</span>
+              </div>
             </div>
-            <div class="json-line">
-              <span class="json-key">"frameworks":</span> 
-              <span class="json-value">["PyTorch", "TensorFlow", "Astro"]</span>
+          </div>
+
+          <!-- Personal Config -->
+          <div class="data-panel">
+            <div class="panel-header">
+              <Icon name="heroicons:cog-6-tooth" />
+              <h3>PERSONAL.CFG</h3>
             </div>
-            <div class="json-line">
-              <span class="json-key">"publications":</span> 
-              <span class="json-value">4</span>
-            </div>
-            <div class="json-line">
-              <span class="json-key">"ieee_papers":</span> 
-              <span class="json-value">true</span>
+            <div class="config-data">
+              <div class="config-item">
+                <span class="config-symbol">$</span>
+                <span class="config-key">music:</span>
+                <span class="config-value">["Piano", "Guitar"]</span>
+              </div>
+              <div class="config-item">
+                <span class="config-symbol">$</span>
+                <span class="config-key">sports:</span>
+                <span class="config-value">["Baseball", "Swimming"]</span>
+              </div>
+              <div class="config-item">
+                <span class="config-symbol">$</span>
+                <span class="config-key">philosophy:</span>
+                <span class="config-value">"音楽は聞くものじゃなく自分でやるもの"</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Personal Config -->
-        <div class="terminal-window config-window">
-          <div class="window-header">
-            <Icon name="heroicons:cog" class="header-icon" />
-            <h3>PERSONAL.CFG</h3>
+        <!-- Access Portal -->
+        <div class="access-portal">
+          <div class="portal-header">
+            <span class="portal-prompt">></span> QUANTUM_PORTAL_INITIALIZED
           </div>
-          <div class="config-content">
-            <div class="config-line">
-              <span class="config-key">$</span> music: 
-              <span class="config-value">["Piano", "Guitar", "Violin_planned"]</span>
-            </div>
-            <div class="config-line">
-              <span class="config-key">$</span> sports: 
-              <span class="config-value">["Baseball", "Swimming"]</span>
-            </div>
-            <div class="config-line">
-              <span class="config-key">$</span> activities: 
-              <span class="config-value">["Boy_Scouts", "Theater"]</span>
-            </div>
-            <div class="config-line">
-              <span class="config-key">$</span> favorite_artists: 
-              <span class="config-value">["Vocaloid", "Classical", "Beatles"]</span>
-            </div>
-            <div class="config-line">
-              <span class="config-key">$</span> philosophy: 
-              <span class="config-value">"音楽は聞くものじゃなく自分でやるもの"</span>
-            </div>
+          <h3 class="access-granted">ACCESS_GRANTED</h3>
+          <p class="portal-comment">// Navigate through the digital matrix</p>
+          <div class="portal-links">
+            <a href="/" class="portal-btn">
+              <span>></span> HOME.APP
+            </a>
+            <a href="/archive" class="portal-btn">
+              <span>></span> ARCHIVE.SH
+            </a>
           </div>
-        </div>
-
-        <!-- Publications Terminal -->
-        <div class="terminal-window publications-window">
-          <div class="window-header">
-            <Icon name="heroicons:academic-cap" class="header-icon" />
-            <h3>PUBLICATIONS.LOG</h3>
-          </div>
-          <div class="log-content">
-            <div class="log-entry">
-              <span class="log-date">[2024]</span> 
-              <a href="https://www.tandfonline.com/doi/abs/10.1080/12460125.2024.2440024" target="_blank" class="log-link">
-                ChatGPT + Deep Learning Research
-              </a>
-            </div>
-            <div class="log-entry">
-              <span class="log-date">[2023]</span> 
-              <a href="https://ieeexplore.ieee.org/document/10086337" target="_blank" class="log-link">
-                Emotion Classification @ IEEE
-              </a>
-            </div>
-            <div class="log-entry">
-              <span class="log-date">[2022]</span> 
-              <a href="https://ieeexplore.ieee.org/document/9929542" target="_blank" class="log-link">
-                Screen Time Analysis @ IEEE
-              </a>
-            </div>
-            <div class="log-entry">
-              <span class="log-date">[2024]</span> 
-              <a href="https://ieeexplore.ieee.org/document/10505450" target="_blank" class="log-link">
-                VR Relaxation Study (Co-author)
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Access Panel -->
-    <div class="access-panel">
-      <div class="access-content">
-        <span class="access-prompt">></span> QUANTUM_PORTAL_INITIALIZED
-        <h3>ACCESS_GRANTED</h3>
-        <p>// Navigate through the digital matrix</p>
-        <div class="portal-links">
-          <a href="/" class="portal-link">
-            <span>></span> HOME.APP
-          </a>
-          <a href="/archive" class="portal-link">
-            <span>></span> ARCHIVE.SH
-          </a>
-          <a href="/contact" class="portal-link">
-            <span>></span> CONTACT.EXE
-          </a>
         </div>
       </div>
     </div>
@@ -211,90 +177,109 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 </MainLayout>
 
 <style>
-  /* Terminal Container */
-  .terminal-container {
-    max-width: 1400px;
+  /* Base Styles */
+  .cyber-container {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
-    font-family: 'Courier New', monospace;
-  }
-
-  /* Terminal Header */
-  .terminal-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 2rem;
-    border-radius: 12px 12px 0 0;
-    margin-bottom: 2rem;
+    font-family: 'Courier New', 'SF Mono', 'Monaco', monospace;
+    background: #0a0e1a;
+    min-height: 100vh;
   }
 
-  .terminal-title h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 1rem;
-    letter-spacing: 0.1em;
-  }
-
-  .terminal-status {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .status-line {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.9rem;
-  }
-
-  .highlight {
-    color: #ffd700;
-    font-weight: bold;
-  }
-
-  .status-online {
-    color: #00ff00;
-    font-weight: bold;
-    animation: blink 2s infinite;
-  }
-
-  /* Main Content */
-  .terminal-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
-  }
-
-  /* Terminal Windows */
-  .terminal-window {
-    background: #1a1a2e;
-    border: 1px solid #16213e;
+  /* Cyber Header */
+  .cyber-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 255, 136, 0.1));
+    border: 1px solid rgba(138, 43, 226, 0.3);
     border-radius: 8px;
+    position: relative;
     overflow: hidden;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   }
 
-  .window-header {
-    background: #0f3460;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #16213e;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .cyber-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(138, 43, 226, 0.4), transparent);
+    animation: scan 3s infinite;
   }
 
-  .window-header h3 {
-    color: #00ff88;
-    font-size: 0.9rem;
+  @keyframes scan {
+    100% { left: 100%; }
+  }
+
+  /* Glitch Effect */
+  .glitch {
+    font-size: 3rem;
     font-weight: bold;
-    margin: 0;
+    text-transform: uppercase;
+    position: relative;
+    color: #00ff88;
+    letter-spacing: 0.2em;
+    animation: glitch-skew 1s infinite linear alternate-reverse;
   }
 
-  .header-icon {
-    width: 1.2rem;
-    height: 1.2rem;
-    color: #00ff88;
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glitch::before {
+    animation: glitch-1 0.5s infinite;
+    color: #00ffff;
+    z-index: -1;
+  }
+
+  .glitch::after {
+    animation: glitch-2 0.5s infinite;
+    color: #ff00ff;
+    z-index: -2;
+  }
+
+  @keyframes glitch-1 {
+    0%, 100% { clip-path: inset(0 0 0 0); }
+    20% { clip-path: inset(20% 0 30% 0); }
+    40% { clip-path: inset(50% 0 20% 0); }
+    60% { clip-path: inset(10% 0 60% 0); }
+    80% { clip-path: inset(80% 0 5% 0); }
+  }
+
+  @keyframes glitch-2 {
+    0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+    20% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, 2px); }
+    40% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -2px); }
+    60% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 2px); }
+    80% { clip-path: inset(5% 0 85% 0); transform: translate(2px, -2px); }
+  }
+
+  @keyframes glitch-skew {
+    0%, 100% { transform: skew(0deg); }
+    20% { transform: skew(-2deg); }
+    40% { transform: skew(1deg); }
+    60% { transform: skew(-1deg); }
+    80% { transform: skew(2deg); }
+  }
+
+  /* System Info */
+  .system-info {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+
+  .system-info p {
+    color: #8892b0;
+    margin: 0.3rem 0;
   }
 
   .prompt {
@@ -302,79 +287,130 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
     font-weight: bold;
   }
 
-  /* Profile Section */
-  .profile-section {
+  .user-highlight {
+    color: #ffd700;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+
+  .status-online {
+    color: #00ff88;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .role-highlight {
+    color: #00ffff;
+    font-weight: bold;
+  }
+
+  /* Main Grid */
+  .cyber-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  /* Terminal Box */
+  .terminal-box {
+    background: #0f1419;
+    border: 1px solid #2a2e3e;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+  }
+
+  .terminal-header {
+    background: #1a1f29;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #2a2e3e;
+  }
+
+  .terminal-prompt {
+    color: #00ff88;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .terminal-body {
     padding: 1.5rem;
   }
 
-  .profile-image {
+  .cyber-avatar {
     width: 120px;
     height: 120px;
     border-radius: 8px;
-    border: 3px solid #00ff88;
+    border: 2px solid #00ff88;
     margin-bottom: 1.5rem;
+    filter: saturate(0.8) contrast(1.2);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
   }
 
-  .command-line {
-    margin-bottom: 1.5rem;
+  /* Terminal Commands */
+  .terminal-commands {
+    margin: 1.5rem 0;
   }
 
-  .command {
-    color: #ffd700;
-    margin-left: 0.5rem;
+  .cmd-line {
+    margin-bottom: 1rem;
   }
 
-  .output {
+  .cmd-prompt {
+    color: #00ff88;
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+
+  .cmd-output {
     color: #ffffff;
     margin-top: 0.5rem;
-    margin-left: 2rem;
+    margin-left: 1.5rem;
     line-height: 1.6;
   }
 
-  /* Status Badges */
-  .status-badges {
-    display: flex;
+  /* Status Grid */
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin: 1.5rem 0;
   }
 
-  .badge {
-    padding: 0.5rem 1rem;
+  .status-card {
+    background: rgba(138, 43, 226, 0.1);
+    border: 1px solid rgba(138, 43, 226, 0.3);
+    padding: 0.75rem;
     border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
   }
 
-  .badge-active {
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid #00ff88;
-  }
-
-  .badge-update {
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid #ffd700;
-  }
-
-  .badge-label {
+  .status-label {
+    display: block;
     font-size: 0.7rem;
-    color: #888;
+    color: #8892b0;
+    margin-bottom: 0.3rem;
   }
 
-  .badge-value {
+  .status-value {
+    display: block;
     font-size: 0.9rem;
-    color: #fff;
+    color: #00ff88;
     font-weight: bold;
   }
 
   /* Connections */
-  .connections {
+  .connections-list {
+    color: #8892b0;
     margin-top: 0.5rem;
-    margin-left: 2rem;
+    margin-left: 1.5rem;
   }
 
-  .connection-item {
-    color: #888;
+  .connections-list div {
     margin-bottom: 0.3rem;
   }
 
@@ -383,168 +419,252 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
     font-weight: bold;
   }
 
-  /* Social Links */
-  .social-links {
-    display: flex;
+  /* Social Grid */
+  .social-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-top: 1.5rem;
   }
 
-  .social-icon {
-    width: 2.5rem;
-    height: 2.5rem;
+  .social-btn {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    padding: 0.75rem;
+    border-radius: 4px;
+    color: #00ff88;
+    text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: #fff;
+    gap: 0.5rem;
     transition: all 0.3s;
   }
 
-  .social-icon:hover {
-    background: #00ff88;
-    color: #1a1a2e;
+  .social-btn:hover {
+    background: rgba(0, 255, 136, 0.2);
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
   }
 
-  /* JSON Content */
-  .json-content, .config-content, .log-content {
-    padding: 1rem;
-    color: #fff;
+  /* Right Panels */
+  .right-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
-  .json-line, .config-line, .log-entry {
-    margin-bottom: 0.75rem;
-    font-size: 0.9rem;
+  /* Neural Interface */
+  .neural-interface {
+    background: linear-gradient(135deg, #1a1f29, #0f1419);
+    border: 1px solid #2a2e3e;
+    border-radius: 8px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
   }
 
-  .json-key {
-    color: #ff79c6;
+  .neural-interface::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00ff88, transparent);
+    animation: scan-line 2s infinite;
   }
 
-  .json-value {
-    color: #50fa7b;
+  @keyframes scan-line {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(100px); }
   }
 
-  .config-key {
-    color: #00ff88;
-  }
-
-  .config-value {
-    color: #8be9fd;
-  }
-
-  .log-date {
+  .neural-header h3 {
     color: #ffd700;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .code-comment {
+    color: #5c6370;
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+
+  .connection-status {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: #00ff88;
+    font-weight: bold;
+    text-align: center;
+    margin: 1rem 0;
+    animation: connection-pulse 2s infinite;
+  }
+
+  @keyframes connection-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+    50% { box-shadow: 0 0 20px 5px rgba(0, 255, 136, 0.4); }
+  }
+
+  .user-line {
+    color: #00ffff;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  /* Panels Grid */
+  .panels-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  /* Data Panel */
+  .data-panel {
+    background: #0f1419;
+    border: 1px solid #2a2e3e;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    background: #1a1f29;
+    padding: 0.75rem;
+    border-bottom: 1px solid #2a2e3e;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .panel-header h3 {
+    color: #00ff88;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  /* JSON Data */
+  .json-data, .config-data {
+    padding: 1rem;
+  }
+
+  .json-item, .config-item {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .json-item:hover, .config-item:hover {
+    transform: translateX(5px);
+  }
+
+  .json-arrow {
+    color: #00ff88;
     margin-right: 0.5rem;
   }
 
-  .log-link {
-    color: #8be9fd;
-    text-decoration: none;
-    transition: color 0.3s;
+  .json-key {
+    color: #c678dd;
   }
 
-  .log-link:hover {
+  .json-value {
+    color: #98c379;
+  }
+
+  .config-symbol {
     color: #00ff88;
-    text-decoration: underline;
+    margin-right: 0.5rem;
   }
 
-  /* Access Panel */
-  .access-panel {
-    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-    padding: 2rem;
-    border-radius: 12px;
+  .config-key {
+    color: #e06c75;
+  }
+
+  .config-value {
+    color: #56b6c2;
+  }
+
+  /* Access Portal */
+  .access-portal {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(138, 43, 226, 0.05));
+    border: 1px solid #2a2e3e;
+    border-radius: 8px;
+    padding: 1.5rem;
     text-align: center;
   }
 
-  .access-content {
-    color: #fff;
-  }
-
-  .access-prompt {
+  .portal-header {
     color: #00ff88;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
   }
 
-  .access-panel h3 {
+  .portal-prompt {
+    font-weight: bold;
+  }
+
+  .access-granted {
     color: #ffd700;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+    font-weight: bold;
     margin: 1rem 0;
     letter-spacing: 0.2em;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
   }
 
-  .access-panel p {
-    color: #888;
+  .portal-comment {
+    color: #5c6370;
     font-style: italic;
+    font-size: 0.85rem;
     margin-bottom: 1.5rem;
   }
 
   .portal-links {
     display: flex;
+    gap: 1rem;
     justify-content: center;
-    gap: 2rem;
-    flex-wrap: wrap;
   }
 
-  .portal-link {
+  .portal-btn {
+    background: rgba(138, 43, 226, 0.1);
+    border: 1px solid rgba(138, 43, 226, 0.3);
     padding: 0.75rem 1.5rem;
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid #00ff88;
     border-radius: 4px;
     color: #00ff88;
     text-decoration: none;
     transition: all 0.3s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+    font-size: 0.9rem;
   }
 
-  .portal-link:hover {
-    background: #00ff88;
-    color: #1a1a2e;
+  .portal-btn:hover {
+    background: rgba(138, 43, 226, 0.2);
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
   }
 
-  .portal-link span {
+  .portal-btn span {
     font-weight: bold;
   }
 
-  /* Animations */
-  @keyframes blink {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0.5; }
-  }
-
   /* Responsive */
-  @media (max-width: 968px) {
-    .terminal-content {
+  @media (max-width: 768px) {
+    .cyber-grid {
       grid-template-columns: 1fr;
     }
 
-    .terminal-title h1 {
-      font-size: 1.8rem;
+    .panels-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .glitch {
+      font-size: 2rem;
     }
 
     .portal-links {
       flex-direction: column;
-      align-items: center;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .terminal-container {
-      padding: 1rem 0.5rem;
-    }
-
-    .status-badges {
-      flex-direction: column;
-    }
-
-    .social-links {
-      justify-content: center;
     }
   }
 </style>
