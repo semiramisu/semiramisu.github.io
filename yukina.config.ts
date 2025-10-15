@@ -8,7 +8,7 @@ const YukinaConfig: Configuration = {
 
   description: "IT、健康、仕事、趣味など様々なテーマについての考察や体験を共有するブログ",
 
-  site: "http://semiramisu.com/",
+  site: "https://semiramisu.com/",
 
   locale: "ja", // set for website language and date format
 
