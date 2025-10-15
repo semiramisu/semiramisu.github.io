@@ -1,6 +1,7 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, subMonths } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { calculateReadingTimeFromContent } from './reading-time';
 
 export interface ContentAnalytics {
   totalPosts: number;
@@ -32,6 +33,24 @@ export async function analyzeContent(): Promise<ContentAnalytics> {
 
   // 公開済みの記事のみ
   const publishedPosts = posts.filter(post => post.data.published <= new Date());
+
+  const publishedPostsWithStats = await Promise.all(
+    publishedPosts.map(async post => {
+      const rendered =
+        typeof post.render === 'function'
+          ? await post.render()
+          : (post as any).rendered;
+      const readingMetadata =
+        rendered?.remarkPluginFrontmatter?.readingMetadata ??
+        rendered?.metadata?.frontmatter?.readingMetadata ??
+        calculateReadingTimeFromContent(post.body);
+
+      return {
+        post,
+        readingMetadata
+      };
+    })
+  );
   
   // 総記事数
   const totalPosts = publishedPosts.length;
@@ -103,12 +122,10 @@ export async function analyzeContent(): Promise<ContentAnalytics> {
   let totalWordCount = 0;
   let postsWithStats = 0;
   
-  publishedPosts.forEach(post => {
-    // 読了時間の計算（rendered.metadataから取得）
-    const metadata = (post.rendered as any)?.metadata;
-    if (metadata?.frontmatter?.readingMetadata) {
-      totalReadingTime += metadata.frontmatter.readingMetadata.time || 0;
-      totalWordCount += metadata.frontmatter.readingMetadata.wordCount || 0;
+  publishedPostsWithStats.forEach(({ readingMetadata }) => {
+    if (readingMetadata) {
+      totalReadingTime += readingMetadata.time || 0;
+      totalWordCount += readingMetadata.wordCount || 0;
       postsWithStats++;
     }
   });
@@ -143,21 +160,19 @@ export async function analyzeContent(): Promise<ContentAnalytics> {
     const monthStart = startOfMonth(targetMonth);
     const monthEnd = endOfMonth(targetMonth);
     
-    const monthPosts = publishedPosts.filter(post => 
+    const monthPosts = publishedPostsWithStats.filter(({ post }) =>
       post.data.published >= monthStart && post.data.published <= monthEnd
     );
-    
-    let monthWords = 0;
-    let monthReadingTime = 0;
-    
-    monthPosts.forEach(post => {
-      const metadata = (post.rendered as any)?.metadata;
-      if (metadata?.frontmatter?.readingMetadata) {
-        monthWords += metadata.frontmatter.readingMetadata.wordCount || 0;
-        monthReadingTime += metadata.frontmatter.readingMetadata.time || 0;
-      }
-    });
-    
+
+    const monthWords = monthPosts.reduce(
+      (sum, { readingMetadata }) => sum + (readingMetadata?.wordCount || 0),
+      0
+    );
+    const monthReadingTime = monthPosts.reduce(
+      (sum, { readingMetadata }) => sum + (readingMetadata?.time || 0),
+      0
+    );
+
     monthlyStats.push({
       month: format(targetMonth, 'yyyy年MM月', { locale: ja }),
       posts: monthPosts.length,
