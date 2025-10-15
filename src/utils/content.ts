@@ -1,6 +1,6 @@
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 import { IdToSlug } from "./hash";
-import { calculateReadingTimeFromContent } from "./reading-time";
+import { calculateReadingTimeFromContent, type ReadingMetadata } from "./reading-time";
 
 /**
  * Extracts date from filename pattern (e.g., "2025_07_01.md")
@@ -22,6 +22,10 @@ function shouldPublishPost(filename: string): boolean {
 /**
  * Represents an archive item with a title, slug, date, and optional tags.
  */
+export type PostWithReadingMetadata = CollectionEntry<"posts"> & {
+  readingMetadata: ReadingMetadata;
+};
+
 export interface Archive {
   title: string;
   id: string;
@@ -29,7 +33,7 @@ export interface Archive {
   tags?: string[];
   description?: string;
   cover?: string;
-  readingMetadata?: { time: number; wordCount: number };
+  readingMetadata?: ReadingMetadata;
 }
 
 /**
@@ -60,7 +64,9 @@ export interface Category {
  * @param lang - Optional language filter. If not provided, defaults to "ja"
  * @returns A promise that resolves to an array of sorted blog posts with navigation properties.
  */
-export async function GetSortedPosts(lang: "ja" | "en" = "ja") {
+export async function GetSortedPosts(
+  lang: "ja" | "en" = "ja"
+): Promise<PostWithReadingMetadata[]> {
   const allBlogPosts = await getCollection("posts", ({ data, id }) => {
     const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
     const isLangFiltered = (data.lang || "ja") === lang;
@@ -82,7 +88,10 @@ export async function GetSortedPosts(lang: "ja" | "en" = "ja") {
     (sorted[i].data as any).prevTitle = sorted[i + 1].data.title;
   }
 
-  return sorted;
+  return sorted.map((entry) => {
+    const readingMetadata = calculateReadingTimeFromContent(entry.body);
+    return Object.assign(entry, { readingMetadata }) as PostWithReadingMetadata;
+  });
 }
 
 /**
@@ -166,10 +175,7 @@ export async function GetTags(lang: "ja" | "en" = "ja") {
         });
       }
 
-      const readingMetadata = {
-        time: Math.ceil(post.body.length / 500), // 1分あたり約500文字として計算
-        wordCount: post.body.split(/\s+/).length
-      };
+      const readingMetadata = calculateReadingTimeFromContent(post.body);
 
       tags.get(tagSlug)!.posts.push({
         title: post.data.title,

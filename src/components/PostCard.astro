@@ -8,6 +8,7 @@ import I18nKeys from "../locales/keys";
 import YukinaConfig from "../../yukina.config";
 import { formatDate } from "../utils/date";
 import ResponsiveImage from "./ResponsiveImage.astro";
+import type { ReadingMetadata } from "../utils/reading-time";
 
 export interface Props {
   id: string;
@@ -17,7 +18,7 @@ export interface Props {
   tags?: string[];
   description?: string;
   image?: string;
-  readingMetadata?: { time: number; wordCount: number };
+  readingMetadata?: ReadingMetadata;
   lang?: "ja" | "en";
 }
 

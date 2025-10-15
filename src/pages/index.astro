@@ -63,7 +63,7 @@ const allTags = await GetAllTags(lang);
               tags={entry.data.tags}
               description={entry.data.description}
               image={entry.data.cover}
-              readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
+              readingMetadata={entry.readingMetadata}
               lang={lang}
             />
           </div>
@@ -99,7 +99,11 @@ const allTags = await GetAllTags(lang);
                 <div class="popular-post-meta">
                   <span class="category-badge">{entry.data.category}</span>
                   <span class="read-time">
-                    {(entry.rendered!.metadata as any).frontmatter.readingMetadata?.readingTime || '5 min'}
+                    {entry.readingMetadata?.time
+                      ? `${entry.readingMetadata.time}${lang === 'ja' ? '分' : ' min'}`
+                      : lang === 'ja'
+                        ? '約5分'
+                        : '5 min'}
                   </span>
                 </div>
               </div>
@@ -179,7 +183,7 @@ const allTags = await GetAllTags(lang);
               tags={entry.data.tags}
               description={entry.data.description}
               image={entry.data.cover}
-              readingMetadata={(entry.rendered!.metadata as any).frontmatter.readingMetadata}
+              readingMetadata={entry.readingMetadata}
               lang={lang}
               isCompact={index > 0}
             />
