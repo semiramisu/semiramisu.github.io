@@ -1,0 +1,306 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+
+const url = new URL(Astro.request.url);
+const langParam = url.searchParams.get("lang");
+const lang = langParam === "en" ? "en" : "ja";
+const initialQuery = url.searchParams.get("q") ?? "";
+const pageTitle = lang === "ja" ? "サイト内検索" : "Search";
+const pageDescription = lang === "ja"
+  ? "ブログ内の記事やページを検索できます"
+  : "Search posts and pages across the blog.";
+---
+
+<MainLayout title={pageTitle} headTitle={`${pageTitle} | semiramisu blog`} headDescription={pageDescription}>
+  <div class="search-page" data-lang={lang} data-initial-query={initialQuery}>
+    <div class="search-header">
+      <h1 class="search-title">{pageTitle}</h1>
+      <p class="search-description">{pageDescription}</p>
+    </div>
+
+    <form id="site-search-form" class="search-form" role="search">
+      <label class="search-label" for="site-search-input">
+        {lang === "ja" ? "検索キーワード" : "Search keyword"}
+      </label>
+      <div class="search-input-wrapper">
+        <input
+          id="site-search-input"
+          class="search-input"
+          type="search"
+          name="q"
+          placeholder={lang === "ja" ? "記事を検索" : "Search posts"}
+          value={initialQuery}
+          autocomplete="off"
+        />
+        <button type="submit" class="search-button">
+          {lang === "ja" ? "検索" : "Search"}
+        </button>
+      </div>
+    </form>
+
+    <div class="search-status" id="search-status" role="status" aria-live="polite"></div>
+    <ul class="search-results" id="search-results" aria-live="polite"></ul>
+  </div>
+</MainLayout>
+
+<style>
+  .search-page {
+    @apply space-y-6;
+  }
+
+  .search-header {
+    @apply space-y-3 text-center;
+  }
+
+  .search-title {
+    @apply text-3xl md:text-4xl font-bold text-[var(--text-color)];
+    font-family: var(--primary-font);
+  }
+
+  .search-description {
+    @apply text-base text-[var(--text-color-lighten)];
+  }
+
+  .search-form {
+    @apply space-y-3;
+  }
+
+  .search-label {
+    @apply block text-sm font-medium text-[var(--text-color-lighten)];
+  }
+
+  .search-input-wrapper {
+    @apply flex flex-col gap-2 md:flex-row md:items-center;
+  }
+
+  .search-input {
+    @apply w-full rounded-full border border-[var(--border-color)] bg-[var(--card-color)] px-5 py-3 text-[var(--text-color)];
+    @apply focus:border-[var(--primary-color)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-color-lighten)];
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-button {
+    @apply inline-flex items-center justify-center rounded-full bg-[var(--primary-color)] px-6 py-3 text-white;
+    @apply transition-colors hover:bg-[var(--primary-color-darken)];
+  }
+
+  .search-status {
+    @apply min-h-[1.5rem] text-sm text-[var(--text-color-lighten)];
+  }
+
+  .search-results {
+    @apply space-y-4;
+  }
+
+  .search-result {
+    @apply rounded-2xl border border-[var(--border-color)] bg-[var(--card-color)] p-5 shadow-sm transition-shadow hover:shadow-lg;
+  }
+
+  .search-result-title {
+    @apply text-xl font-semibold text-[var(--text-color)];
+  }
+
+  .search-result-excerpt {
+    @apply mt-2 text-sm text-[var(--text-color-lighten)];
+  }
+
+  .search-result-meta {
+    @apply mt-3 flex flex-wrap gap-2 text-xs text-[var(--text-color-lighten)];
+  }
+
+  .search-result-tag {
+    @apply inline-flex items-center rounded-full bg-[var(--background-color)] px-2 py-0.5;
+  }
+
+  .search-result-link {
+    @apply mt-4 inline-flex items-center text-sm font-medium text-[var(--primary-color)] hover:underline;
+  }
+</style>
+
+<script type="module">
+  const root = document.querySelector(".search-page");
+  if (!root) {
+    console.error("Search page root element not found.");
+  } else {
+    const lang = root.dataset.lang === "en" ? "en" : "ja";
+    const initialQuery = root.dataset.initialQuery ?? "";
+
+    const searchInput = document.getElementById("site-search-input");
+    const searchForm = document.getElementById("site-search-form");
+    const resultsContainer = document.getElementById("search-results");
+    const statusElement = document.getElementById("search-status");
+
+    const messages = {
+      idle: lang === "ja" ? "検索キーワードを入力してください" : "Enter a keyword to search.",
+      loading: lang === "ja" ? "検索中..." : "Searching...",
+      noResults: lang === "ja" ? "一致する結果は見つかりませんでした" : "No matching results were found.",
+      error: lang === "ja" ? "検索機能を読み込めませんでした" : "Search could not be loaded.",
+    };
+
+    let pagefindInstance = null;
+
+    const updateStatus = (message) => {
+      if (statusElement) {
+        statusElement.textContent = message;
+      }
+    };
+
+    const escapeHtml = (value) =>
+      String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    const ensurePagefind = async () => {
+      if (pagefindInstance) return pagefindInstance;
+
+      try {
+        if (typeof window !== "undefined") {
+          if (!window.pagefind) {
+            const module = await import("/pagefind/pagefind.js");
+            window.pagefind = module;
+          }
+
+          if (window.pagefind?.init) {
+            pagefindInstance = await window.pagefind.init();
+          } else {
+            pagefindInstance = window.pagefind;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to initialize pagefind", error);
+        pagefindInstance = null;
+      }
+
+      return pagefindInstance;
+    };
+
+    const highlight = (text, keyword) => {
+      const safeText = escapeHtml(text);
+      if (!keyword) return safeText;
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(${escapedKeyword})`, "gi");
+      return safeText.replace(regex, '<mark class="highlight">$1</mark>');
+    };
+
+    const renderResults = async (query) => {
+      if (!resultsContainer) return;
+
+      if (!query.trim()) {
+        resultsContainer.innerHTML = "";
+        updateStatus(messages.idle);
+        return;
+      }
+
+      updateStatus(messages.loading);
+      resultsContainer.innerHTML = "";
+
+      const instance = await ensurePagefind();
+      if (!instance) {
+        updateStatus(messages.error);
+        return;
+      }
+
+      try {
+        const search = await instance.search(query);
+        if (!search || !search.results || search.results.length === 0) {
+          updateStatus(messages.noResults);
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        for (const result of search.results) {
+          const data = await result.data();
+          const title = data.meta?.title || data.title || data.url;
+          const excerpt = data.excerpt || "";
+          const tags = Array.isArray(data.meta?.tags)
+            ? data.meta.tags
+            : typeof data.meta?.tags === "string"
+              ? data.meta.tags.split(",").map((tag) => tag.trim()).filter(Boolean)
+              : [];
+          const category = data.meta?.category;
+          const url = typeof data.url === "string" ? data.url : "#";
+
+          const li = document.createElement("li");
+          li.className = "search-result";
+          li.innerHTML = `
+            <h2 class="search-result-title">${highlight(title, query)}</h2>
+            ${excerpt ? `<p class="search-result-excerpt">${highlight(excerpt, query)}</p>` : ""}
+            <div class="search-result-meta">
+              ${category ? `<span class="search-result-tag">${escapeHtml(category)}</span>` : ""}
+              ${tags.map(tag => `<span class="search-result-tag">${escapeHtml(tag)}</span>`).join("")}
+            </div>
+            <a class="search-result-link" href="${url}">
+              ${lang === "ja" ? "記事を読む" : "Read more"}
+            </a>
+          `;
+          fragment.appendChild(li);
+        }
+
+        resultsContainer.appendChild(fragment);
+        updateStatus(`${search.results.length} ${lang === "ja" ? "件ヒットしました" : "result(s) found."}`);
+      } catch (error) {
+        console.error("Search error", error);
+        updateStatus(messages.error);
+      }
+    };
+
+    const updateUrl = (query) => {
+      const currentUrl = new URL(window.location.href);
+      if (query) {
+        currentUrl.searchParams.set("q", query);
+      } else {
+        currentUrl.searchParams.delete("q");
+      }
+      window.history.replaceState({}, "", currentUrl.toString());
+    };
+
+    if (searchForm && searchInput instanceof HTMLInputElement) {
+      searchForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const query = searchInput.value.trim();
+        updateUrl(query);
+        await renderResults(query);
+      });
+
+      searchInput.addEventListener("input", (event) => {
+        const target = event.target;
+        if (target instanceof HTMLInputElement) {
+          updateUrl(target.value);
+        }
+      });
+
+      const debouncedSearch = (() => {
+        let timeout;
+        return (value) => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            renderResults(value);
+          }, 250);
+        };
+      })();
+
+      searchInput.addEventListener("input", (event) => {
+        const target = event.target;
+        if (target instanceof HTMLInputElement) {
+          debouncedSearch(target.value.trim());
+        }
+      });
+    }
+
+    updateStatus(messages.idle);
+
+    if (initialQuery && searchInput instanceof HTMLInputElement) {
+      searchInput.value = initialQuery;
+      renderResults(initialQuery);
+    }
+  }
+</script>
+
+<style>
+  .highlight {
+    @apply bg-yellow-200 dark:bg-yellow-800 px-1 rounded;
+  }
+</style>
