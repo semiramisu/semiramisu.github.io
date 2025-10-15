@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://semiramisu.com/sitemap-index.xml
