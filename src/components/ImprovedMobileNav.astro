@@ -220,15 +220,11 @@ const isActive = (href: string) => {
     display: block;
   }
 
-  /* Add padding to body to account for bottom nav */
-  @media (max-width: 768px) {
-    body {
-      padding-bottom: calc(56px + env(safe-area-inset-bottom));
-    }
-  }
 </style>
 
 <script>
+  document.body.classList.add('has-mobile-bottom-nav');
+
   // Smart Header Scroll Behavior
   const smartHeader = document.getElementById('smart-header');
   let lastScrollY = window.scrollY;
