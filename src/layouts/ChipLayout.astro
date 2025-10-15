@@ -12,12 +12,30 @@ export interface Props {
   subTitle?: string;
   bannerImage?: string;
   slug?: string;
+  headTitle?: string;
+  headDescription?: string;
 }
 
-const { chips, title, subTitle, bannerImage, slug } = Astro.props;
+const {
+  chips,
+  title,
+  subTitle,
+  bannerImage,
+  slug,
+  headTitle = title,
+  headDescription = subTitle,
+}: Props = Astro.props;
 ---
 
-<Main title={title} subTitle={subTitle} bannerImage={bannerImage} slug={slug} isHome={false}>
+<Main
+  title={title}
+  subTitle={subTitle}
+  bannerImage={bannerImage}
+  slug={slug}
+  isHome={false}
+  headTitle={headTitle}
+  headDescription={headDescription}
+>
   <div class="flex flex-col rounded-2xl bg-[var(--card-color)] p-6">
     <div class="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3">
       {

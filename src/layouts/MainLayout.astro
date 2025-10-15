@@ -14,12 +14,22 @@ export interface Props {
   bannerImage?: string;
   slug?: string;
   isHome?: boolean;
+  headTitle?: string;
+  headDescription?: string;
 }
 
-const { title, subTitle, bannerImage, slug, isHome = false } = Astro.props;
+const {
+  title,
+  subTitle,
+  bannerImage,
+  slug,
+  isHome = false,
+  headTitle = title,
+  headDescription = subTitle,
+}: Props = Astro.props;
 ---
 
-<Base>
+<Base title={headTitle} description={headDescription}>
   <meta name="page-type" content={isHome ? "home" : "content"} slot="head" />
   <slot name="head" slot="head" />
   

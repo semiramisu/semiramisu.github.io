@@ -1,6 +1,13 @@
 ---
 import YukinaConfig from "../../yukina.config";
 import BaseHead from "../components/BaseHead.astro";
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description }: Props = Astro.props;
 ---
 
 <html lang={YukinaConfig.locale}>
@@ -25,7 +32,7 @@ import BaseHead from "../components/BaseHead.astro";
       }
     </script>
     
-    <BaseHead />
+    <BaseHead title={title} description={description} />
     <slot name="head" />
   </head>
   <body>

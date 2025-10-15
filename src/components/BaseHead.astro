@@ -10,8 +10,18 @@ import ServiceWorkerSetup from "./ServiceWorkerSetup.astro";
 import StructuredData from "./StructuredData.astro";
 import OGPTags from "./OGPTags.astro";
 
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description }: Props = Astro.props;
+
+const resolvedTitle = title ?? YukinaConfig.title;
+const resolvedDescription = description ?? YukinaConfig.description;
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const isHomePage = Astro.url.pathname === '/' || 
+const isHomePage = Astro.url.pathname === '/' ||
                    Astro.url.pathname === '/index.html';
 ---
 
@@ -25,9 +35,9 @@ const isHomePage = Astro.url.pathname === '/' ||
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
-<title>{YukinaConfig.title}</title>
-<meta name="title" content={YukinaConfig.title} />
-<meta name="description" content={YukinaConfig.description} />
+<title>{resolvedTitle}</title>
+<meta name="title" content={resolvedTitle} />
+<meta name="description" content={resolvedDescription} />
 
 <!-- PWA Manifest -->
 <link rel="manifest" href="/manifest.json" />

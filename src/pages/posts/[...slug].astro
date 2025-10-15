@@ -22,6 +22,7 @@ const slug = IdToSlug(entry.id);
     <PostLayout
       title={entry.data.title}
       subTitle={entry.data.description}
+      description={entry.data.description}
       bannerImage={entry.data.cover}
       published={entry.data.published}
       headings={headings}
@@ -47,6 +48,7 @@ const slug = IdToSlug(entry.id);
     <PostLayout
       title={entry.data.title}
       subTitle={entry.data.description}
+      description={entry.data.description}
       bannerImage={entry.data.cover}
       published={entry.data.published}
       license={{ name: entry.data.licenseName, url: entry.data.licenseUrl }}
