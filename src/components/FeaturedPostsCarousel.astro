@@ -294,16 +294,50 @@ function getExcerpt(body: string, maxLength: number = 150): string {
 </style>
 
 <script>
+  let cleanupCarousel: (() => void) | null = null;
+  let carouselState:
+    | {
+        slideCount: number;
+        getCurrentIndex: () => number;
+        updateSlidePosition: (index: number) => void;
+      }
+    | null = null;
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (!carouselState) return;
+
+    if (event.key === 'ArrowRight') {
+      const nextIndex = (carouselState.getCurrentIndex() + 1) % carouselState.slideCount;
+      carouselState.updateSlidePosition(nextIndex);
+    } else if (event.key === 'ArrowLeft') {
+      const prevIndex =
+        (carouselState.getCurrentIndex() - 1 + carouselState.slideCount) % carouselState.slideCount;
+      carouselState.updateSlidePosition(prevIndex);
+    }
+  };
+
+  const cleanupExistingCarousel = () => {
+    if (cleanupCarousel) {
+      cleanupCarousel();
+      cleanupCarousel = null;
+    }
+  };
+
   // カルーセルの初期化関数
   function initCarousel() {
+    cleanupExistingCarousel();
+
     const track = document.querySelector('.carousel-track');
     const slides = document.querySelectorAll('.carousel-slide');
     const nextButton = document.querySelector('.control-button.next');
     const prevButton = document.querySelector('.control-button.prev');
     const indicators = document.querySelectorAll('.indicator');
-    
-    if (!track || !slides.length || !nextButton || !prevButton) return;
-    
+
+    if (!track || !slides.length || !nextButton || !prevButton) {
+      carouselState = null;
+      return;
+    }
+
     let currentIndex = 0;
     const slideCount = slides.length;
     
@@ -315,9 +349,9 @@ function getExcerpt(body: string, maxLength: number = 150): string {
       slide.style.width = `${100 / slideCount}%`;
     });
     
-    const updateSlidePosition = (index) => {
+    const updateSlidePosition = (index: number) => {
       track.style.transform = `translateX(-${index * (100 / slideCount)}%)`;
-      
+
       // Update active indicator
       indicators.forEach((indicator, i) => {
         indicator.classList.toggle('active', i === index);
@@ -326,34 +360,29 @@ function getExcerpt(body: string, maxLength: number = 150): string {
       currentIndex = index;
     };
     
-    // Clear existing event listeners
-    const newNextButton = nextButton.cloneNode(true);
-    const newPrevButton = prevButton.cloneNode(true);
-    nextButton.parentNode.replaceChild(newNextButton, nextButton);
-    prevButton.parentNode.replaceChild(newPrevButton, prevButton);
-    
-    // Next slide
-    newNextButton.addEventListener('click', () => {
+    const handleNextClick = () => {
       const nextIndex = (currentIndex + 1) % slideCount;
       updateSlidePosition(nextIndex);
-    });
-    
-    // Previous slide
-    newPrevButton.addEventListener('click', () => {
+    };
+
+    const handlePrevClick = () => {
       const prevIndex = (currentIndex - 1 + slideCount) % slideCount;
       updateSlidePosition(prevIndex);
-    });
-    
-    // Clear existing indicator listeners
+    };
+
+    nextButton.addEventListener('click', handleNextClick);
+    prevButton.addEventListener('click', handlePrevClick);
+
+    const indicatorHandlers: Array<{ element: Element; handler: () => void }> = [];
     indicators.forEach((indicator, index) => {
-      const newIndicator = indicator.cloneNode(true);
-      indicator.parentNode.replaceChild(newIndicator, indicator);
-      
-      newIndicator.addEventListener('click', () => {
+      const handler = () => {
         updateSlidePosition(index);
-      });
+      };
+
+      indicator.addEventListener('click', handler);
+      indicatorHandlers.push({ element: indicator, handler });
     });
-    
+
     // Auto advance slides
     let intervalId = setInterval(() => {
       const nextIndex = (currentIndex + 1) % slideCount;
@@ -361,29 +390,23 @@ function getExcerpt(body: string, maxLength: number = 150): string {
     }, 5000);
     
     // Pause on hover
-    track.addEventListener('mouseenter', () => {
+    const handleMouseEnter = () => {
       clearInterval(intervalId);
-    });
-    
-    track.addEventListener('mouseleave', () => {
+    };
+
+    const handleMouseLeave = () => {
       clearInterval(intervalId);
       intervalId = setInterval(() => {
         const nextIndex = (currentIndex + 1) % slideCount;
         updateSlidePosition(nextIndex);
       }, 5000);
-    });
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') {
-        const nextIndex = (currentIndex + 1) % slideCount;
-        updateSlidePosition(nextIndex);
-      } else if (e.key === 'ArrowLeft') {
-        const prevIndex = (currentIndex - 1 + slideCount) % slideCount;
-        updateSlidePosition(prevIndex);
-      }
-    });
-    
+    };
+
+    track.addEventListener('mouseenter', handleMouseEnter);
+    track.addEventListener('mouseleave', handleMouseLeave);
+
+    document.addEventListener('keydown', handleKeydown);
+
     // Lazy load images
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -401,14 +424,45 @@ function getExcerpt(body: string, maxLength: number = 150): string {
     document.querySelectorAll('.lozad').forEach(img => {
       observer.observe(img);
     });
+
+    carouselState = {
+      slideCount,
+      getCurrentIndex: () => currentIndex,
+      updateSlidePosition,
+    };
+
+    cleanupCarousel = () => {
+      nextButton.removeEventListener('click', handleNextClick);
+      prevButton.removeEventListener('click', handlePrevClick);
+
+      indicatorHandlers.forEach(({ element, handler }) => {
+        element.removeEventListener('click', handler);
+      });
+
+      track.removeEventListener('mouseenter', handleMouseEnter);
+      track.removeEventListener('mouseleave', handleMouseLeave);
+
+      clearInterval(intervalId);
+      observer.disconnect();
+
+      document.removeEventListener('keydown', handleKeydown);
+      carouselState = null;
+    };
   }
 
   // Astro's view transitions event
-  document.addEventListener('astro:page-load', initCarousel);
-  
+  const handleAstroPageLoad = () => {
+    cleanupExistingCarousel();
+    initCarousel();
+  };
+  document.addEventListener('astro:page-load', handleAstroPageLoad);
+
   // Standard DOM event as fallback
-  document.addEventListener('DOMContentLoaded', initCarousel);
-  
+  const handleDOMContentLoaded = () => {
+    initCarousel();
+  };
+  document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
+
   // Additional initialization for cases where both events might have already fired
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     setTimeout(initCarousel, 100);
