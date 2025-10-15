@@ -136,11 +136,6 @@
       min-height: 48px;
       min-width: 48px;
     }
-    
-    /* 下部ナビゲーションがある場合のコンテンツパディング */
-    body {
-      padding-bottom: 64px;
-    }
   }
 </style>
 
@@ -294,6 +289,7 @@
   // 初期化
   function initMobileEnhancements() {
     if ('ontouchstart' in window) {
+      document.body.classList.add('has-mobile-bottom-nav');
       initPullToRefresh();
       initSwipeNavigation();
       initBottomNav();

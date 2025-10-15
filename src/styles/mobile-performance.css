@@ -10,6 +10,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  body.has-mobile-bottom-nav {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* Mobile-specific animation adjustments */
 @media (max-width: 768px) {
   /* Simplify animations on mobile */
