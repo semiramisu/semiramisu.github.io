@@ -105,6 +105,13 @@ import I18nKeys from "../../locales/keys";
     const searchResults = document.getElementById('search-results');
     
     if (!searchInput || !searchResults) return;
+
+    const initTarget = searchResults || searchInput;
+    if (initTarget.dataset.initialized === 'true') {
+      return;
+    }
+
+    initTarget.dataset.initialized = 'true';
     
     let pagefind: any = null;
     
