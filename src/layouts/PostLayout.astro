@@ -19,6 +19,7 @@ import ReadingModeToggle from "../components/ReadingModeToggle.astro";
 interface Props {
   title?: string;
   subTitle?: string;
+  description?: string;
   bannerImage?: string;
   published?: Date;
   license?: {
@@ -41,6 +42,7 @@ interface Props {
 const {
   title,
   subTitle,
+  description,
   bannerImage,
   published,
   license,
@@ -51,7 +53,7 @@ const {
   currentPost,
   wordCount,
   readingTime,
-} = Astro.props;
+}: Props = Astro.props;
 
 // 記事のURLを構築
 const siteUrl = Astro.site?.toString() || '';
@@ -65,13 +67,20 @@ const breadcrumbs = [
 ];
 ---
 
-<Main title={title} subTitle={subTitle} bannerImage={bannerImage} isHome={false}>
+<Main
+  title={title}
+  subTitle={subTitle}
+  bannerImage={bannerImage}
+  isHome={false}
+  headTitle={title}
+  headDescription={description ?? subTitle}
+>
   {/* 構造化データ */}
   {currentPost && (
     <Fragment slot="head">
       <OGPTags
         title={title}
-        description={subTitle}
+        description={description ?? subTitle}
         type="article"
         publishedTime={published}
         author={author}

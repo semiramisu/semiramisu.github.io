@@ -9,15 +9,27 @@ import { Icon } from 'astro-icon/components';
 export interface Props {
   archiveMap: Map<number, Array<Archive>>;
   title?: string;
+  headTitle?: string;
+  headDescription?: string;
 }
 
-const { archiveMap, title } = Astro.props;
+const {
+  archiveMap,
+  title,
+  headTitle = title,
+  headDescription,
+}: Props = Astro.props;
 
 // すべての記事を1つの配列にまとめる
 const allPosts = [...archiveMap.values()].flat();
 ---
 
-<MainLayout title={title || i18n(I18nKeys.pages_archive_archive)} isHome={false}>
+<MainLayout
+  title={title || i18n(I18nKeys.pages_archive_archive)}
+  isHome={false}
+  headTitle={headTitle || i18n(I18nKeys.pages_archive_archive)}
+  headDescription={headDescription}
+>
   <div class="archives">
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-[var(--border-color)]">
       <div class="flex items-center space-x-2 mb-4 sm:mb-0">
