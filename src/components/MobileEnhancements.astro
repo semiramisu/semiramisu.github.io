@@ -157,24 +157,29 @@
         startY = e.touches[0].clientY;
         pulling = true;
       }
-    });
-    
+    }, { passive: true });
+
     document.addEventListener('touchmove', (e) => {
       if (!pulling) return;
-      
+
       currentY = e.touches[0].clientY;
       const diff = currentY - startY;
-      
-      if (diff > 0 && diff < 150) {
-        e.preventDefault();
-        ptr?.classList.add('visible');
-        ptr.style.transform = `translateY(${Math.min(diff, 80)}px)`;
+
+      if (diff <= 0) {
+        ptr?.classList.remove('visible');
+        if (ptr) ptr.style.transform = '';
+        return;
       }
-    });
-    
+
+      e.preventDefault();
+      const translateY = Math.min(diff, 80);
+      ptr?.classList.add('visible');
+      if (ptr) ptr.style.transform = `translateY(${translateY}px)`;
+    }, { passive: false });
+
     document.addEventListener('touchend', () => {
       if (!pulling) return;
-      
+
       const diff = currentY - startY;
       if (diff > 80) {
         // リフレッシュ実行
@@ -184,13 +189,13 @@
         }, 1000);
       } else {
         ptr?.classList.remove('visible');
-        ptr.style.transform = '';
+        if (ptr) ptr.style.transform = '';
       }
-      
+
       pulling = false;
       startY = 0;
       currentY = 0;
-    });
+    }, { passive: true });
   }
   
   // スワイプナビゲーション
@@ -201,12 +206,12 @@
     
     document.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
-    });
-    
+    }, { passive: true });
+
     document.addEventListener('touchend', (e) => {
       touchEndX = e.changedTouches[0].screenX;
       handleSwipe();
-    });
+    }, { passive: true });
     
     function handleSwipe() {
       const diff = touchStartX - touchEndX;
