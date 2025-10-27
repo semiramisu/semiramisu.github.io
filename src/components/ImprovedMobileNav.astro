@@ -5,13 +5,14 @@ const currentPath = Astro.url.pathname;
 
 const navItems = [
   { href: "/", icon: "mingcute:home-4-fill", label: "ホーム" },
-  { href: "/all-posts", icon: "mingcute:search-3-fill", label: "検索" },
+  { action: "open-search", icon: "mingcute:search-3-fill", label: "検索" },
   { href: "/categories", icon: "mingcute:grid-fill", label: "カテゴリ" },
   { href: "/archive", icon: "mingcute:calendar-fill", label: "アーカイブ" },
-  { href: "#top", icon: "mingcute:arrow-up-fill", label: "トップへ", isAction: true }
+  { action: "scroll-top", icon: "mingcute:arrow-up-fill", label: "トップへ" }
 ];
 
-const isActive = (href: string) => {
+const isActive = (href?: string) => {
+  if (!href) return false;
   if (href === "/") return currentPath === href;
   return currentPath.startsWith(href);
 };
@@ -21,10 +22,11 @@ const isActive = (href: string) => {
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
   <div class="nav-container">
     {navItems.map((item) => (
-      item.isAction ? (
+      item.action ? (
         <button
           class="nav-item"
-          data-action="scroll-top"
+          type="button"
+          data-action={item.action}
           aria-label={item.label}
         >
           <Icon name={item.icon} width={24} height={24} />
@@ -263,6 +265,13 @@ const isActive = (href: string) => {
       top: 0,
       behavior: 'smooth'
     });
+  });
+
+  document.querySelector('[data-action="open-search"]')?.addEventListener('click', () => {
+    const searchModal = document.getElementById('search-modal');
+    const modalSearchInput = document.getElementById('modal-search-input') as HTMLInputElement | null;
+    searchModal?.classList.add('visible');
+    modalSearchInput?.focus();
   });
 
   // Theme toggle
