@@ -4,6 +4,7 @@ logs
 
 # build output
 dist/
+.netlify/
 # generated types
 .astro/
 
