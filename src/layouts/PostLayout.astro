@@ -151,39 +151,47 @@ const breadcrumbs = [
 </Main>
 
 <style is:global>
-  /* 強制的にレイアウトを保持するための!importantスタイル */
+  /* 記事ページレイアウト */
   .post-content-wrapper {
     display: flex !important;
     width: 100% !important;
-    gap: 1.5rem !important;
+    gap: 2rem !important;
     min-height: 300px !important;
   }
 
   .post-article {
     flex: 1 !important;
     background-color: var(--card-color) !important;
-    border-radius: 1rem !important;
-    padding: 1.5rem !important;
+    border-radius: 1.25rem !important;
+    padding: 1.75rem !important;
     min-width: 0 !important;
     width: auto !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
   }
 
   @media (min-width: 768px) {
     .post-article {
-      padding: 2rem 2.5rem !important;
+      padding: 2.5rem 3rem !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .post-article {
+      padding: 3rem 3.5rem !important;
     }
   }
 
   .article-inner {
-    font-size: var(--primary-font);
+    font-family: var(--primary-font);
+    line-height: 1.85;
   }
-  
+
   .post-actions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 3rem;
     padding-top: 2rem;
     border-top: 1px solid var(--border-color);
   }
@@ -207,6 +215,11 @@ const breadcrumbs = [
 
   .related-posts-sidebar {
     margin-top: 2rem;
+  }
+
+  /* ダークモード */
+  :root.dark .post-article {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
   }
 </style>
 

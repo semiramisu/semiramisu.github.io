@@ -30,28 +30,37 @@ const allTags = await GetAllTags(lang);
   <meta name="page-type" content="home" slot="head" />
   
   <!-- Hero Section -->
-  <div class="hero-section-simple mb-2">
-    <div class="fade-in-up flex flex-col items-center justify-center space-y-4 text-center py-3">
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient">
+  <div class="hero-section-simple mb-6">
+    <div class="fade-in-up flex flex-col items-center justify-center space-y-3 text-center py-4">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gradient">
         <AnimatedHeading text={lang === 'ja' ? "ようこそ！私のブログへ" : "Welcome to My Blog!"} />
       </h1>
+      <p class="text-base md:text-lg text-[var(--text-color-lighten)] max-w-2xl mx-auto">
+        {lang === 'ja' ? '日々の発見や学びを記録するブログです' : 'A blog documenting daily discoveries and learnings'}
+      </p>
     </div>
   </div>
 
   <div class="space-y-8">
     <!-- Featured Posts Carousel -->
     <section class="featured-posts">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.featured_posts)}</h2>
+      <div class="section-header">
+        <h2 class="section-title">{i18n(I18nKeys.featured_posts)}</h2>
+        <div class="section-line"></div>
+      </div>
       <FeaturedPostsCarousel posts={featuredPosts} lang={lang} />
     </section>
 
     <!-- Recent Posts -->
     <section class="recent-posts">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.recent_posts)}</h2>
+      <div class="section-header">
+        <h2 class="section-title">{i18n(I18nKeys.recent_posts)}</h2>
+        <div class="section-line"></div>
+      </div>
       <!-- Desktop Grid -->
       <div class="posts-grid desktop-only">
         {recentPosts.slice(0, 6).map((entry, index) => (
-          <div 
+          <div
             class="post-card-animation"
             style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
           >
@@ -69,8 +78,8 @@ const allTags = await GetAllTags(lang);
           </div>
         ))}
       </div>
-      <div class="mt-8 text-center">
-        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all transform hover:scale-105">
+      <div class="mt-10 text-center">
+        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="view-all-btn">
           {lang === 'ja' ? 'すべての記事を見る' : 'View All Posts'}
         </a>
       </div>
@@ -81,9 +90,8 @@ const allTags = await GetAllTags(lang);
     <!-- Left Column: Popular Posts -->
     <div class="column-left">
       <!-- Popular Posts Section -->
-      <div class="popular-section mb-8">
+      <div class="column-card mb-8">
         <h2 class="column-title mb-4">
-          <span class="title-icon">🔥</span>
           {lang === 'ja' ? '人気記事' : 'Popular Articles'}
         </h2>
         <div class="popular-posts">
@@ -117,9 +125,8 @@ const allTags = await GetAllTags(lang);
     <!-- Center Column: Tags & Categories -->
     <div class="column-center">
       <!-- Tag Cloud -->
-      <div class="sidebar-section mb-8">
+      <div class="column-card mb-8">
         <h2 class="column-title mb-4">
-          <span class="title-icon">🏷️</span>
           {lang === 'ja' ? 'タグ' : 'Tags'}
         </h2>
         <div class="tag-cloud-container">
@@ -128,9 +135,8 @@ const allTags = await GetAllTags(lang);
       </div>
 
       <!-- Categories -->
-      <div class="sidebar-section mb-8">
+      <div class="column-card mb-8">
         <h2 class="column-title mb-4">
-          <span class="title-icon">📂</span>
           {lang === 'ja' ? 'カテゴリー' : 'Categories'}
         </h2>
         <div class="categories-list">
@@ -149,9 +155,8 @@ const allTags = await GetAllTags(lang);
 
     <!-- Right Column: Archive -->
     <div class="column-right">
-      <div class="sidebar-section">
+      <div class="column-card">
         <h2 class="column-title mb-4">
-          <span class="title-icon">📅</span>
           {lang === 'ja' ? 'アーカイブ' : 'Archive'}
         </h2>
         <div class="archive-mini">
@@ -191,7 +196,7 @@ const allTags = await GetAllTags(lang);
         ))}
       </div>
       <div class="mt-6 text-center">
-        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all">
+        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="view-all-btn">
           {lang === 'ja' ? 'すべての記事を見る' : 'View All Posts'}
         </a>
       </div>
@@ -213,68 +218,106 @@ const allTags = await GetAllTags(lang);
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-color-darken));
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Section Header */
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    @apply text-2xl md:text-3xl font-bold text-[var(--text-color)];
+    font-family: var(--brand-font);
+    letter-spacing: -0.02em;
+  }
+
+  .section-line {
+    width: 3rem;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+    border-radius: 2px;
+    margin-top: 0.5rem;
+  }
+
+  /* View All Button */
+  .view-all-btn {
+    @apply inline-block py-3 px-8 rounded-full font-semibold transition-all;
+    background: var(--primary-color);
+    color: white;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 14px rgba(var(--primary-color-rgb), 0.3);
+  }
+
+  .view-all-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--primary-color-rgb), 0.4);
+    color: white;
   }
 
   /* Three Column Layout */
   .three-column-layout {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
     max-width: 1400px;
     margin: 2rem auto;
     padding: 0 1rem;
   }
 
+  /* Column Card */
+  .column-card {
+    background: var(--card-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
   /* Column Titles */
   .column-title {
-    @apply text-xl font-bold text-[var(--text-color)] flex items-center gap-2;
+    @apply text-lg font-bold text-[var(--text-color)] flex items-center gap-2;
+    font-family: var(--brand-font);
+    padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 0.5rem;
     margin-bottom: 1rem;
-  }
-
-  .title-icon {
-    font-size: 1.2em;
-  }
-
-  .section-title {
-    @apply text-2xl md:text-3xl font-bold text-[var(--text-color)];
   }
 
   /* Column Styles */
   .column-left, .column-center, .column-right {
-    @apply space-y-4;
+    @apply space-y-0;
   }
 
   /* Popular Posts */
   .popular-posts {
-    @apply space-y-3;
+    @apply space-y-2;
   }
 
   .popular-post-card {
-    @apply flex items-start gap-3 p-3 rounded-lg border border-[var(--border-color)] hover:shadow-md transition-all;
-    background: var(--bg-color);
+    @apply flex items-start gap-3 p-3 rounded-xl transition-all;
+    border: 1px solid transparent;
   }
 
   .popular-post-card:hover {
-    border-color: var(--primary-color);
-    transform: translateX(4px);
+    background: var(--primary-color-transparent);
+    border-color: var(--primary-color-lighten);
   }
 
   .rank-badge {
-    @apply flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[var(--primary-color)] to-[var(--primary-color-darken)] text-white font-bold flex items-center justify-center text-sm;
+    @apply flex-shrink-0 w-7 h-7 rounded-lg font-bold flex items-center justify-center text-xs;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-color-darken));
+    color: white;
   }
 
   .popular-post-content {
-    @apply flex-1;
+    @apply flex-1 min-w-0;
   }
 
   .popular-post-title {
-    @apply text-base font-medium mb-1;
+    @apply text-sm font-medium mb-1;
+    line-height: 1.4;
   }
 
   .popular-post-title a {
@@ -286,24 +329,26 @@ const allTags = await GetAllTags(lang);
   }
 
   .category-badge {
-    @apply px-2 py-1 rounded bg-[var(--bg-color-darken)] text-[var(--text-color-lighten)];
+    @apply px-2 py-0.5 rounded-md text-[var(--text-color-lighten)];
+    background: var(--primary-color-lighten);
+    font-size: 0.7rem;
   }
 
   .read-time {
     @apply text-[var(--text-color-lighten)];
-  }
-
-  .sidebar-section {
-    @apply p-4 rounded-lg border border-[var(--border-color)];
-    background: var(--bg-color);
+    font-size: 0.7rem;
   }
 
   .categories-list {
-    @apply space-y-2;
+    @apply space-y-1;
   }
 
   .category-item {
-    @apply flex items-center justify-between p-2 rounded hover:bg-[var(--bg-color-darken)] transition-colors;
+    @apply flex items-center justify-between p-2 rounded-lg transition-all;
+  }
+
+  .category-item:hover {
+    background: var(--primary-color-transparent);
   }
 
   .category-name {
@@ -311,7 +356,8 @@ const allTags = await GetAllTags(lang);
   }
 
   .category-count {
-    @apply text-xs px-2 py-1 rounded-full bg-[var(--bg-color-darken)] text-[var(--text-color-lighten)];
+    @apply text-xs px-2 py-0.5 rounded-full text-[var(--primary-color)] font-medium;
+    background: var(--primary-color-lighten);
   }
 
   .archive-mini {
@@ -321,7 +367,7 @@ const allTags = await GetAllTags(lang);
 
   /* View All Links */
   .view-all-link {
-    @apply inline-block text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] font-medium transition-colors;
+    @apply inline-block text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] font-medium transition-colors text-sm;
   }
 
   /* Animations */
@@ -331,11 +377,11 @@ const allTags = await GetAllTags(lang);
   }
 
   .fade-in-up {
-    animation: fadeInUp 1s ease-out forwards;
+    animation: fadeInUp 0.8s ease-out forwards;
   }
 
   .post-card-animation {
-    animation: fadeIn 0.6s ease-out forwards;
+    animation: fadeInUp 0.6s ease-out forwards;
     opacity: 0;
   }
 
@@ -343,7 +389,7 @@ const allTags = await GetAllTags(lang);
   .desktop-only {
     display: block;
   }
-  
+
   .mobile-only {
     display: none;
   }
@@ -352,7 +398,7 @@ const allTags = await GetAllTags(lang);
     .three-column-layout {
       grid-template-columns: 1.2fr 1fr;
     }
-    
+
     .column-right {
       display: none;
     }
@@ -362,7 +408,7 @@ const allTags = await GetAllTags(lang);
     .desktop-only {
       display: none;
     }
-    
+
     .mobile-only {
       display: block;
     }
@@ -373,9 +419,9 @@ const allTags = await GetAllTags(lang);
   }
 
   .posts-grid {
-    @apply grid grid-cols-1 gap-6;
-    @apply md:grid-cols-2 md:gap-6;
-    @apply lg:grid-cols-3 lg:gap-6;
+    @apply grid grid-cols-1 gap-7;
+    @apply md:grid-cols-2 md:gap-7;
+    @apply lg:grid-cols-3 lg:gap-7;
   }
 
   .tag-chip {
@@ -386,7 +432,7 @@ const allTags = await GetAllTags(lang);
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
     to {
       opacity: 1;
@@ -409,12 +455,17 @@ const allTags = await GetAllTags(lang);
   }
 
   .archive-mini::-webkit-scrollbar-track {
-    background: var(--bg-color-darken);
+    background: transparent;
     border-radius: 2px;
   }
 
   .archive-mini::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
+    background: var(--primary-color-lighten);
     border-radius: 2px;
+  }
+
+  /* Dark mode */
+  :root.dark .column-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 </style>

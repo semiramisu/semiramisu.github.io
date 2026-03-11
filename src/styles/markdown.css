@@ -12,8 +12,10 @@
   border-radius: 4px;
   color: var(--primary-color) !important;
   background-color: var(--primary-color-lighten) !important;
+  padding: 0.15em 0.4em;
 }
 
+/* 見出しスタイル - 雑誌風 */
 .article h1,
 .article h2,
 .article h3,
@@ -24,22 +26,63 @@
   flex-direction: row;
   align-items: center;
   position: relative;
+  font-family: var(--brand-font);
+  letter-spacing: -0.01em;
 }
 
+.article h1 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.article h2 {
+  font-size: 1.6rem;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.article h3 {
+  font-size: 1.3rem;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.article h4 {
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 見出しの左アクセントバー */
 .article h1::before,
-.article h2::before,
+.article h2::before {
+  position: absolute;
+  display: block;
+  content: " ";
+  background: linear-gradient(to bottom, var(--primary-color), var(--primary-color-darken));
+  top: 4px;
+  bottom: 4px;
+  width: 0.25rem;
+  border-radius: 4px;
+}
+
 .article h3::before,
-.article h4::before,
-.article h5::before,
-.article h6::before {
+.article h4::before {
   position: absolute;
   display: block;
   content: " ";
   background-color: var(--primary-color);
-  top: 2.5px;
-  bottom: 3px;
-  width: 0.3rem;
+  top: 4px;
+  bottom: 4px;
+  width: 0.2rem;
   border-radius: 4px;
+  opacity: 0.6;
+}
+
+.article h5::before,
+.article h6::before {
+  display: none;
 }
 
 .article h1 > a,
@@ -51,19 +94,33 @@
   @apply m-2;
 }
 
+/* 段落スタイル */
+.article p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.85;
+  font-size: 1rem;
+}
+
+/* リスト */
 .article li::marker {
   color: var(--primary-color) !important;
 }
 
-.article blockquote {
-  border-inline-start-color: var(--primary-color) !important;
+.article li {
+  line-height: 1.8;
+  margin-bottom: 0.25rem;
 }
 
+/* 引用 - 雑誌風 */
 .article blockquote {
-  @apply py-0.5 pl-3 pr-3 lg:pl-4;
+  border-inline-start: 3px solid var(--primary-color) !important;
+  border-inline-start-color: var(--primary-color) !important;
+  @apply py-1 pl-4 pr-4 lg:pl-5;
   font-style: normal !important;
-  border-radius: 0.25rem;
+  border-radius: 0 0.5rem 0.5rem 0;
   background-color: var(--primary-color-transparent) !important;
+  margin: 1.5rem 0;
 }
 
 .article blockquote blockquote {
@@ -74,14 +131,15 @@
   padding: 0;
   margin: 0;
   color: var(--text-color);
+  line-height: 1.75;
 }
 
 .article blockquote p:first-child {
-  padding-top: 0.3rem;
+  padding-top: 0.4rem;
 }
 
 .article blockquote p:last-child {
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.4rem;
 }
 
 .article blockquote p::before {
@@ -92,23 +150,43 @@
   content: "" !important;
 }
 
+/* リンク */
 .article a {
   color: var(--primary-color) !important;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
 }
 
+.article a:hover {
+  text-decoration-style: solid;
+}
+
+/* 区切り線 */
 .article hr {
-  @apply my-6;
-  border-color: var(--primary-color-lighten) !important;
+  @apply my-8;
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border-color),
+    var(--primary-color-lighten),
+    var(--border-color),
+    transparent
+  );
 }
 
+/* コードブロック */
 .article pre {
-  @apply my-3;
+  @apply my-4;
   overflow: hidden !important;
 }
 
 .article span.line {
   font-size: 14px !important;
-  line-height: normal;
+  line-height: 1.6;
   font-family: var(--code-font) !important;
 }
 
@@ -131,12 +209,25 @@
   display: none;
 }
 
-.article p {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
 .article .astro-code {
   border-radius: 0.75rem !important;
   scrollbar-width: thin;
+  padding: 1.25rem 1rem !important;
+}
+
+/* 画像 */
+.article img {
+  border-radius: 0.75rem;
+  margin: 1.5rem auto;
+}
+
+/* テーブル */
+.article table {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.article th {
+  background-color: var(--primary-color-lighten);
+  font-weight: 600;
 }
