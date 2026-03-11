@@ -51,7 +51,10 @@ export function calculateReadingTime(text: string): ReadingMetadata {
  * @param content Markdown/HTMLコンテンツ
  * @returns 読了時間と単語数のメタデータ
  */
-export function calculateReadingTimeFromContent(content: string): ReadingMetadata {
+export function calculateReadingTimeFromContent(content: string | undefined): ReadingMetadata {
+  if (!content) {
+    return { time: 1, wordCount: 0 };
+  }
   // HTMLタグを除去
   let text = content.replace(/<[^>]*>/g, ' ');
   

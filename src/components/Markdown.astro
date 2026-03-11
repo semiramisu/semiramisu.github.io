@@ -9,7 +9,7 @@ const { class: className } = Astro.props;
 ---
 
 <div
-  class=`prose prose-sm lg:prose-base dark:prose-invert shrink max-w-full ${className ?? ''}`
+  class=`prose prose-base lg:prose-lg dark:prose-invert shrink max-w-full article ${className ?? ''}`
 >
   <slot />
 </div>
