@@ -1,7 +1,6 @@
 ---
 import { IdToSlug } from "../utils/hash";
 import { Icon } from "astro-icon/components";
-import PostCardInfoIcon from "./widgets/PostCardInfoIcon.astro";
 import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
 import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
@@ -32,7 +31,6 @@ const { time = 0, wordCount = 0 } = props.readingMetadata ?? { time: 0, wordCoun
 
 // 画像URLを取得（外部URLの場合はそのまま使用）
 const imageUrl = props.image ?? GetCoverURLForUnspecifiedEntry(entryID);
-const isExternalImage = imageUrl.startsWith('http');
 ---
 
 <article class="post-card">
@@ -58,7 +56,7 @@ const isExternalImage = imageUrl.startsWith('http');
           {formatDate(props.published, YukinaConfig.locale)}
         </time>
         <span class="card-reading-time">
-          {time}{i18n(I18nKeys.post_card_minutes)}
+          {time} {i18n(I18nKeys.post_card_minutes)}
         </span>
       </div>
       <h3 class="card-title">{props.title}</h3>
