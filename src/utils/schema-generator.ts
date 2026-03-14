@@ -152,7 +152,7 @@ export function generatePersonSchema(): any {
     url: SITE_URL,
     sameAs: [
       "https://github.com/semiramisu",
-      "https://twitter.com/semiramisu" // TwitterアカウントがあればURLを追加
+      "https://x.com/sekine_DS"
     ],
     jobTitle: "Software Developer",
     worksFor: {
