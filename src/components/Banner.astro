@@ -100,38 +100,44 @@ const carouselAnimationTime = `${bannerImages.length * 6}s`;
 </header>
 
 <script>
-  const styleElement = document.createElement("style");
-  const carouselImgs = document.getElementById("carousel_imgs");
-  const carouselImgsCount = carouselImgs?.children.length ?? 0;
+  function initCarouselAnimation() {
+    const carouselImgs = document.getElementById("carousel_imgs");
+    const carouselImgsCount = carouselImgs?.children.length ?? 0;
 
-  if (carouselImgsCount > 0) {
-    const carouselAnimation = `
-    @keyframes carousel-animation {
-      0% {
-        opacity: 0;
-        transform: scale(0.9);
+    if (carouselImgsCount > 0) {
+      const bannerElement = document.getElementById("banner");
+      if (bannerElement && !bannerElement.querySelector("style[data-carousel]")) {
+        const styleElement = document.createElement("style");
+        styleElement.setAttribute("data-carousel", "");
+        const carouselAnimation = `
+        @keyframes carousel-animation {
+          0% {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          4% {
+            opacity: 1;
+          }
+          ${100 / carouselImgsCount}% {
+            opacity: 1;
+          }
+          ${100 / carouselImgsCount + 50 / carouselImgsCount}% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.08);
+          }
+        }
+        `;
+        styleElement.textContent = carouselAnimation;
+        bannerElement.appendChild(styleElement);
       }
-      4% {
-        opacity: 1;
-      }
-      ${100 / carouselImgsCount}% {
-        opacity: 1;
-      }
-      ${100 / carouselImgsCount + 50 / carouselImgsCount}% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 0;
-        transform: scale(1.08);
-      }
-    }
-    `;
-    styleElement.textContent = carouselAnimation;
-    const bannerElement = document.getElementById("banner");
-    if (bannerElement && !bannerElement.querySelector("style")) {
-      bannerElement.appendChild(styleElement);
     }
   }
+
+  // ViewTransitions対応: 初回ロードとページ遷移の両方で実行
+  document.addEventListener("astro:page-load", initCarouselAnimation);
 </script>
 
 <style define:vars={{ carouselAnimationTime }}>
