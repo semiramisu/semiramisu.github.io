@@ -12,113 +12,63 @@ export interface Props {
 }
 
 const { posts, lang = "ja" } = Astro.props;
-const langParam = lang === 'en' ? '?lang=en' : '';
-
-// 記事の冒頭部分を抽出する関数
-function getExcerpt(body: string, maxLength: number = 150): string {
-  if (!body) return '';
-  
-  // Markdownの記法を簡単に除去
-  const plainText = body
-    .replace(/^#+\s+/gm, '') // 見出し
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // リンク
-    .replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, '$1') // 強調
-    .replace(/`([^`]+)`/g, '$1') // インラインコード
-    .replace(/```[\s\S]*?```/g, '') // コードブロック
-    .replace(/^>\s+/gm, '') // 引用
-    .replace(/^[-*+]\s+/gm, '') // リスト
-    .replace(/\n{2,}/g, ' ') // 複数改行
-    .replace(/\n/g, ' ') // 改行
-    .trim();
-  
-  // 指定文字数で切り取り
-  if (plainText.length <= maxLength) {
-    return plainText;
-  }
-  
-  // 文の区切りで自然に切る
-  const truncated = plainText.substring(0, maxLength);
-  const lastPeriod = truncated.lastIndexOf('。');
-  const lastSpace = truncated.lastIndexOf(' ');
-  
-  let cutIndex = maxLength;
-  if (lastPeriod > maxLength * 0.8) {
-    cutIndex = lastPeriod + 1;
-  } else if (lastSpace > maxLength * 0.8) {
-    cutIndex = lastSpace;
-  }
-  
-  return plainText.substring(0, cutIndex) + '...';
-}
+const langParam = lang === "en" ? "?lang=en" : "";
 ---
 
-<div class="featured-carousel-container">
-  <div class="controls">
-    <button class="control-button prev" aria-label="Previous slide">
-      <Icon name="line-md:chevron-left" class="control-icon" />
-    </button>
-    <button class="control-button next" aria-label="Next slide">
-      <Icon name="line-md:chevron-right" class="control-icon" />
-    </button>
-  </div>
-  
+<div class="featured-carousel-container" data-featured-carousel>
   <div class="carousel-track-container">
     <div class="carousel-track">
-      {posts.map((post, index) => {
+      {posts.map((post) => {
         const entryID = IdToSlug(post.id);
         const contentUrl = `/posts/${entryID}${langParam}`;
-        const excerpt = getExcerpt(post.body);
         return (
-          <div class="carousel-slide">
+          <article class="carousel-slide">
             <a href={contentUrl} class="slide-content">
-              <div class="slide-image-container">
-                <OptimizedImage
-                  class="slide-image" 
-                  src={post.data.cover ?? GetCoverURLForUnspecifiedEntry(entryID)} 
-                  alt={post.data.title}
-                  width={800}
-                  height={400}
-                  loading="lazy"
-                />
-                <div class="slide-overlay">
-                  <div class="slide-meta">
-                    <span class="slide-date">
-                      <Icon name="cuida:calendar-outline" class="slide-icon" />
-                      {formatDate(post.data.published, YukinaConfig.locale)}
-                    </span>
-                    {post.data.category && (
-                      <span class="slide-category">
-                        <Icon name="dashicons:category" class="slide-icon" />
-                        {post.data.category}
-                      </span>
-                    )}
-                  </div>
-                  <h3 class="slide-title">{post.data.title}</h3>
-                  {post.data.description && (
-                    <p class="slide-description">{post.data.description}</p>
-                  )}
-                  {excerpt && (
-                    <p class="slide-excerpt">{excerpt}</p>
-                  )}
-                  <div class="slide-read-more">
-                    <span>{lang === 'ja' ? '続きを読む' : 'Read More'}</span>
-                    <Icon name="cuida:caret-right-outline" class="read-more-icon" />
-                  </div>
+              <OptimizedImage
+                class="slide-image"
+                src={post.data.cover ?? GetCoverURLForUnspecifiedEntry(entryID)}
+                alt={post.data.title}
+                width={960}
+                height={520}
+                loading="lazy"
+              />
+              <div class="slide-overlay">
+                <span class="slide-category">{post.data.category ?? (lang === "ja" ? "記事" : "Post")}</span>
+                <h3 class="slide-title">{post.data.title}</h3>
+                {post.data.description && <p class="slide-description">{post.data.description}</p>}
+                <div class="slide-meta">
+                  <span class="meta-item">
+                    <Icon name="cuida:calendar-outline" class="meta-icon" />
+                    {formatDate(post.data.published, YukinaConfig.locale)}
+                  </span>
+                  <span class="meta-item read-more">
+                    {lang === "ja" ? "続きを読む" : "Read more"}
+                    <Icon name="cuida:caret-right-outline" class="meta-icon" />
+                  </span>
                 </div>
               </div>
             </a>
-          </div>
+          </article>
         );
       })}
     </div>
   </div>
-  
+
+  <div class="controls" role="group" aria-label={lang === "ja" ? "スライド操作" : "Slide controls"}>
+    <button class="control-button prev" aria-label={lang === "ja" ? "前へ" : "Previous"}>
+      <Icon name="line-md:chevron-left" class="control-icon" />
+    </button>
+    <button class="control-button next" aria-label={lang === "ja" ? "次へ" : "Next"}>
+      <Icon name="line-md:chevron-right" class="control-icon" />
+    </button>
+  </div>
+
   <div class="carousel-indicators">
     {posts.map((_, index) => (
-      <button 
-        class={`indicator ${index === 0 ? "active" : ""}`} 
+      <button
+        class={`indicator ${index === 0 ? "active" : ""}`}
         data-index={index}
-        aria-label={`Go to slide ${index + 1}`}
+        aria-label={`${lang === "ja" ? "スライド" : "Slide"} ${index + 1}`}
       ></button>
     ))}
   </div>
@@ -126,345 +76,308 @@ function getExcerpt(body: string, maxLength: number = 150): string {
 
 <style>
   .featured-carousel-container {
-    @apply relative w-full overflow-hidden rounded-2xl;
-    height: 400px;
-  }
-  
-  @media (min-width: 768px) {
-    .featured-carousel-container {
-      height: 400px;
-    }
-  }
-  
-  .carousel-track-container {
-    @apply w-full h-full overflow-hidden;
-  }
-  
-  .carousel-track {
-    @apply flex transition-transform duration-500 h-full;
-  }
-  
-  .carousel-slide {
-    @apply flex-none w-full h-full;
-  }
-  
-  .slide-content {
-    @apply block w-full h-full relative overflow-hidden;
-  }
-  
-  .slide-image-container {
-    @apply relative w-full h-full overflow-hidden;
-  }
-  
-  .slide-image {
-    @apply w-full h-full object-cover transition-all duration-500;
-  }
-  
-  .slide-content:hover .slide-image {
-    @apply transform scale-105;
-  }
-  
-  .slide-overlay {
-    @apply absolute bottom-0 right-0 p-6;
-    @apply flex flex-col justify-end;
-    background: linear-gradient(to left, rgba(0,0,0,0.98), rgba(0,0,0,0.95), rgba(0,0,0,0.8));
+    --radius-card: 14px;
+    position: relative;
     width: 100%;
-  }
-  
-  /* ライトモードでも暗い背景を維持 */
-  :global(.light) .slide-overlay,
-  :global([data-theme="light"]) .slide-overlay {
-    background: linear-gradient(to left, rgba(0,0,0,0.98), rgba(0,0,0,0.95), rgba(0,0,0,0.8)) !important;
-  }
-  
-  /* ライトモードのテキスト色を強制 */
-  :global(.light) .slide-overlay *,
-  :global([data-theme="light"]) .slide-overlay * {
-    color: white !important;
-  }
-  
-  @media (min-width: 768px) {
-    .slide-overlay {
-      @apply bottom-auto top-0 h-full justify-center;
-      background: linear-gradient(to left, rgba(0,0,0,0.98), rgba(0,0,0,0.95) 40%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0.7) 90%);
-      width: 50%;
-      padding-left: 3rem;
-    }
-    
-    /* ライトモードでも暗い背景を維持 */
-    :global(.light) .slide-overlay,
-    :global([data-theme="light"]) .slide-overlay {
-      background: linear-gradient(to left, rgba(0,0,0,0.98), rgba(0,0,0,0.95) 40%, rgba(0,0,0,0.9) 70%, rgba(0,0,0,0.7) 90%) !important;
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .slide-overlay {
-      width: 45%;
-      padding-left: 4rem;
-    }
-  }
-  
-  .slide-meta {
-    @apply flex flex-wrap gap-3 text-sm;
-    color: rgba(255, 255, 255, 0.8) !important;
-  }
-  
-  .slide-date, .slide-category {
-    @apply flex items-center gap-1;
-  }
-  
-  .slide-icon {
-    @apply w-4 h-4;
-  }
-  
-  .slide-title {
-    @apply text-xl font-bold line-clamp-2 mb-2;
-    font-family: var(--primary-font);
-    color: white !important;
-  }
-  
-  @media (min-width: 768px) {
-    .slide-title {
-      @apply text-2xl mb-3;
-    }
-  }
-  
-  .slide-description {
-    @apply text-sm line-clamp-2;
-    color: rgba(255, 255, 255, 0.9) !important;
-  }
-  
-  .slide-excerpt {
-    @apply text-sm line-clamp-3 mt-2;
-    color: rgba(255, 255, 255, 0.8) !important;
-  }
-  
-  @media (min-width: 768px) {
-    .slide-excerpt {
-      @apply line-clamp-4 text-base;
-    }
-  }
-  
-  .slide-read-more {
-    @apply flex items-center gap-1 text-sm mt-3 transition-colors font-medium;
-    color: white !important;
-  }
-  
-  .slide-read-more:hover {
-    color: rgba(255, 255, 255, 0.8) !important;
-  }
-  
-  @media (min-width: 768px) {
-    .slide-read-more {
-      @apply mt-4;
-    }
-  }
-  
-  .read-more-icon {
-    @apply w-4 h-4;
-  }
-  
-  .controls {
-    @apply absolute top-1/2 left-0 right-0 flex justify-between px-4 -translate-y-1/2 z-10;
-  }
-  
-  .control-button {
-    @apply flex items-center justify-center w-10 h-10 rounded-full bg-[var(--card-color)] text-[var(--text-color)] shadow-lg;
-    @apply transform transition-all duration-300 hover:scale-110 hover:shadow-xl;
+    height: clamp(320px, 48vw, 460px);
+    overflow: hidden;
+    border-radius: var(--radius-card);
     border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
   }
-  
+
+  .carousel-track-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.55s cubic-bezier(0.22, 0.68, 0, 1.02);
+  }
+
+  .carousel-slide {
+    min-width: 100%;
+    height: 100%;
+  }
+
+  .slide-content {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+  }
+
+  .slide-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+  }
+
+  .slide-content:hover .slide-image {
+    transform: scale(1.035);
+  }
+
+  .slide-overlay {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.1rem;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in oklch, var(--token-primary-darken) 28%, transparent) 40%,
+      color-mix(in oklch, var(--token-primary-darken) 62%, transparent) 100%
+    );
+    color: color-mix(in oklch, var(--background-color) 92%, var(--card-color));
+  }
+
+  .slide-category {
+    width: fit-content;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklch, var(--background-color) 24%, transparent);
+    padding: 0.22rem 0.72rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: color-mix(in oklch, var(--primary-color) 58%, transparent);
+    color: color-mix(in oklch, var(--background-color) 94%, var(--card-color));
+  }
+
+  .slide-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+    font-weight: 700;
+    line-height: 1.3;
+    color: color-mix(in oklch, var(--background-color) 92%, var(--card-color));
+  }
+
+  .slide-description {
+    margin: 0;
+    max-width: 64ch;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    color: color-mix(in oklch, var(--background-color) 82%, var(--card-color));
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .slide-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+  }
+
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: color-mix(in oklch, var(--background-color) 86%, var(--card-color));
+  }
+
+  .meta-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .read-more {
+    font-weight: 600;
+  }
+
+  .controls {
+    position: absolute;
+    inset: 50% 0 auto;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    pointer-events: none;
+  }
+
+  .control-button {
+    pointer-events: auto;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklch, var(--background-color) 24%, transparent);
+    background: color-mix(in oklch, var(--card-color) 58%, transparent);
+    color: color-mix(in oklch, var(--text-color) 90%, var(--background-color));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+
+  .control-button:hover {
+    transform: translateY(-1px);
+    border-color: var(--primary-color);
+  }
+
   .control-icon {
-    @apply w-6 h-6;
+    width: 1.3rem;
+    height: 1.3rem;
   }
-  
+
   .carousel-indicators {
-    @apply absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10;
+    position: absolute;
+    inset: auto 0 0.7rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    z-index: 2;
   }
-  
+
   .indicator {
-    @apply w-2.5 h-2.5 rounded-full bg-[var(--text-color-lighten)] transition-all duration-300;
-    @apply cursor-pointer hover:bg-[var(--text-color)];
+    width: 2.5rem;
+    height: 3px;
+    border: none;
+    border-radius: 2px;
+    background: color-mix(in oklch, var(--card-color) 40%, transparent);
+    transition: background-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
-  
+
   .indicator.active {
-    @apply bg-[var(--primary-color)] w-6;
+    background: color-mix(in oklch, var(--card-color) 30%, transparent);
+  }
+
+  .indicator.active::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--gradient-border);
+    animation: indicator-fill 6.5s linear forwards;
+  }
+
+  @keyframes indicator-fill {
+    from { transform: scaleX(0); transform-origin: left; }
+    to { transform: scaleX(1); transform-origin: left; }
+  }
+
+  @media (max-width: 767px) {
+    .featured-carousel-container {
+      height: 350px;
+    }
+
+    .slide-overlay {
+      padding: 0.95rem;
+    }
+
+    .slide-description {
+      -webkit-line-clamp: 3;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      padding: 0 0.4rem;
+    }
   }
 </style>
 
 <script>
-  let cleanupCarousel: (() => void) | null = null;
-  let carouselState:
-    | {
-        slideCount: number;
-        getCurrentIndex: () => number;
-        updateSlidePosition: (index: number) => void;
-      }
-    | null = null;
+  let activeCarouselCleanup: (() => void) | null = null;
 
-  const handleKeydown = (event: KeyboardEvent) => {
-    if (!carouselState) return;
-
-    if (event.key === 'ArrowRight') {
-      const nextIndex = (carouselState.getCurrentIndex() + 1) % carouselState.slideCount;
-      carouselState.updateSlidePosition(nextIndex);
-    } else if (event.key === 'ArrowLeft') {
-      const prevIndex =
-        (carouselState.getCurrentIndex() - 1 + carouselState.slideCount) % carouselState.slideCount;
-      carouselState.updateSlidePosition(prevIndex);
+  function cleanupCarousel() {
+    if (activeCarouselCleanup) {
+      activeCarouselCleanup();
+      activeCarouselCleanup = null;
     }
-  };
+  }
 
-  const cleanupExistingCarousel = () => {
-    if (cleanupCarousel) {
-      cleanupCarousel();
-      cleanupCarousel = null;
-    }
-  };
+  function setupCarousel() {
+    cleanupCarousel();
 
-  // カルーセルの初期化関数
-  function initCarousel() {
-    cleanupExistingCarousel();
+    const container = document.querySelector<HTMLElement>('[data-featured-carousel]');
+    if (!container) return;
 
-    const track = document.querySelector('.carousel-track');
-    const slides = document.querySelectorAll('.carousel-slide');
-    const nextButton = document.querySelector('.control-button.next');
-    const prevButton = document.querySelector('.control-button.prev');
-    const indicators = document.querySelectorAll('.indicator');
+    const track = container.querySelector<HTMLElement>('.carousel-track');
+    const slides = Array.from(container.querySelectorAll<HTMLElement>('.carousel-slide'));
+    const prevButton = container.querySelector<HTMLButtonElement>('.control-button.prev');
+    const nextButton = container.querySelector<HTMLButtonElement>('.control-button.next');
+    const indicators = Array.from(container.querySelectorAll<HTMLButtonElement>('.indicator'));
 
-    if (!track || !slides.length || !nextButton || !prevButton) {
-      carouselState = null;
-      return;
-    }
+    if (!track || slides.length === 0 || !prevButton || !nextButton) return;
 
     let currentIndex = 0;
-    const slideCount = slides.length;
-    
-    // Set initial track width
-    track.style.width = `${slideCount * 100}%`;
-    
-    // Set each slide width
-    slides.forEach(slide => {
-      slide.style.width = `${100 / slideCount}%`;
-    });
-    
-    const updateSlidePosition = (index: number) => {
-      track.style.transform = `translateX(-${index * (100 / slideCount)}%)`;
 
-      // Update active indicator
-      indicators.forEach((indicator, i) => {
-        indicator.classList.toggle('active', i === index);
+    const render = (index: number) => {
+      currentIndex = (index + slides.length) % slides.length;
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      indicators.forEach((indicator, indicatorIndex) => {
+        indicator.classList.toggle('active', indicatorIndex === currentIndex);
       });
-      
-      currentIndex = index;
-    };
-    
-    const handleNextClick = () => {
-      const nextIndex = (currentIndex + 1) % slideCount;
-      updateSlidePosition(nextIndex);
     };
 
-    const handlePrevClick = () => {
-      const prevIndex = (currentIndex - 1 + slideCount) % slideCount;
-      updateSlidePosition(prevIndex);
-    };
+    const handlePrev = () => render(currentIndex - 1);
+    const handleNext = () => render(currentIndex + 1);
 
-    nextButton.addEventListener('click', handleNextClick);
-    prevButton.addEventListener('click', handlePrevClick);
+    prevButton.addEventListener('click', handlePrev);
+    nextButton.addEventListener('click', handleNext);
 
-    const indicatorHandlers: Array<{ element: Element; handler: () => void }> = [];
-    indicators.forEach((indicator, index) => {
-      const handler = () => {
-        updateSlidePosition(index);
-      };
-
+    const indicatorHandlers = indicators.map((indicator, index) => {
+      const handler = () => render(index);
       indicator.addEventListener('click', handler);
-      indicatorHandlers.push({ element: indicator, handler });
+      return { indicator, handler };
     });
 
-    // Auto advance slides
-    let intervalId = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % slideCount;
-      updateSlidePosition(nextIndex);
-    }, 5000);
-    
-    // Pause on hover
-    const handleMouseEnter = () => {
-      clearInterval(intervalId);
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') handlePrev();
+      if (event.key === 'ArrowRight') handleNext();
     };
-
-    const handleMouseLeave = () => {
-      clearInterval(intervalId);
-      intervalId = setInterval(() => {
-        const nextIndex = (currentIndex + 1) % slideCount;
-        updateSlidePosition(nextIndex);
-      }, 5000);
-    };
-
-    track.addEventListener('mouseenter', handleMouseEnter);
-    track.addEventListener('mouseleave', handleMouseLeave);
-
     document.addEventListener('keydown', handleKeydown);
 
-    // Lazy load images
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const img = entry.target;
-          const src = img.getAttribute('data-src');
-          if (src) {
-            img.setAttribute('src', src);
-            observer.unobserve(img);
-          }
-        }
-      });
-    });
-    
-    document.querySelectorAll('.lozad').forEach(img => {
-      observer.observe(img);
-    });
+    let intervalId = window.setInterval(() => {
+      render(currentIndex + 1);
+    }, 6500);
 
-    carouselState = {
-      slideCount,
-      getCurrentIndex: () => currentIndex,
-      updateSlidePosition,
+    const stopAuto = () => {
+      window.clearInterval(intervalId);
     };
 
-    cleanupCarousel = () => {
-      nextButton.removeEventListener('click', handleNextClick);
-      prevButton.removeEventListener('click', handlePrevClick);
+    const restartAuto = () => {
+      stopAuto();
+      intervalId = window.setInterval(() => {
+        render(currentIndex + 1);
+      }, 6500);
+    };
 
-      indicatorHandlers.forEach(({ element, handler }) => {
-        element.removeEventListener('click', handler);
+    container.addEventListener('mouseenter', stopAuto);
+    container.addEventListener('mouseleave', restartAuto);
+
+    render(0);
+
+    activeCarouselCleanup = () => {
+      prevButton.removeEventListener('click', handlePrev);
+      nextButton.removeEventListener('click', handleNext);
+      indicatorHandlers.forEach(({ indicator, handler }) => {
+        indicator.removeEventListener('click', handler);
       });
-
-      track.removeEventListener('mouseenter', handleMouseEnter);
-      track.removeEventListener('mouseleave', handleMouseLeave);
-
-      clearInterval(intervalId);
-      observer.disconnect();
-
       document.removeEventListener('keydown', handleKeydown);
-      carouselState = null;
+      container.removeEventListener('mouseenter', stopAuto);
+      container.removeEventListener('mouseleave', restartAuto);
+      stopAuto();
     };
   }
 
-  // Astro's view transitions event
-  const handleAstroPageLoad = () => {
-    cleanupExistingCarousel();
-    initCarousel();
-  };
-  document.addEventListener('astro:page-load', handleAstroPageLoad);
+  document.addEventListener('astro:page-load', setupCarousel);
+  document.addEventListener('DOMContentLoaded', setupCarousel);
 
-  // Standard DOM event as fallback
-  const handleDOMContentLoaded = () => {
-    initCarousel();
-  };
-  document.addEventListener('DOMContentLoaded', handleDOMContentLoaded);
-
-  // Additional initialization for cases where both events might have already fired
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initCarousel, 100);
+  if (document.readyState !== 'loading') {
+    setTimeout(setupCarousel, 0);
   }
-</script> 
+</script>

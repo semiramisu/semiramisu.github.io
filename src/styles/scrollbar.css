@@ -60,15 +60,16 @@
 }
 
 :root {
-  --os-handle-bg-custom: rgba(0, 0, 0, 0.3);
-  --os-handle-bg-custom-hover: rgba(0, 0, 0, 0.5);
-  --os-handle-bg-custom-active: rgba(0, 0, 0, 0.6);
+  --os-handle-bg-custom: color-mix(in oklch, var(--text-color) 28%, transparent);
+  --os-handle-bg-custom-hover: color-mix(in oklch, var(--text-color) 40%, transparent);
+  --os-handle-bg-custom-active: color-mix(in oklch, var(--text-color) 48%, transparent);
 }
 
-:root.dark {
-  --os-handle-bg-custom: rgba(255, 255, 255, 0.4);
-  --os-handle-bg-custom-hover: rgba(255, 255, 255, 0.6);
-  --os-handle-bg-custom-active: rgba(255, 255, 255, 0.7);
+:root.dark,
+html[data-theme="dark"] {
+  --os-handle-bg-custom: color-mix(in oklch, var(--text-color) 36%, transparent);
+  --os-handle-bg-custom-hover: color-mix(in oklch, var(--text-color) 48%, transparent);
+  --os-handle-bg-custom-active: color-mix(in oklch, var(--text-color) 56%, transparent);
 }
 
 .scrollbar-auto.os-scrollbar {
@@ -78,7 +79,7 @@
 }
 
 .scrollbar-dark.os-scrollbar {
-  --os-handle-bg: rgba(255, 255, 255, 0.4);
-  --os-handle-bg-hover: rgba(255, 255, 255, 0.6);
-  --os-handle-bg-active: rgba(255, 255, 255, 0.7);
+  --os-handle-bg: color-mix(in oklch, var(--text-color) 42%, transparent);
+  --os-handle-bg-hover: color-mix(in oklch, var(--text-color) 54%, transparent);
+  --os-handle-bg-active: color-mix(in oklch, var(--text-color) 62%, transparent);
 }

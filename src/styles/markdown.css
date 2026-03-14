@@ -35,7 +35,7 @@
   position: absolute;
   display: block;
   content: " ";
-  background-color: var(--primary-color);
+  background: linear-gradient(180deg, var(--token-primary) 0%, var(--token-accent) 100%);
   top: 2.5px;
   bottom: 3px;
   width: 0.3rem;
@@ -56,7 +56,8 @@
 }
 
 .article blockquote {
-  border-inline-start-color: var(--primary-color) !important;
+  border-inline-start: 3px solid transparent !important;
+  border-image: linear-gradient(180deg, var(--token-primary), var(--token-accent)) 1 !important;
 }
 
 .article blockquote {
@@ -123,7 +124,7 @@
   display: inline-block;
   margin-right: 1rem;
   width: 1rem;
-  color: rgba(255, 255, 255, 0.25);
+  color: color-mix(in oklch, var(--text-color) 35%, transparent);
 }
 
 .article span.line:last-child:empty,
@@ -132,8 +133,20 @@
 }
 
 .article p {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-top: 0.85rem;
+  margin-bottom: 0.85rem;
+  line-height: 1.8;
+}
+
+.article img {
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px color-mix(in oklch, var(--text-color) 8%, transparent);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.article img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 8px 24px color-mix(in oklch, var(--text-color) 12%, transparent);
 }
 
 .article .astro-code {

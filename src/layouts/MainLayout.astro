@@ -32,130 +32,137 @@ const {
 <Base title={headTitle} description={headDescription}>
   <meta name="page-type" content={isHome ? "home" : "content"} slot="head" />
   <slot name="head" slot="head" />
-  
-  <div id="page-container" class={isHome ? 'is-home-page' : 'is-content-page'} data-is-home={isHome.toString()}>
-  <NavBar />
 
-  {
-    YukinaConfig.bannerStyle == "LOOP" && (
-      <Banner
-          title={title}
-          subTitle={subTitle}
-          bannerImage={bannerImage}
-          slug={slug}
-      />
-    )
-  }
+  <div id="page-container" class={isHome ? "is-home-page" : "is-content-page"} data-is-home={isHome.toString()}>
+    <NavBar />
 
-  <div class="main-container my-10">
-      <div class="layout-container flex flex-col md:flex-row items-start lg:space-x-6">
+    {
+      YukinaConfig.bannerStyle == "LOOP" && (
+        <Banner title={title} subTitle={subTitle} bannerImage={bannerImage} slug={slug} />
+      )
+    }
+
+    <div class="main-container">
+      <div class="layout-grid">
         {!isHome && (
-          <aside class="sidebar-container sticky-sidebar" id="sidebar-container">
-        <SideBar />
+          <aside class="sidebar-container sticky-sidebar" id="main-sidebar">
+            <SideBar />
           </aside>
         )}
-        <div class="content-container w-full space-y-8">
-          <main class="content">
-          <slot />
-        </main>
-        <Footer />
+
+        <div class="content-container">
+          <main class="content transition-main">
+            <slot />
+          </main>
+          <Footer />
         </div>
       </div>
     </div>
   </div>
+
   <MobileEnhancements />
   <ImprovedMobileNav />
 </Base>
 
 <style>
-  /* コンテナスタイル */
   .main-container {
-    @apply w-full md:min-w-[90%] md:max-w-[90%] lg:min-w-[var(--page-width-lg)] lg:max-w-[var(--page-width-lg)] xl:min-w-[var(--page-width-xl)] xl:max-w-[var(--page-width-xl)];
-    @apply md:mx-auto;
+    width: 100%;
+    margin: 0 auto;
+    padding: calc(4.8rem + var(--space-md)) var(--space-md) var(--space-2xl);
+    max-width: calc(var(--page-width-xl) + var(--space-2xl));
   }
 
-  /* サイドバースタイル */
+  .layout-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .content-container {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .content {
+    width: 100%;
+    min-width: 0;
+  }
+
   .sidebar-container {
-    @apply hidden min-w-[248px] max-w-[248px] lg:block;
+    display: none;
+    min-width: 16rem;
+    max-width: 16rem;
   }
 
-  /* 追従するサイドバー */
   .sticky-sidebar {
     position: sticky;
-    top: 5rem;
-    height: fit-content;
+    top: calc(5rem + var(--space-xs));
     max-height: calc(100vh - 6rem);
     overflow-y: auto;
+    padding-right: var(--space-xs);
   }
 
-  /* コンテンツスタイル - ホームページ */
-  .is-home-page .content {
-    @apply w-full;
-  }
-
-  /* コンテンツスタイル - 通常ページ */
-  .is-content-page .content {
-    @apply w-full lg:w-[calc(100%-264px)] xl:w-[calc(var(--page-width-xl)-264px)];
-  }
-  
-  /* スクロールバーのスタイル */
   .sticky-sidebar::-webkit-scrollbar {
-    width: 4px;
+    width: 0.28rem;
   }
-  
-  .sticky-sidebar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
+
   .sticky-sidebar::-webkit-scrollbar-thumb {
     background-color: var(--primary-color-lighten);
-    border-radius: 4px;
+    border-radius: var(--radius-pill);
+  }
+
+  @media (min-width: 768px) {
+    .main-container {
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .main-container {
+      max-width: calc(var(--page-width-lg) + var(--space-2xl));
+      padding-top: calc(5.15rem + var(--space-md));
+    }
+
+    .is-content-page .layout-grid {
+      grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+      gap: var(--space-xl);
+    }
+
+    .sidebar-container {
+      display: block;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .main-container {
+      max-width: calc(var(--page-width-xl) + var(--space-2xl));
+    }
   }
 </style>
 
 <script>
-  // ページタイプに応じたスタイル適用
   function applyPageStyles() {
-    const container = document.getElementById('page-container');
-    const sidebar = document.getElementById('sidebar-container');
-    
-    if (!container) return;
-    
-    const isHomePage = container.getAttribute('data-is-home') === 'true';
-    
-    // サイドバーの表示制御
-    if (sidebar) {
-      if (isHomePage) {
-        sidebar.style.display = 'none';
-      } else if (window.innerWidth >= 1024) { // lg breakpoint
-        sidebar.style.display = 'block';
-      } else {
-        sidebar.style.display = 'none';
-      }
+    const container = document.getElementById("page-container");
+    if (!container) {
+      return;
     }
-    
-    // コンテンツ幅の設定
-    const contentElements = document.querySelectorAll('.content');
-    contentElements.forEach(el => {
-      if (el instanceof HTMLElement) {
-        if (isHomePage) {
-          el.style.width = '100%';
-        } else if (window.innerWidth >= 1024) {
-          el.style.width = 'calc(100% - 264px)';
-        } else {
-          el.style.width = '100%';
-        }
-      }
-    });
-  }
-  
-  // 即時実行
-  applyPageStyles();
-  
-  // DOMContentLoaded時に実行
-  document.addEventListener('DOMContentLoaded', applyPageStyles);
-  
-  // ウィンドウサイズ変更時にも実行
-  window.addEventListener('resize', applyPageStyles);
-</script>
 
+    const isHomePage = container.getAttribute("data-is-home") === "true";
+    document.documentElement.dataset.layout = isHomePage ? "home" : "main";
+
+    const sidebar = document.getElementById("main-sidebar");
+    if (sidebar) {
+      const shouldShow = !isHomePage && window.innerWidth >= 1024;
+      sidebar.style.display = shouldShow ? "block" : "none";
+    }
+  }
+
+  applyPageStyles();
+  document.addEventListener("DOMContentLoaded", applyPageStyles);
+  document.addEventListener("astro:after-swap", applyPageStyles);
+  window.addEventListener("resize", applyPageStyles);
+</script>

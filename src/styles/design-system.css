@@ -1,0 +1,96 @@
+:root {
+  --surface-elevated: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
+  --surface-muted: color-mix(in oklch, var(--background-color) 84%, var(--card-color));
+}
+
+.surface-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  background: var(--card-color);
+  box-shadow: var(--shadow-soft);
+}
+
+.surface-card-hover {
+  transition: box-shadow var(--transition-speed) var(--transition-timing),
+    transform var(--transition-speed) var(--transition-timing);
+}
+
+.surface-card-hover:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.surface-muted {
+  border: 1px solid var(--border-color);
+  background: var(--surface-muted);
+}
+
+.section-title {
+  font-family: var(--title-font);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-color);
+}
+
+.text-subtle {
+  color: var(--text-color-lighten);
+}
+
+.link-underline {
+  color: var(--primary-color);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  text-decoration-color: var(--primary-color-lighten);
+}
+
+.link-underline:hover {
+  text-decoration-color: var(--primary-color);
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient border utility */
+.border-gradient {
+  position: relative;
+  border: none;
+  background: var(--card-color);
+  border-radius: var(--radius-card);
+}
+
+.border-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: var(--gradient-border);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Glass morphism utility */
+.glass {
+  background: color-mix(in oklch, var(--card-color) 72%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border: 1px solid color-mix(in oklch, var(--border-color) 40%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface-card-hover {
+    transition: none;
+  }
+
+  .surface-card-hover:hover {
+    transform: none;
+  }
+}

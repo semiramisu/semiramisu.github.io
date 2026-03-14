@@ -1,68 +1,63 @@
 ---
 import YukinaConfig from "../../yukina.config";
 import { i18n } from "../locales/translation";
-
 import { Icon } from "astro-icon/components";
-import SearchBar from "./SearchBar.svelte";
 import EnhancedSearchBar from "./EnhancedSearchBar.svelte";
-import MobileSearchBar from "./MobileSearchBar.svelte";
 import EnhancedMobileSearchBar from "./EnhancedMobileSearchBar.svelte";
 import LanguageSwitcher from "./LanguageSwitcher.astro";
 import "astro-pagefind";
 
 const navCount = YukinaConfig.navigators.length;
-
-// Get language from URL parameter
 const url = new URL(Astro.request.url);
-const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
+const lang = (url.searchParams.get("lang") === "en" ? "en" : "ja") as
+  | "ja"
+  | "en";
 ---
 
-<nav class="nav" id="nav">
-  <div
-    class="relative flex h-[4rem] w-full items-center justify-between overflow-visible lg:h-[4.5rem]"
-  >
-    <div class="brand after:content-['']">
+<nav id="nav" class="nav-shell" aria-label="Site navigation">
+  <div class="nav-frame">
+    <div class="brand-mobile">
       <button
         id="menu-switcher"
         type="button"
-        class="h-[40px] w-[44px] content-center"
+        class="icon-button"
+        aria-label="モバイルメニュー切り替え"
       >
         <Icon
           id="menu-icon-closed"
-          size={24}
+          size={22}
           name="line-md:close-to-menu-transition"
           class="mx-auto hidden"
         />
         <Icon
           id="menu-icon-opened"
-          size={24}
+          size={22}
           name="line-md:menu-to-close-transition"
           class="mx-auto hidden"
         />
       </button>
-      <a class="title" href="/">
-        {YukinaConfig.brandTitle}
-      </a>
+      <a class="brand-link-mobile" href="/">{YukinaConfig.brandTitle}</a>
     </div>
-    <a class="brand-lg" href="/">
-      <div class="title space-x-2">
-        <Icon name="heroicons:home" size={32} />
-        <p>{YukinaConfig.brandTitle}</p>
-      </div>
+
+    <a class="brand-link-desktop" href="/">
+      <Icon name="heroicons:home" size={20} />
+      <span>{YukinaConfig.brandTitle}</span>
     </a>
-    <div class="menu">
+
+    <div class="desktop-menu" role="menubar" aria-label="Primary links">
       {
         YukinaConfig.navigators.map((nav) => (
-          <a href={nav.href} title={i18n(nav.nameKey)}>
+          <a href={nav.href} title={i18n(nav.nameKey)} role="menuitem" class="menu-link">
             {nav.icon ? (
-              <Icon name={nav.icon} size={24} />
+              <Icon name={nav.icon} size={18} />
             ) : (
-              <p>{i18n(nav.nameKey)}</p>
+              <span>{i18n(nav.nameKey)}</span>
             )}
           </a>
         ))
       }
     </div>
+
     <div class="toolbar">
       <div class="lg:hidden">
         <EnhancedMobileSearchBar client:only="svelte" />
@@ -72,44 +67,48 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
       </div>
       <LanguageSwitcher currentLang={lang} />
       <div class="theme-switcher">
-        <button type="button" id="theme-switcher" aria-label="ダークモード切り替え" class="theme-toggle">
+        <button
+          type="button"
+          id="theme-switcher"
+          aria-label="テーマ切り替え"
+          class="theme-toggle"
+        >
           <div class="sun-moon-container">
-          <Icon
-            id="theme-icon-light"
-            name="line-md:moon-alt-to-sunny-outline-loop-transition"
-            size={24}
+            <Icon
+              id="theme-icon-light"
+              name="line-md:moon-alt-to-sunny-outline-loop-transition"
+              size={20}
               class="theme-icon hidden"
-          />
-          <Icon
-            id="theme-icon-dark"
-            name="line-md:sunny-outline-to-moon-alt-loop-transition"
-            size={24}
+            />
+            <Icon
+              id="theme-icon-dark"
+              name="line-md:sunny-outline-to-moon-alt-loop-transition"
+              size={20}
               class="theme-icon hidden"
-          />
+            />
           </div>
-          <div class="theme-toggle-track">
+          <div class="theme-toggle-track" aria-hidden="true">
             <div class="theme-toggle-thumb"></div>
           </div>
         </button>
       </div>
     </div>
   </div>
-  <div id="mobile-menu" class="px-3 transition-all">
-    <ul
-      id="mobile-menu-nav"
-      class="mobile-menu-nav mobile-menu-nav-closed flex flex-col space-y-6 overflow-hidden text-xl font-medium text-[var(--text-color)] transition-all duration-300"
-    >
+
+  <div id="mobile-menu" class="mobile-menu-shell">
+    <ul id="mobile-menu-nav" class="mobile-menu-nav mobile-menu-nav-closed">
       {
         YukinaConfig.navigators.map((nav) => (
-          <li class="mt-1">
+          <li>
             <a href={nav.href} class="mobile-nav-item">
-              <div class="flex flex-row items-center space-x-2">
-                <span class="text-[var(--primary-color)]">·</span>
+              <span class="mobile-nav-label">
+                <span class="dot" aria-hidden="true"></span>
                 <span>{i18n(nav.nameKey)}</span>
-              </div>
+              </span>
               <Icon
                 name="cuida:caret-right-outline"
-                class="text-[var(--text-color-lighten)]"
+                class="mobile-nav-caret"
+                size={18}
               />
             </a>
           </li>
@@ -120,363 +119,571 @@ const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en
 </nav>
 
 <style define:vars={{ navCount }}>
-  .nav {
-    @apply fixed left-1/2 z-10 flex w-full select-none flex-col justify-end rounded-b-xl bg-[var(--card-color-transparent)] px-2.5 opacity-0 backdrop-blur-md transition-all;
-    @apply lg:w-[var(--page-width-lg)] lg:rounded-b-2xl;
-    @apply xl:w-[var(--page-width-xl)];
-    transform: translateX(-50%) translateY(-5rem);
-    animation: 300ms nav-onload-animation;
-    animation-fill-mode: forwards;
+  .nav-shell {
+    position: fixed;
+    left: 50%;
+    top: 0;
+    z-index: 40;
+    width: min(100%, var(--page-width-xl));
+    transform: translate(-50%, -5.2rem);
+    opacity: 0;
+    animation: nav-onload-animation 360ms var(--transition-timing) forwards;
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    border: 1px solid color-mix(in oklch, var(--border-color) 60%, transparent);
+    border-top: none;
+    background: color-mix(in oklch, var(--card-color) 78%, transparent);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
-  .brand {
-    @apply flex w-full flex-row items-center justify-between;
-    @apply lg:hidden;
+  .nav-shell.nav-scrolled {
+    background: color-mix(in oklch, var(--card-color) 92%, transparent);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-medium);
   }
 
-  .brand > .title {
-    @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 truncate rounded-lg px-4 py-2 text-2xl font-medium text-[var(--primary-color)] transition-all;
-    @apply hover:bg-[var(--primary-color-hover)];
+  .nav-frame {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    min-height: 4rem;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .brand-mobile {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
+  .icon-button {
+    display: flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-card);
+    color: var(--text-color);
+    transition: background-color var(--transition-speed) var(--transition-timing),
+      color var(--transition-speed) var(--transition-timing);
+  }
+
+  .icon-button:hover {
+    background: var(--primary-color-hover);
+    color: var(--primary-color);
+  }
+
+  .brand-link-mobile {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: calc(100% - 5.5rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: var(--radius-pill);
+    padding: var(--space-xs) var(--space-md);
     font-family: var(--brand-font);
+    font-size: 1.28rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    transition: background-color var(--transition-speed) var(--transition-timing);
   }
 
-  .brand button {
-    @apply mr-2 flex h-[44px] w-[44px] flex-row items-center rounded-lg text-[var(--text-color)] transition-all;
-    @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
+  .brand-link-mobile:hover {
+    background: var(--primary-color-hover);
   }
 
-  .brand .icon {
-    @apply w-full text-center text-2xl;
-  }
-
-  .brand-lg {
-    @apply hidden h-[3.25rem] rounded-lg px-5 font-medium transition-all;
-    @apply lg:block;
-    @apply hover:bg-[var(--primary-color-hover)];
-    @apply active:scale-95;
-  }
-
-  .brand-lg > .title {
-    @apply flex h-full flex-row content-center items-center text-2xl text-[var(--primary-color)];
+  .brand-link-desktop {
+    display: none;
+    align-items: center;
+    gap: var(--space-xs);
+    border-radius: var(--radius-pill);
+    padding: 0.6rem 0.95rem;
     font-family: var(--brand-font);
+    font-size: 1.03rem;
+    color: var(--primary-color);
+    transition: background-color var(--transition-speed) var(--transition-timing),
+      transform var(--transition-speed) var(--transition-timing);
   }
 
-  .brand-lg .icon {
-    @apply mr-2 stroke-2 text-2xl;
+  .brand-link-desktop:hover {
+    background: var(--primary-color-hover);
+    transform: translateY(-1px);
   }
 
-  .menu {
-    @apply absolute left-1/2 hidden -translate-x-1/2 items-center justify-between space-x-1 text-lg text-[var(--text-color)] opacity-85;
-    @apply lg:flex;
+  .desktop-menu {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
   }
 
-  .menu a {
-    @apply flex h-[3.25rem] items-center rounded-lg px-4 transition-all;
-    @apply hover:bg-[var(--primary-color-hover)] hover:text-[var(--primary-color)];
-    @apply active:scale-95;
+  .menu-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: var(--radius-pill);
+    padding: 0.55rem 0.9rem;
+    font-family: var(--title-font);
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: var(--text-color-lighten);
+    transition: color var(--transition-speed) var(--transition-timing),
+      background-color var(--transition-speed) var(--transition-timing),
+      transform var(--transition-speed) var(--transition-timing);
   }
 
-  .menu p {
-    @apply font-medium leading-normal;
-    font-family: var(--primary-font);
+  .menu-link::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--gradient-border);
+    transform: translateX(-50%);
+    transition: width 0.3s var(--transition-timing);
+  }
+
+  .menu-link:hover {
+    color: var(--primary-color);
+    background: var(--primary-color-hover);
+    transform: translateY(-1px);
+  }
+
+  .menu-link:hover::after {
+    width: 60%;
   }
 
   .toolbar {
-    @apply flex flex-row items-center justify-end space-x-2 lg:mr-2;
-  }
-
-  .toolbar button {
-    @apply flex justify-center rounded-lg text-[var(--text-color)] transition-all;
-    @apply hover:text-[var(--primary-color)];
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-xs);
   }
 
   .theme-switcher {
-    @apply relative flex items-center;
+    display: flex;
+    align-items: center;
   }
 
   .theme-toggle {
-    @apply relative flex items-center justify-between p-1 rounded-full w-14 h-7 transition-all duration-300;
-    background-color: var(--card-color);
-    border: 2px solid var(--border-color);
-    overflow: hidden;
+    position: relative;
+    height: 2.125rem;
+    width: 3.65rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color);
+    background: var(--card-color);
+    transition: border-color var(--transition-speed) var(--transition-timing);
   }
 
   .theme-toggle:hover {
-    @apply border-[var(--primary-color)];
+    border-color: var(--primary-color);
   }
 
   .theme-toggle-track {
-    @apply absolute inset-0 rounded-full pointer-events-none transition-colors duration-300;
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-pill);
   }
 
   .theme-toggle-thumb {
-    @apply absolute w-5 h-5 rounded-full bg-[var(--primary-color)] transition-transform duration-300 transform top-1 left-1;
+    position: absolute;
+    left: 0.3rem;
+    top: 0.29rem;
+    height: 1.45rem;
+    width: 1.45rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+    transition: transform var(--transition-speed) var(--transition-timing);
   }
 
-  [data-theme="dark"] .theme-toggle-thumb {
-    transform: translateX(calc(100% + 4px));
+  [data-theme="dark"] .theme-toggle-thumb,
+  .dark .theme-toggle-thumb {
+    transform: translateX(1.5rem);
   }
 
   .sun-moon-container {
-    @apply absolute inset-0 flex items-center justify-between px-1.5 z-10 pointer-events-none;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.35rem;
   }
 
   .theme-icon {
-    @apply text-[var(--text-color)] transition-all duration-300;
+    color: var(--text-color-lighten);
   }
 
   .theme-ripple {
     position: absolute;
     border-radius: 50%;
     transform: scale(0);
-    animation: ripple 0.8s linear;
-    z-index: 0;
+    background: var(--primary-color-transparent);
+    animation: ripple 680ms linear;
     pointer-events: none;
   }
-  
+
+  .mobile-menu-shell {
+    padding: 0 var(--space-md) var(--space-sm);
+  }
+
+  .mobile-menu-nav {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--card-color) 96%, var(--primary-color-lighten));
+    transition: opacity var(--transition-speed) var(--transition-timing),
+      height var(--transition-speed) var(--transition-timing);
+  }
+
+  .mobile-menu-nav-closed {
+    height: 0;
+    opacity: 0;
+    border: none;
+  }
+
+  .mobile-menu-nav-opened {
+    opacity: 1;
+    height: calc(var(--navCount) * 3.4rem);
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: 0.95rem var(--space-md);
+    font-family: var(--title-font);
+    font-weight: 500;
+    color: var(--text-color);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: background-color var(--transition-speed) var(--transition-timing),
+      color var(--transition-speed) var(--transition-timing),
+      opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .mobile-menu-nav-opened .mobile-nav-item {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .mobile-menu-nav-opened li:nth-child(1) .mobile-nav-item { transition-delay: 0.05s; }
+  .mobile-menu-nav-opened li:nth-child(2) .mobile-nav-item { transition-delay: 0.1s; }
+  .mobile-menu-nav-opened li:nth-child(3) .mobile-nav-item { transition-delay: 0.15s; }
+  .mobile-menu-nav-opened li:nth-child(4) .mobile-nav-item { transition-delay: 0.2s; }
+  .mobile-menu-nav-opened li:nth-child(5) .mobile-nav-item { transition-delay: 0.25s; }
+  .mobile-menu-nav-opened li:nth-child(6) .mobile-nav-item { transition-delay: 0.3s; }
+
+  .mobile-nav-item:hover {
+    background: var(--primary-color-hover);
+    color: var(--primary-color);
+  }
+
+  .mobile-nav-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .dot {
+    display: inline-flex;
+    height: 0.45rem;
+    width: 0.45rem;
+    border-radius: 50%;
+    background: var(--primary-color);
+  }
+
+  .mobile-nav-caret {
+    color: var(--text-color-lighten);
+  }
+
+  @keyframes nav-onload-animation {
+    0% {
+      transform: translate(-50%, -5.2rem);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
   @keyframes ripple {
     to {
       transform: scale(1);
       opacity: 0;
     }
   }
-  
+
   :global(.theme-transition) {
     transition: background-color 0.5s ease, color 0.5s ease;
   }
-  
+
   :global(.theme-transition *) {
-    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease,
+      box-shadow 0.5s ease;
   }
 
-  .mobile-menu-nav-closed {
-    @apply h-0 opacity-0;
-  }
-
-  .mobile-menu-nav-opened {
-    @apply opacity-100;
-    height: calc(var(--navCount) * 52px);
-  }
-
-  .mobile-menu-nav li a {
-    @apply flex flex-row items-center justify-between;
-    font-family: var(--primary-font);
-  }
-
-  @keyframes nav-onload-animation {
-    0% {
-      transform: translateY(-5rem) translateX(-50%);
-      opacity: 0;
+  @media (min-width: 1024px) {
+    .nav-shell {
+      width: min(100%, var(--page-width-lg));
+      border-radius: var(--radius-pill);
+      margin-top: var(--space-sm);
+      border: 1px solid var(--border-color);
     }
-    100% {
-      transform: translateY(0) translateX(-50%);
-      opacity: 1;
+
+    .nav-frame {
+      min-height: 4.35rem;
+      padding: var(--space-sm);
+      gap: var(--space-md);
+    }
+
+    .brand-mobile {
+      display: none;
+    }
+
+    .brand-link-desktop {
+      display: inline-flex;
+      min-width: 12rem;
+    }
+
+    .desktop-menu {
+      display: inline-flex;
+      flex: 1;
+    }
+
+    .mobile-menu-shell {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .nav-shell {
+      width: min(100%, var(--page-width-xl));
+    }
+
+    .nav-frame {
+      padding-left: var(--space-lg);
+      padding-right: var(--space-lg);
     }
   }
 </style>
 
 <script>
-  /**
-   * Reinitializes an SVG icon by cloning it and replacing the original icon with the clone.
-   *
-   * @param icon - The SVG element to be reinitialized.
-   * @returns The cloned SVG element that replaced the original.
-   */
   const reinitializeIcon = (icon: SVGElement) => {
     const cloned = icon.cloneNode(true) as SVGElement;
     icon.parentNode?.replaceChild(cloned, icon);
     return cloned;
   };
 
-  // get elements
-  const menuSwitcher = document.getElementById(
-    "menu-switcher",
-  ) as HTMLButtonElement;
-  const mobileMenuNav = document.getElementById(
-    "mobile-menu-nav",
-  ) as HTMLUListElement;
-  const mobileMenuNavItems = document.getElementsByClassName("mobile-nav-item");
-  let menuIconClosed = document.getElementById(
-    "menu-icon-closed",
-  ) as any as SVGElement;
-  let menuIconOpened = document.getElementById(
-    "menu-icon-opened",
-  ) as any as SVGElement;
-
-  // menu state
-  let isMenuOpen = false;
-
-  // switch menu open / close
-  const switchMenuState = () => {
-    menuIconClosed.style.display = isMenuOpen ? "block" : "none";
-    menuIconOpened.style.display = !isMenuOpen ? "block" : "none";
-    if (isMenuOpen) menuIconClosed = reinitializeIcon(menuIconClosed);
-    else menuIconOpened = reinitializeIcon(menuIconOpened);
-    if (isMenuOpen) {
-      mobileMenuNav.classList.replace(
-        "mobile-menu-nav-opened",
-        "mobile-menu-nav-closed",
-      );
-    } else {
-      mobileMenuNav.classList.replace(
-        "mobile-menu-nav-closed",
-        "mobile-menu-nav-opened",
-      );
+  const initNavBar = () => {
+    const navBarElement = document.getElementById("nav") as HTMLElement | null;
+    if (!navBarElement || navBarElement.dataset.initialized === "true") {
+      return;
     }
-    isMenuOpen = !isMenuOpen;
-  };
+    navBarElement.dataset.initialized = "true";
 
-  // click menu item then close menu
-  menuSwitcher.addEventListener("click", switchMenuState);
-  for (let i = 0; i < mobileMenuNavItems.length; ++i) {
-    mobileMenuNavItems.item(i)?.addEventListener("click", switchMenuState);
-  }
-  // click other elements then close menu
-  document.addEventListener("click", (event) => {
-    if (
-      !menuSwitcher.contains(event.target as any) &&
-      !mobileMenuNav.contains(event.target as any) &&
-      isMenuOpen
-    ) {
-      switchMenuState();
-    }
-  });
+    const menuSwitcher = document.getElementById("menu-switcher") as HTMLButtonElement | null;
+    const mobileMenuNav = document.getElementById("mobile-menu-nav") as HTMLUListElement | null;
+    const mobileMenuNavItems = document.getElementsByClassName("mobile-nav-item");
 
-  // Theme switcher
-  // Get elements
-  const themeSwitcher = document.getElementById(
-    "theme-switcher",
-  ) as HTMLButtonElement;
-  let themeIconLight = document.getElementById(
-    "theme-icon-light",
-  ) as any as SVGElement;
-  let themeIconDark = document.getElementById(
-    "theme-icon-dark",
-  ) as any as SVGElement;
-  const themeToggleThumb = document.querySelector(".theme-toggle-thumb") as HTMLElement;
+    let menuIconClosed = document.getElementById("menu-icon-closed") as unknown as SVGElement;
+    let menuIconOpened = document.getElementById("menu-icon-opened") as unknown as SVGElement;
 
-  // Record the current theme
-  let currentTheme = localStorage.getItem("theme") || "light";
+    let themeIconLight = document.getElementById("theme-icon-light") as unknown as SVGElement;
+    let themeIconDark = document.getElementById("theme-icon-dark") as unknown as SVGElement;
+    const themeSwitcher = document.getElementById("theme-switcher") as HTMLButtonElement | null;
 
-  // Set theme with animation
-  const setTheme = (theme: string) => {
-    // Add transition class to body for page-wide transition
-    document.body.classList.add('theme-transition');
-    
-    // Update theme attributes
-    document.documentElement.setAttribute("data-theme", theme);
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem("theme", theme);
-    currentTheme = theme;
+    let isMenuOpen = false;
 
-    // 背景色とテキスト色をすぐに設定
-    if (theme === "dark") {
-      document.documentElement.style.setProperty('--background-color', 'var(--dark-background-color, #121212)');
-      document.documentElement.style.setProperty('--text-color', 'var(--dark-text-color, #e0e0e0)');
-      document.documentElement.style.setProperty('--card-color', 'var(--dark-card-color, #1e1e1e)');
-    } else {
-      document.documentElement.style.setProperty('--background-color', 'var(--light-background-color, #ffffff)');
-      document.documentElement.style.setProperty('--text-color', 'var(--light-text-color, #333333)');
-      document.documentElement.style.setProperty('--card-color', 'var(--light-card-color, #f8f8f8)');
-    }
+    const switchMenuState = () => {
+      if (!mobileMenuNav || !menuIconClosed || !menuIconOpened) {
+        return;
+      }
 
-    // Show/hide icons for different themes with animation
-    if (theme === "dark") {
-      themeIconDark.style.display = "block";
-      themeIconLight.style.display = "none";
-      themeIconDark = reinitializeIcon(themeIconDark);
-      
-      // Create ripple effect
-      createRippleEffect(themeSwitcher, 'dark');
-    } else {
-      themeIconLight.style.display = "block";
-      themeIconDark.style.display = "none";
-      themeIconLight = reinitializeIcon(themeIconLight);
-      
-      // Create ripple effect
-      createRippleEffect(themeSwitcher, 'light');
-    }
+      menuIconClosed.style.display = isMenuOpen ? "block" : "none";
+      menuIconOpened.style.display = isMenuOpen ? "none" : "block";
 
-    // Toggle dark class
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    
-    // Remove transition class after animation completes
-    setTimeout(() => {
-      document.body.classList.remove('theme-transition');
-    }, 1000);
-  };
-  
-  // Create ripple effect when toggling theme
-  const createRippleEffect = (button: HTMLElement, theme: string) => {
-    const ripple = document.createElement('span');
-    ripple.classList.add('theme-ripple');
-    
-    // Set ripple color based on theme
-    ripple.style.backgroundColor = theme === 'dark' 
-      ? 'rgba(30, 41, 59, 0.5)' 
-      : 'rgba(255, 255, 255, 0.5)';
-      
-    // Position the ripple
-    const rect = button.getBoundingClientRect();
-    ripple.style.width = ripple.style.height = `${Math.max(rect.width, rect.height) * 2}px`;
-    
-    // Add the ripple to the button
-    button.appendChild(ripple);
-    
-    // Remove the ripple after animation
-    setTimeout(() => {
-      ripple.remove();
-    }, 1000);
-  };
+      if (isMenuOpen) {
+        menuIconClosed = reinitializeIcon(menuIconClosed);
+        mobileMenuNav.classList.replace("mobile-menu-nav-opened", "mobile-menu-nav-closed");
+      } else {
+        menuIconOpened = reinitializeIcon(menuIconOpened);
+        mobileMenuNav.classList.replace("mobile-menu-nav-closed", "mobile-menu-nav-opened");
+      }
+      isMenuOpen = !isMenuOpen;
+    };
 
-  // Click to switch theme
-  themeSwitcher.addEventListener("click", () => {
-    setTheme(currentTheme === "light" ? "dark" : "light");
-  });
+    if (menuSwitcher && mobileMenuNav) {
+      menuSwitcher.addEventListener("click", switchMenuState);
 
-  // Initialize
-  document.addEventListener("DOMContentLoaded", () => {
-    setTheme(currentTheme);
-    menuIconClosed.style.display = "block";
-  });
+      for (let i = 0; i < mobileMenuNavItems.length; ++i) {
+        mobileMenuNavItems.item(i)?.addEventListener("click", () => {
+          if (isMenuOpen) {
+            switchMenuState();
+          }
+        });
+      }
 
-  // fold nav bar when scroll down
-  const navBarElement = document.getElementById("nav");
-  const bannerElement = document.getElementById("banner");
-  const bannerHeight = bannerElement!.offsetHeight - 50;
-  let lastYPos = 0;
-  window.addEventListener("scroll", () => {
-    if (bannerHeight < window.scrollY && window.scrollY > lastYPos) {
-      navBarElement!.style.top = "-72px";
-    } else {
-      navBarElement!.style.top = "0";
-    }
-    lastYPos = window.scrollY;
-  });
-</script>
-
-<script is:inline>
-  // load pagefind - client-side only
-  async function loadPagefind() {
-    try {
-      const pagefind = await import("/pagefind/pagefind.js");
-      await pagefind.options({
-        excerptLength: 20,
+      document.addEventListener("click", (event) => {
+        if (
+          isMenuOpen &&
+          !menuSwitcher.contains(event.target as Node) &&
+          !mobileMenuNav.contains(event.target as Node)
+        ) {
+          switchMenuState();
+        }
       });
+    }
+
+    let currentTheme = localStorage.getItem("theme");
+    if (!currentTheme) {
+      currentTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+
+    const createRippleEffect = (button: HTMLElement) => {
+      const ripple = document.createElement("span");
+      ripple.classList.add("theme-ripple");
+      const rect = button.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 2;
+      ripple.style.width = `${size}px`;
+      ripple.style.height = `${size}px`;
+      ripple.style.left = `${(rect.width - size) / 2}px`;
+      ripple.style.top = `${(rect.height - size) / 2}px`;
+      button.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 700);
+    };
+
+    const setTheme = (theme: string, withRipple = false) => {
+      document.body.classList.add("theme-transition");
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.classList.toggle("dark", theme === "dark");
+
+      document.documentElement.style.setProperty(
+        "--background-color",
+        theme === "dark" ? "var(--dark-background-color)" : "var(--light-background-color)",
+      );
+      document.documentElement.style.setProperty(
+        "--text-color",
+        theme === "dark" ? "var(--dark-text-color)" : "var(--light-text-color)",
+      );
+      document.documentElement.style.setProperty(
+        "--card-color",
+        theme === "dark" ? "var(--dark-card-color)" : "var(--light-card-color)",
+      );
+
+      localStorage.setItem("theme", theme);
+      currentTheme = theme;
+
+      if (themeIconDark && themeIconLight) {
+        if (theme === "dark") {
+          themeIconDark.style.display = "block";
+          themeIconLight.style.display = "none";
+          themeIconDark = reinitializeIcon(themeIconDark);
+        } else {
+          themeIconLight.style.display = "block";
+          themeIconDark.style.display = "none";
+          themeIconLight = reinitializeIcon(themeIconLight);
+        }
+      }
+
+      if (withRipple && themeSwitcher) {
+        createRippleEffect(themeSwitcher);
+      }
+
+      setTimeout(() => {
+        document.body.classList.remove("theme-transition");
+      }, 700);
+    };
+
+    if (themeSwitcher) {
+      themeSwitcher.addEventListener("click", () => {
+        setTheme(currentTheme === "light" ? "dark" : "light", true);
+      });
+    }
+
+    setTheme(currentTheme);
+
+    if (menuIconClosed) {
+      menuIconClosed.style.display = "block";
+    }
+
+    if (!(window as any).__yukinaNavScrollBound) {
+      (window as any).__yukinaNavScrollBound = true;
+      let lastYPos = window.scrollY;
+
+      window.addEventListener("scroll", () => {
+        const navElement = document.getElementById("nav") as HTMLElement | null;
+        if (!navElement) {
+          return;
+        }
+
+        const bannerElement = document.getElementById("banner") as HTMLElement | null;
+        const bannerHeight = (bannerElement?.offsetHeight ?? 120) - 50;
+
+        if (window.scrollY > bannerHeight && window.scrollY > lastYPos) {
+          navElement.style.top = "-84px";
+        } else {
+          navElement.style.top = "0";
+        }
+
+        // Add scrolled class for visual feedback
+        if (window.scrollY > 20) {
+          navElement.classList.add("nav-scrolled");
+        } else {
+          navElement.classList.remove("nav-scrolled");
+        }
+
+        lastYPos = window.scrollY;
+      });
+    }
+  };
+
+  const loadPagefind = async () => {
+    try {
+      if ((window as any).pagefind) {
+        return;
+      }
+      const pagefindPath = "/pagefind/pagefind.js";
+      const pagefind = await import(/* @vite-ignore */ pagefindPath);
+      await pagefind.options({ excerptLength: 20 });
       pagefind.init();
-      window.pagefind = pagefind;
-      console.log("Pagefind loaded successfully");
+      (window as any).pagefind = pagefind;
       pagefind.search("");
     } catch (error) {
       console.error("Failed to load pagefind:", error);
     }
-  }
-  
-  // Load pagefind after DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadPagefind);
-  } else {
-    // Use setTimeout to ensure DOM is fully ready
+  };
+
+  const boot = () => {
+    initNavBar();
     setTimeout(loadPagefind, 100);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
   }
+
+  document.addEventListener("astro:after-swap", boot);
 </script>

@@ -2,124 +2,563 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import PostCard from "../components/PostCard.astro";
 import { GetSortedPosts, GetAllCategories } from "../utils/content";
-import { i18n } from "../locales/translation";
-import I18nKeys from "../locales/keys";
 
-// Get language from URL parameter
 const url = new URL(Astro.request.url);
-const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
+const lang = (url.searchParams.get("lang") === "en" ? "en" : "ja") as "ja" | "en";
+const langParam = lang === "en" ? "?lang=en" : "";
+const selectedCategory = url.searchParams.get("category")?.trim() ?? null;
 
-// 全ての記事とカテゴリーを取得
 const allPosts = await GetSortedPosts(lang);
 const allCategories = await GetAllCategories(lang);
 
-// 初期表示するカテゴリーの数（デフォルトは10）
+type PostEntry = (typeof allPosts)[number];
+
 const initialCategoryCount = 10;
-// カテゴリーが多い場合は初期表示を制限
 const hasMoreCategories = allCategories.length > initialCategoryCount;
+
+const starterCount = 3;
+const weeklyCount = 6;
+const categoryPickCount = 6;
+
+const starterCandidates =
+  lang === "ja"
+    ? ["welcome", "start", "first", "about", "index"]
+    : ["welcome", "start", "first", "about", "index"];
+
+const normalizeId = (value: string) => value.trim().toLowerCase().replace(/\.md$/, "");
+
+const isCandidateMatch = (entry: PostEntry, candidate: string) => {
+  const normalizedCandidate = normalizeId(candidate);
+  const normalizedId = normalizeId(entry.id);
+  const lastSegment = normalizedId.split("/").pop() ?? normalizedId;
+  return (
+    normalizedId === normalizedCandidate ||
+    lastSegment === normalizedCandidate ||
+    normalizedId.includes(normalizedCandidate) ||
+    lastSegment.includes(normalizedCandidate)
+  );
+};
+
+const usedIntentPostIds = new Set<string>();
+
+const takeFallbackPosts = (limit: number): PostEntry[] => {
+  const selected: PostEntry[] = [];
+  for (const entry of allPosts) {
+    if (usedIntentPostIds.has(entry.id)) {
+      continue;
+    }
+    selected.push(entry);
+    usedIntentPostIds.add(entry.id);
+    if (selected.length >= limit) {
+      break;
+    }
+  }
+  return selected;
+};
+
+const starterPosts: PostEntry[] = [];
+for (const candidate of starterCandidates) {
+  const match = allPosts.find(
+    (entry) => !usedIntentPostIds.has(entry.id) && isCandidateMatch(entry, candidate),
+  );
+  if (!match) {
+    continue;
+  }
+  starterPosts.push(match);
+  usedIntentPostIds.add(match.id);
+  if (starterPosts.length >= starterCount) {
+    break;
+  }
+}
+if (starterPosts.length < starterCount) {
+  starterPosts.push(...takeFallbackPosts(starterCount - starterPosts.length));
+}
+
+const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+const weeklyPosts: PostEntry[] = [];
+for (const entry of allPosts) {
+  if (usedIntentPostIds.has(entry.id)) {
+    continue;
+  }
+  if (entry.data.published >= weekAgo) {
+    weeklyPosts.push(entry);
+    usedIntentPostIds.add(entry.id);
+  }
+  if (weeklyPosts.length >= weeklyCount) {
+    break;
+  }
+}
+if (weeklyPosts.length < weeklyCount) {
+  weeklyPosts.push(...takeFallbackPosts(weeklyCount - weeklyPosts.length));
+}
+
+const categoryPicks: PostEntry[] = [];
+const pickedCategories = new Set<string>();
+for (const entry of allPosts) {
+  if (usedIntentPostIds.has(entry.id)) {
+    continue;
+  }
+
+  const category = entry.data.category?.trim();
+  if (!category || pickedCategories.has(category)) {
+    continue;
+  }
+
+  categoryPicks.push(entry);
+  pickedCategories.add(category);
+  usedIntentPostIds.add(entry.id);
+
+  if (categoryPicks.length >= categoryPickCount) {
+    break;
+  }
+}
+if (categoryPicks.length < categoryPickCount) {
+  categoryPicks.push(...takeFallbackPosts(categoryPickCount - categoryPicks.length));
+}
+
+const isVisibleInCategory = (entry: PostEntry) => {
+  if (!selectedCategory) {
+    return true;
+  }
+  return (entry.data.category ?? "").trim() === selectedCategory;
+};
+
+const buildNextReadLinks = (posts: PostEntry[]) => {
+  const links: Array<{ href: string; label: string }> = [];
+  const seen = new Set<string>();
+
+  for (const post of posts) {
+    const category = post.data.category?.trim();
+    if (!category) {
+      continue;
+    }
+    const href = `/all-posts?category=${encodeURIComponent(category)}${lang === "en" ? "&lang=en" : ""}`;
+    if (seen.has(href)) {
+      continue;
+    }
+    seen.add(href);
+    links.push({
+      href,
+      label: lang === "ja" ? `カテゴリ: ${category}` : `Category: ${category}`,
+    });
+    if (links.length >= 2) {
+      break;
+    }
+  }
+
+  links.push({
+    href: `/all-posts${langParam}`,
+    label: lang === "ja" ? "全記事一覧へ" : "View all posts",
+  });
+
+  return links;
+};
+
+const starterNextLinks = buildNextReadLinks(starterPosts);
+const weeklyNextLinks = buildNextReadLinks(weeklyPosts);
+const categoryNextLinks = buildNextReadLinks(categoryPicks);
+
+const labels = {
+  pageTitle: lang === "ja" ? "すべての記事" : "All Posts",
+  pageIntro:
+    lang === "ja"
+      ? "目的別に読み進められる導線を先頭に置き、その後ろに全記事一覧を配置しています。"
+      : "Intent-based entry points are placed first, followed by the full archive list.",
+  allCategory: lang === "ja" ? "すべて" : "All",
+  showMore: lang === "ja" ? "もっと見る" : "Show more",
+  collapse: lang === "ja" ? "折りたたむ" : "Collapse",
+  starterTitle: lang === "ja" ? "まず読む3本" : "Start with These 3",
+  starterDesc:
+    lang === "ja"
+      ? "固定候補を優先し、足りない分は最新記事で補完しています。"
+      : "Prioritizes fixed picks, then falls back to recent posts.",
+  weeklyTitle: lang === "ja" ? "今週の更新" : "Updates This Week",
+  weeklyDesc:
+    lang === "ja"
+      ? "直近7日を優先し、件数不足時は新しい順で補完しています。"
+      : "Prioritizes the latest 7 days and backfills with recent posts.",
+  categoryTitle: lang === "ja" ? "カテゴリ別ピック" : "Category Picks",
+  categoryDesc:
+    lang === "ja"
+      ? "カテゴリごとに代表記事を1本ずつ抽出しています。"
+      : "Picks one representative post per category.",
+  nextRead: lang === "ja" ? "次に読む" : "Next to read",
+  fullListTitle: lang === "ja" ? "全記事一覧" : "Full Archive",
+  fullListDesc:
+    lang === "ja"
+      ? "以下は公開順（新しい順）の全件です。"
+      : "Below is the complete list in reverse chronological order.",
+};
 ---
 
-<MainLayout title={lang === 'ja' ? "すべての記事" : "All Posts"}>
+<MainLayout title={labels.pageTitle}>
   <div class="page-container">
-    <h1 class="page-title">{lang === 'ja' ? 'すべての記事' : 'All Posts'}</h1>
-    
+    <header class="page-header">
+      <h1 class="page-title">{labels.pageTitle}</h1>
+      <p class="page-intro">{labels.pageIntro}</p>
+    </header>
+
     <div class="categories-container">
       <div class="categories-filter" id="categories-filter">
-        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="category-pill active">{lang === 'ja' ? 'すべて' : 'All'}</a>
-        {allCategories.map((category, index) => (
-          <a 
-            href={`/all-posts?category=${encodeURIComponent(category.name)}${lang === 'en' ? '&lang=en' : ''}`} 
-            class={`category-pill ${index >= initialCategoryCount ? 'hidden-category' : ''}`}
-          >
-            {category.name}
-          </a>
-        ))}
-      </div>
-      
-      {hasMoreCategories && (
-        <div class="text-center mt-3">
-          <button id="show-more-categories" class="show-more-button">
-            {lang === 'ja' ? 'もっと見る' : 'Show more'} <span class="arrow-down">▼</span>
-          </button>
-        </div>
-      )}
-    </div>
-    
-    <div class="posts-grid">
-      {allPosts.map((entry, index) => (
-        <div 
-          class="post-card-animation"
-          style={`animation-delay: calc(var(--onload-animation-delay) + ${index % 12 + 1} * var(--onload-animation-interval));`}
-          data-category={entry.data.category || ""}
+        <a
+          href={`/all-posts${langParam}`}
+          class={`category-pill ${!selectedCategory ? "active" : ""}`}
         >
-          <PostCard
-            id={entry.id}
-            title={entry.data.title}
-            published={entry.data.published}
-            category={entry.data.category}
-            tags={entry.data.tags}
-            description={entry.data.description}
-            image={entry.data.cover}
-            readingMetadata={entry.readingMetadata}
-            lang={lang}
-          />
-        </div>
-      ))}
+          {labels.allCategory}
+        </a>
+        {
+          allCategories.map((category, index) => {
+            const categoryName = category.name.trim();
+            const isActive = selectedCategory === categoryName;
+            return (
+              <a
+                href={`/all-posts?category=${encodeURIComponent(categoryName)}${lang === "en" ? "&lang=en" : ""}`}
+                class={`category-pill ${isActive ? "active" : ""} ${index >= initialCategoryCount ? "hidden-category" : ""}`}
+              >
+                {categoryName}
+              </a>
+            );
+          })
+        }
+      </div>
+
+      {
+        hasMoreCategories && (
+          <div class="show-more-wrapper">
+            <button id="show-more-categories" class="show-more-button" type="button" data-expanded="false">
+              {labels.showMore} <span class="arrow-down">▼</span>
+            </button>
+          </div>
+        )
+      }
     </div>
+
+    <section class="intent-section" data-intent-section="starter">
+      <div class="intent-head">
+        <h2>{labels.starterTitle}</h2>
+        <p>{labels.starterDesc}</p>
+      </div>
+      <div class="posts-grid intent-grid">
+        {
+          starterPosts.map((entry, index) => (
+            <div
+              class={`post-card-animation ${!isVisibleInCategory(entry) ? "query-hidden" : ""}`}
+              style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
+              data-category={entry.data.category || ""}
+            >
+              <PostCard
+                id={entry.id}
+                title={entry.data.title}
+                published={entry.data.published}
+                category={entry.data.category}
+                tags={entry.data.tags}
+                description={entry.data.description}
+                image={entry.data.cover}
+                readingMetadata={entry.readingMetadata}
+                lang={lang}
+              />
+            </div>
+          ))
+        }
+      </div>
+      <div class="next-read-links">
+        <span class="next-label">{labels.nextRead}</span>
+        {
+          starterNextLinks.map((link) => (
+            <a href={link.href} class="next-link">{link.label}</a>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="intent-section" data-intent-section="weekly">
+      <div class="intent-head">
+        <h2>{labels.weeklyTitle}</h2>
+        <p>{labels.weeklyDesc}</p>
+      </div>
+      <div class="posts-grid intent-grid">
+        {
+          weeklyPosts.map((entry, index) => (
+            <div
+              class={`post-card-animation ${!isVisibleInCategory(entry) ? "query-hidden" : ""}`}
+              style={`animation-delay: calc(var(--onload-animation-delay) + ${(index % 12) + 1} * var(--onload-animation-interval));`}
+              data-category={entry.data.category || ""}
+            >
+              <PostCard
+                id={entry.id}
+                title={entry.data.title}
+                published={entry.data.published}
+                category={entry.data.category}
+                tags={entry.data.tags}
+                description={entry.data.description}
+                image={entry.data.cover}
+                readingMetadata={entry.readingMetadata}
+                lang={lang}
+              />
+            </div>
+          ))
+        }
+      </div>
+      <div class="next-read-links">
+        <span class="next-label">{labels.nextRead}</span>
+        {
+          weeklyNextLinks.map((link) => (
+            <a href={link.href} class="next-link">{link.label}</a>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="intent-section" data-intent-section="category-picks">
+      <div class="intent-head">
+        <h2>{labels.categoryTitle}</h2>
+        <p>{labels.categoryDesc}</p>
+      </div>
+      <div class="posts-grid intent-grid">
+        {
+          categoryPicks.map((entry, index) => (
+            <div
+              class={`post-card-animation ${!isVisibleInCategory(entry) ? "query-hidden" : ""}`}
+              style={`animation-delay: calc(var(--onload-animation-delay) + ${(index % 12) + 1} * var(--onload-animation-interval));`}
+              data-category={entry.data.category || ""}
+            >
+              <PostCard
+                id={entry.id}
+                title={entry.data.title}
+                published={entry.data.published}
+                category={entry.data.category}
+                tags={entry.data.tags}
+                description={entry.data.description}
+                image={entry.data.cover}
+                readingMetadata={entry.readingMetadata}
+                lang={lang}
+              />
+            </div>
+          ))
+        }
+      </div>
+      <div class="next-read-links">
+        <span class="next-label">{labels.nextRead}</span>
+        {
+          categoryNextLinks.map((link) => (
+            <a href={link.href} class="next-link">{link.label}</a>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="full-list-section" data-intent-section="all-posts">
+      <div class="intent-head">
+        <h2>{labels.fullListTitle}</h2>
+        <p>{labels.fullListDesc}</p>
+      </div>
+      <div class="posts-grid">
+        {
+          allPosts.map((entry, index) => (
+            <div
+              class={`post-card-animation ${!isVisibleInCategory(entry) ? "query-hidden" : ""}`}
+              style={`animation-delay: calc(var(--onload-animation-delay) + ${(index % 12) + 1} * var(--onload-animation-interval));`}
+              data-category={entry.data.category || ""}
+            >
+              <PostCard
+                id={entry.id}
+                title={entry.data.title}
+                published={entry.data.published}
+                category={entry.data.category}
+                tags={entry.data.tags}
+                description={entry.data.description}
+                image={entry.data.cover}
+                readingMetadata={entry.readingMetadata}
+                lang={lang}
+              />
+            </div>
+          ))
+        }
+      </div>
+    </section>
   </div>
 </MainLayout>
 
 <style>
   .page-container {
-    @apply w-full space-y-8;
+    width: 100%;
+    display: grid;
+    gap: 1.5rem;
   }
-  
+
+  .page-header {
+    display: grid;
+    gap: 0.65rem;
+    text-align: center;
+  }
+
   .page-title {
-    @apply text-3xl md:text-4xl font-bold text-[var(--text-color)] text-center mb-8;
-    font-family: var(--primary-font);
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: clamp(1.8rem, 4vw, 2.35rem);
+    color: var(--text-color);
   }
-  
+
+  .page-intro {
+    margin: 0 auto;
+    max-width: 64ch;
+    color: var(--text-color-lighten);
+    line-height: 1.7;
+  }
+
   .categories-container {
-    @apply mb-8;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
+    padding: 1rem;
   }
-  
+
   .categories-filter {
-    @apply flex flex-wrap justify-center gap-2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
   }
-  
+
   .category-pill {
-    @apply px-4 py-2 rounded-full bg-[var(--card-color)] text-[var(--text-color)] border border-[var(--border-color)];
-    @apply hover:bg-[var(--primary-color-lighten)] hover:text-[var(--primary-color)] transition-all;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color);
+    background: var(--card-color);
+    color: var(--text-color);
+    padding: 0.5rem 0.9rem;
+    font-size: 0.9rem;
+    transition: background-color var(--transition-speed) var(--transition-timing),
+      color var(--transition-speed) var(--transition-timing),
+      border-color var(--transition-speed) var(--transition-timing);
   }
-  
+
+  .category-pill:hover {
+    background: var(--primary-color-hover);
+    color: var(--primary-color);
+    border-color: var(--primary-color-lighten);
+  }
+
   .category-pill.active {
-    @apply bg-[var(--primary-color)] text-white border-transparent;
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--background-color);
+    font-weight: 600;
   }
-  
+
   .hidden-category {
-    @apply hidden;
+    display: none;
   }
-  
+
+  .show-more-wrapper {
+    margin-top: 0.85rem;
+    display: flex;
+    justify-content: center;
+  }
+
   .show-more-button {
-    @apply px-4 py-1 rounded-full bg-[var(--card-color)] text-[var(--text-color)] border border-[var(--border-color)];
-    @apply hover:bg-[var(--primary-color-lighten)] hover:text-[var(--primary-color)] transition-all;
-    @apply inline-flex items-center gap-1 text-sm;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color);
+    background: var(--card-color);
+    color: var(--text-color);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.85rem;
+    transition: background-color var(--transition-speed) var(--transition-timing);
   }
-  
+
+  .show-more-button:hover {
+    background: var(--primary-color-hover);
+  }
+
   .arrow-down {
-    @apply text-xs transition-transform duration-300;
+    font-size: 0.65rem;
   }
-  
+
+  .intent-section,
+  .full-list-section {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--card-color) 90%, var(--background-color));
+    padding: 1rem;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .intent-head {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .intent-head h2 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 1.2rem;
+    color: var(--text-color);
+  }
+
+  .intent-head p {
+    margin: 0;
+    color: var(--text-color-lighten);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
   .posts-grid {
-    @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  
+
+  .intent-grid {
+    gap: 0.9rem;
+  }
+
   .post-card-animation {
-    @apply h-full;
-    animation: fadeIn 0.6s ease-out forwards;
+    height: 100%;
+    animation: fadeIn 0.5s ease-out forwards;
     opacity: 0;
   }
-  
+
+  .query-hidden {
+    display: none;
+  }
+
+  .next-read-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .next-label {
+    color: var(--text-color-lighten);
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-right: 0.2rem;
+  }
+
+  .next-link {
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color);
+    background: var(--card-color);
+    color: var(--primary-color);
+    font-size: 0.82rem;
+    padding: 0.3rem 0.65rem;
+    transition: border-color var(--transition-speed) var(--transition-timing),
+      background-color var(--transition-speed) var(--transition-timing);
+  }
+
+  .next-link:hover {
+    border-color: var(--primary-color-lighten);
+    background: var(--primary-color-hover);
+  }
+
+  .section-hidden {
+    display: none;
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -128,147 +567,171 @@ const hasMoreCategories = allCategories.length > initialCategoryCount;
       opacity: 1;
     }
   }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .intent-section,
+    .full-list-section {
+      padding: 1.2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .page-container {
+      gap: 1.8rem;
+    }
+  }
 </style>
 
 <script>
-  // カテゴリーフィルタリング機能
   function initializeFilters() {
-    console.log("カテゴリーフィルタ初期化");
-    // URLからカテゴリーパラメータを取得
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoryParam = urlParams.get('category');
-    
-    // すべてのカテゴリーピルと記事カードを取得
-    const categoryPills = document.querySelectorAll('.category-pill');
-    const postCards = document.querySelectorAll('.post-card-animation');
-    const showMoreButton = document.getElementById('show-more-categories');
-    const hiddenCategories = document.querySelectorAll('.hidden-category');
-    
-    // もっと見るボタンのクリックイベント
-    if (showMoreButton) {
+    const container = document.querySelector('.page-container');
+    if (!container) {
+      return;
+    }
+
+    const categoryPills = container.querySelectorAll('.category-pill');
+    const postCards = container.querySelectorAll('.post-card-animation');
+    const sectionBlocks = container.querySelectorAll('[data-intent-section]');
+
+    const showMoreButton = container.querySelector('#show-more-categories');
+    const hiddenCategories = container.querySelectorAll('.hidden-category');
+
+    const updateSectionVisibility = () => {
+      sectionBlocks.forEach((section) => {
+        if (!(section instanceof HTMLElement)) {
+          return;
+        }
+        const cards = section.querySelectorAll('.post-card-animation');
+        const hasVisibleCards = Array.from(cards).some((card) => {
+          if (!(card instanceof HTMLElement)) {
+            return false;
+          }
+          return card.style.display !== 'none';
+        });
+        section.classList.toggle('section-hidden', !hasVisibleCards);
+      });
+    };
+
+    const updateCategoryPills = (category) => {
+      const trimmedCategory = category ? category.trim() : null;
+
+      categoryPills.forEach((pill) => {
+        if (!(pill instanceof HTMLAnchorElement)) {
+          return;
+        }
+
+        const pillUrl = new URL(pill.href);
+        const pillParams = new URLSearchParams(pillUrl.search);
+        const pillCategory = pillParams.get('category');
+        const trimmedPillCategory = pillCategory ? pillCategory.trim() : null;
+
+        if (
+          (trimmedPillCategory === trimmedCategory) ||
+          (!trimmedPillCategory && !trimmedCategory)
+        ) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    };
+
+    const filterPosts = (category) => {
+      const trimmedCategory = category ? category.trim() : null;
+
+      postCards.forEach((card) => {
+        if (!(card instanceof HTMLElement)) {
+          return;
+        }
+
+        if (!trimmedCategory) {
+          card.style.display = '';
+          return;
+        }
+
+        const cardCategory = card.getAttribute('data-category');
+        const trimmedCardCategory = cardCategory ? cardCategory.trim() : '';
+        card.style.display = trimmedCardCategory === trimmedCategory ? '' : 'none';
+      });
+
+      updateSectionVisibility();
+    };
+
+    if (showMoreButton instanceof HTMLButtonElement && showMoreButton.dataset.bound !== 'true') {
+      showMoreButton.dataset.bound = 'true';
       showMoreButton.addEventListener('click', () => {
-        const arrowSpan = showMoreButton.querySelector('.arrow-down');
         const isExpanded = showMoreButton.getAttribute('data-expanded') === 'true';
-        
-        hiddenCategories.forEach(category => {
+
+        hiddenCategories.forEach((category) => {
           if (category instanceof HTMLElement) {
             category.classList.toggle('hidden-category');
           }
         });
-        
-        const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ja';
-        if (isExpanded) {
-          showMoreButton.textContent = lang === 'ja' ? 'もっと見る ' : 'Show more ';
-          showMoreButton.setAttribute('data-expanded', 'false');
-        } else {
-          showMoreButton.textContent = lang === 'ja' ? '折りたたむ ' : 'Collapse ';
-          showMoreButton.setAttribute('data-expanded', 'true');
-        }
-        
-        // 新しい矢印要素を作成
-        const newArrow = document.createElement('span');
-        newArrow.className = 'arrow-down';
-        newArrow.textContent = isExpanded ? '▼' : '▲';
-        showMoreButton.appendChild(newArrow);
+
+        const currentLang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ja';
+        showMoreButton.setAttribute('data-expanded', isExpanded ? 'false' : 'true');
+
+        const buttonLabel = isExpanded
+          ? (currentLang === 'ja' ? 'もっと見る' : 'Show more')
+          : (currentLang === 'ja' ? '折りたたむ' : 'Collapse');
+        const buttonArrow = isExpanded ? '▼' : '▲';
+        showMoreButton.innerHTML = `${buttonLabel} <span class="arrow-down">${buttonArrow}</span>`;
       });
     }
-    
-    // カテゴリーピルのクリックイベントを設定
-    categoryPills.forEach(pill => {
-      if (pill instanceof HTMLAnchorElement) {
-        pill.addEventListener('click', (e) => {
-          console.log("カテゴリークリック:", pill.textContent?.trim());
-          
-          // すでにアクティブなピルをクリックした場合は通常の遷移を許可
-          if (pill.classList.contains('active')) return;
-          
-          e.preventDefault();
-          const pillUrl = new URL(pill.href);
-          const pillParams = new URLSearchParams(pillUrl.search);
-          const pillCategory = pillParams.get('category');
-          
-          // URLを更新
-          const currentParams = new URLSearchParams(window.location.search);
-          const lang = currentParams.get('lang');
-          const newParams = new URLSearchParams();
-          if (lang) newParams.set('lang', lang);
-          if (pillCategory) newParams.set('category', pillCategory.trim());
-          
-          const newUrl = newParams.toString() 
-            ? `${window.location.pathname}?${newParams.toString()}` 
-            : window.location.pathname;
-          
-          console.log("新しいURL:", newUrl);
-          window.history.pushState({}, '', newUrl);
-          
-          // カテゴリーピルの状態を更新
-          updateCategoryPills(pillCategory);
-          
-          // 記事をフィルタリング
-          filterPosts(pillCategory);
-        });
+
+    categoryPills.forEach((pill) => {
+      if (!(pill instanceof HTMLAnchorElement) || pill.dataset.bound === 'true') {
+        return;
       }
+
+      pill.dataset.bound = 'true';
+      pill.addEventListener('click', (event) => {
+        if (pill.classList.contains('active')) {
+          return;
+        }
+
+        event.preventDefault();
+        const pillUrl = new URL(pill.href);
+        const pillParams = new URLSearchParams(pillUrl.search);
+        const pillCategory = pillParams.get('category');
+
+        const currentParams = new URLSearchParams(window.location.search);
+        const currentLang = currentParams.get('lang');
+        const newParams = new URLSearchParams();
+        if (currentLang) {
+          newParams.set('lang', currentLang);
+        }
+        if (pillCategory) {
+          newParams.set('category', pillCategory.trim());
+        }
+
+        const newUrl = newParams.toString()
+          ? `${window.location.pathname}?${newParams.toString()}`
+          : window.location.pathname;
+
+        window.history.pushState({}, '', newUrl);
+        updateCategoryPills(pillCategory);
+        filterPosts(pillCategory);
+      });
     });
-    
-    // 初期ロード時のフィルタリング
-    if (categoryParam) {
-      console.log("初期カテゴリーフィルタ:", categoryParam);
-      updateCategoryPills(categoryParam);
-      filterPosts(categoryParam);
-    }
-    
-    // カテゴリーピルの状態を更新する関数
-    function updateCategoryPills(category: string | null) {
-      console.log("カテゴリーピル更新:", category);
-      const trimmedCategory = category ? category.trim() : null;
-      
-      categoryPills.forEach(pill => {
-        if (pill instanceof HTMLAnchorElement) {
-          const pillUrl = new URL(pill.href);
-          const pillParams = new URLSearchParams(pillUrl.search);
-          const pillCategory = pillParams.get('category');
-          const trimmedPillCategory = pillCategory ? pillCategory.trim() : null;
-          
-          if ((trimmedPillCategory === trimmedCategory) || (!trimmedPillCategory && !trimmedCategory)) {
-            pill.classList.add('active');
-          } else {
-            pill.classList.remove('active');
-          }
-        }
-      });
-    }
-    
-    // 記事をフィルタリングする関数
-    function filterPosts(category: string | null) {
-      console.log("記事フィルタリング:", category);
-      const trimmedCategory = category ? category.trim() : null;
-      
-      postCards.forEach(card => {
-        if (card instanceof HTMLElement) {
-          // カテゴリーがないか「すべて」の場合はすべて表示
-          if (!trimmedCategory) {
-            card.style.display = 'block';
-            return;
-          }
-          
-          const cardCategory = card.getAttribute('data-category');
-          const trimmedCardCategory = cardCategory ? cardCategory.trim() : '';
-          
-          console.log(`カード「${card.querySelector('.title')?.textContent}」のカテゴリー: 「${trimmedCardCategory}」, 比較: 「${trimmedCategory}」`);
-          
-          if (trimmedCardCategory === trimmedCategory) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
-        }
-      });
+
+    const initialCategory = new URLSearchParams(window.location.search).get('category');
+    if (initialCategory) {
+      updateCategoryPills(initialCategory);
+      filterPosts(initialCategory);
+    } else {
+      updateSectionVisibility();
     }
   }
 
-  // DOMContentLoaded イベントでフィルター初期化
   document.addEventListener('DOMContentLoaded', initializeFilters);
-  
-  // Astroのページ遷移イベントでも初期化
   document.addEventListener('astro:page-load', initializeFilters);
-</script> 
+</script>

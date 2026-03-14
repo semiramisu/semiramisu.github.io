@@ -2,8 +2,6 @@
 import { IdToSlug } from "../utils/hash";
 import { Icon } from "astro-icon/components";
 import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
-import { i18n } from "../locales/translation";
-import I18nKeys from "../locales/keys";
 import YukinaConfig from "../../yukina.config";
 import { formatDate } from "../utils/date";
 import ResponsiveImage from "./ResponsiveImage.astro";
@@ -23,83 +21,65 @@ export interface Props {
 }
 
 const props = Astro.props;
-const baseUrl = props.id.startsWith('/') ? props.id : `/posts/${IdToSlug(props.id)}`;
-const langParam = props.lang === 'en' ? '?lang=en' : '';
+const baseUrl = props.id.startsWith("/") ? props.id : `/posts/${IdToSlug(props.id)}`;
+const langParam = props.lang === "en" ? "?lang=en" : "";
 const contentUrl = `${baseUrl}${langParam}`;
-const entryID = props.id.startsWith('/') ? props.id.split('/').pop()! : IdToSlug(props.id);
-const { time = 0, wordCount = 0 } = props.readingMetadata ?? { time: 0, wordCount: 0 };
+const entryID = props.id.startsWith("/") ? props.id.split("/").pop()! : IdToSlug(props.id);
+const { time = 0 } = props.readingMetadata ?? { time: 0 };
 
 const imageUrl = props.image ?? GetCoverURLForUnspecifiedEntry(entryID);
 const isCompact = props.isCompact ?? false;
+const minuteLabel = props.lang === "en" ? "min" : "分";
 ---
 
 {isCompact ? (
-  <!-- Compact Mobile Card (for list views) -->
-  <article class="mobile-post-card-compact">
+  <article class="mobile-card compact">
     <a href={contentUrl} class="card-link">
-      <div class="card-content">
-        <div class="card-image">
-          <ResponsiveImage
-            src={imageUrl}
-            alt={props.title}
-            width={120}
-            height={90}
-            loading="lazy"
-          />
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">{props.title}</h3>
-          <p class="card-description">{props.description}</p>
-          <div class="card-meta">
-            <span class="meta-date">
-              {formatDate(props.published, YukinaConfig.locale)}
-            </span>
-            {props.category && (
-              <>
-                <span class="meta-separator">•</span>
-                <span class="meta-category">{props.category}</span>
-              </>
-            )}
-            <span class="meta-separator">•</span>
-            <span class="meta-reading-time">{time}分</span>
-          </div>
+      <div class="compact-image-wrap">
+        <ResponsiveImage src={imageUrl} alt={props.title} width={140} height={104} loading="lazy" class="compact-image" />
+      </div>
+      <div class="compact-body">
+        <h3 class="compact-title">{props.title}</h3>
+        <p class="compact-description">{props.description}</p>
+        <div class="compact-meta">
+          <span>{formatDate(props.published, YukinaConfig.locale)}</span>
+          {props.category && (
+            <>
+              <span class="meta-dot">•</span>
+              <span>{props.category}</span>
+            </>
+          )}
+          <span class="meta-dot">•</span>
+          <span>
+            {time}
+            {minuteLabel}
+          </span>
         </div>
       </div>
     </a>
   </article>
 ) : (
-  <!-- Full Mobile Card (for featured content) -->
-  <article class="mobile-post-card">
-    <a href={contentUrl} class="card-link">
-      <div class="card-image-container">
-        <ResponsiveImage
-          src={imageUrl}
-          alt={props.title}
-          width={400}
-          height={240}
-          loading="lazy"
-          class="card-image-full"
-        />
-        <div class="card-overlay">
-          <div class="overlay-meta">
-            <span class="meta-badge">{props.category || "記事"}</span>
-            <span class="meta-reading-time">
-              <Icon name="mingcute:time-line" width={16} height={16} />
-              {time}分
-            </span>
-          </div>
+  <article class="mobile-card featured">
+    <a href={contentUrl} class="card-link full-link">
+      <div class="featured-image-wrap">
+        <ResponsiveImage src={imageUrl} alt={props.title} width={640} height={360} loading="lazy" class="featured-image" />
+        <div class="featured-overlay">
+          <span class="featured-category">{props.category || (props.lang === "en" ? "Post" : "記事")}</span>
+          <span class="featured-reading-time">
+            <Icon name="mingcute:time-line" width={15} height={15} />
+            {time}
+            {minuteLabel}
+          </span>
         </div>
       </div>
-      <div class="card-content-full">
-        <h2 class="card-title-full">{props.title}</h2>
-        <p class="card-description-full">{props.description}</p>
-        <div class="card-meta-full">
-          <span class="meta-date-full">
-            {formatDate(props.published, YukinaConfig.locale)}
-          </span>
+      <div class="featured-body">
+        <h2 class="featured-title">{props.title}</h2>
+        <p class="featured-description">{props.description}</p>
+        <div class="featured-footer">
+          <span class="featured-date">{formatDate(props.published, YukinaConfig.locale)}</span>
           {props.tags && props.tags.length > 0 && (
-            <div class="meta-tags">
-              {props.tags.slice(0, 3).map(tag => (
+            <div class="featured-tags">
+              {props.tags.slice(0, 3).map((tag) => (
                 <span class="tag-badge">{tag}</span>
               ))}
             </div>
@@ -111,270 +91,201 @@ const isCompact = props.isCompact ?? false;
 )}
 
 <style>
-  /* Compact Mobile Card Styles */
-  .mobile-post-card-compact {
-    background: var(--card-color);
-    border-radius: 16px;
+  .mobile-card {
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease;
+    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
+    margin-bottom: 0.9rem;
+    transition: transform 0.2s var(--transition-timing),
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
-  .mobile-post-card-compact:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  .mobile-card:active {
+    transform: scale(0.97);
+    border-color: var(--token-accent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--token-accent) 16%, transparent);
   }
 
   .card-link {
-    text-decoration: none;
     color: inherit;
+    text-decoration: none;
     display: block;
   }
 
-  .card-content {
+  .compact .card-link {
     display: flex;
-    padding: 1rem;
-    gap: 1rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
   }
 
-  .card-image {
+  .compact-image-wrap {
     flex-shrink: 0;
-    width: 100px;
-    height: 75px;
-    border-radius: 12px;
+    width: 120px;
+    height: 88px;
+    border-radius: 11px;
     overflow: hidden;
-    background: var(--border-color);
+    border: 1px solid var(--border-color);
   }
 
-  .card-image img {
+  .compact-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .card-body {
-    flex: 1;
+  .compact-body {
     min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
+    display: grid;
+    gap: 0.35rem;
   }
 
-  .card-title {
-    font-size: var(--mobile-text-base);
-    font-weight: 600;
+  .compact-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 0.98rem;
     line-height: 1.4;
     color: var(--text-color);
-    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    margin: 0;
+    overflow: hidden;
   }
 
-  .card-description {
-    font-size: var(--mobile-text-sm);
+  .compact-description {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.5;
     color: var(--text-color-lighten);
-    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-    margin: 0;
+    overflow: hidden;
   }
 
-  .card-meta {
-    display: flex;
-    align-items: center;
-    font-size: var(--mobile-text-xs);
-    color: var(--text-color-lighten);
-    gap: 0.375rem;
+  .compact-meta {
     margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.74rem;
+    color: var(--text-color-lighten);
   }
 
-  .meta-separator {
-    opacity: 0.5;
+  .meta-dot {
+    opacity: 0.55;
   }
 
-  /* Full Mobile Card Styles */
-  .mobile-post-card {
-    background: var(--card-color);
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s ease;
-  }
-
-  .mobile-post-card:active {
-    transform: scale(0.98);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  }
-
-  .card-image-container {
+  .featured-image-wrap {
     position: relative;
     width: 100%;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
   }
 
-  .card-image-full {
+  .featured-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .card-overlay {
+  .featured-overlay {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  }
-
-  .overlay-meta {
+    inset: auto 0 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--text-color) 8%, transparent),
+      color-mix(in oklch, var(--text-color) 42%, transparent)
+    );
   }
 
-  .meta-badge {
-    background: var(--accent-color);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: var(--mobile-text-xs);
+  .featured-category {
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklch, var(--background-color) 20%, transparent);
+    background: color-mix(in oklch, var(--primary-color) 60%, transparent);
+    color: color-mix(in oklch, var(--background-color) 94%, var(--card-color));
+    padding: 0.2rem 0.65rem;
+    font-size: 0.72rem;
     font-weight: 600;
   }
 
-  .meta-reading-time {
-    display: flex;
+  .featured-reading-time {
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    color: white;
-    font-size: var(--mobile-text-sm);
+    gap: 0.22rem;
+    color: color-mix(in oklch, var(--background-color) 92%, var(--card-color));
+    font-size: 0.78rem;
+    font-weight: 600;
   }
 
-  .card-content-full {
-    padding: 1.25rem;
+  .featured-body {
+    padding: 0.95rem;
+    display: grid;
+    gap: 0.6rem;
   }
 
-  .card-title-full {
-    font-size: var(--mobile-text-xl);
-    font-weight: 700;
-    line-height: 1.3;
+  .featured-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 1.1rem;
+    line-height: 1.35;
     color: var(--text-color);
-    margin: 0 0 0.75rem 0;
-    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .card-description-full {
-    font-size: var(--mobile-text-base);
-    line-height: 1.6;
+  .featured-description {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.65;
     color: var(--text-color-lighten);
-    margin: 0 0 1rem 0;
-    overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  .card-meta-full {
+  .featured-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .meta-date-full {
-    font-size: var(--mobile-text-sm);
-    color: var(--text-color-lighten);
-  }
-
-  .meta-tags {
-    display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
   }
 
+  .featured-date {
+    font-size: 0.78rem;
+    color: var(--text-color-lighten);
+  }
+
+  .featured-tags {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
   .tag-badge {
-    background: var(--primary-color-transparent);
+    border-radius: 9999px;
+    border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--primary-color-lighten) 72%, var(--card-color));
     color: var(--primary-color);
-    padding: 0.125rem 0.5rem;
-    border-radius: 12px;
-    font-size: var(--mobile-text-xs);
-    font-weight: 500;
-  }
-
-  /* Dark mode adjustments */
-  :root.dark .mobile-post-card-compact,
-  :root.dark .mobile-post-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  }
-
-  :root.dark .mobile-post-card-compact:active,
-  :root.dark .mobile-post-card:active {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  :root.dark .meta-badge {
-    background: var(--primary-color);
-  }
-
-  /* Responsive adjustments */
-  @media (min-width: 375px) {
-    .card-image {
-      width: 120px;
-      height: 90px;
-    }
-
-    .card-image-container {
-      height: 240px;
-    }
+    padding: 0.14rem 0.5rem;
+    font-size: 0.72rem;
+    line-height: 1.1;
   }
 
   @media (min-width: 768px) {
-    /* Hide mobile cards on larger screens */
-    .mobile-post-card-compact,
-    .mobile-post-card {
+    .mobile-card {
       display: none;
-    }
-  }
-
-  /* Landscape mode adjustments */
-  @media (max-width: 768px) and (orientation: landscape) {
-    .card-image-container {
-      height: 180px;
-    }
-
-    .card-content-full {
-      padding: 1rem;
-    }
-  }
-
-  /* Accessibility */
-  @media (prefers-reduced-motion: reduce) {
-    .mobile-post-card-compact,
-    .mobile-post-card {
-      transition: none;
-    }
-  }
-
-  /* High contrast mode */
-  @media (prefers-contrast: high) {
-    .mobile-post-card-compact,
-    .mobile-post-card {
-      border: 1px solid var(--border-color);
-    }
-
-    .meta-badge,
-    .tag-badge {
-      border: 1px solid currentColor;
     }
   }
 </style>

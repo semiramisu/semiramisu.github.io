@@ -75,6 +75,58 @@
   transform: translate3d(0, 0, 0);
 }
 
+/* Gradient rotation animation */
+@keyframes gradient-rotate {
+  0% { --gradient-angle: 0deg; }
+  100% { --gradient-angle: 360deg; }
+}
+
+/* Scale in from center */
+@keyframes scale-in {
+  0% {
+    transform: scale3d(0.92, 0.92, 1);
+    opacity: 0;
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+  0% {
+    transform: translate3d(-1.5rem, 0, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+/* Blur in effect */
+@keyframes blur-in {
+  0% {
+    filter: blur(8px);
+    opacity: 0;
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+/* Gentle floating motion */
+@keyframes float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
 /* アニメーション終了後のクリーンアップ */
 .animation-finished {
   will-change: auto;

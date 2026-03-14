@@ -13,200 +13,302 @@ const categoryKeys = [...categories.keys()];
 const tagKeys = [...tags.keys()];
 ---
 
-<div class="sidebar-content flex w-full flex-row justify-center">
-  <div class="flex flex-col space-y-3">
-    <div
-      class="onload-animation rounded-3xl bg-[var(--card-color)] p-3"
+<div class="sidebar-content" id="sidebar-container">
+  <div class="sidebar-stack">
+    <section
+      class="sidebar-card profile-card onload-animation"
       style=`animation-delay: var(--onload-animation-delay);`
     >
-      <a href="/about" class="avatar-wrapper">
-        <img
-          src={YukinaConfig.avatarUrl}
-          alt="avatar"
-          class="avatar lozad select-none"
-        />
+      <a href="/about" class="avatar-wrapper" aria-label="About">
+        <img src={YukinaConfig.avatarUrl} alt="avatar" class="avatar lozad" />
       </a>
-      <div class="username mt-4">
-        <p>{YukinaConfig.username}</p>
-      </div>
-      <p class="slogan mt-2 text-center text-[var(--text-color-lighten)]">
-        {YukinaConfig.sign}
-      </p>
-      {
-        YukinaConfig.socialLinks.length > 0 && (
-          <div class="mt-1 flex flex-row justify-center">
-            <div class="flex w-[184px] flex-wrap justify-center gap-2">
-              {YukinaConfig.socialLinks.map((item) => (
-                <SocialIcon name={item.icon} link={item.link} />
-              ))}
-            </div>
-          </div>
-        )
-      }
-      
-      <!-- X Timeline -->
-      <div class="mt-4 twitter-timeline-container">
-        <a class="twitter-timeline" data-height="300" href="https://twitter.com/semiramisuWeb3?ref_src=twsrc%5Etfw">Tweets by semiramisuWeb3</a>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-    </div>
 
-    <!-- categories -->
+      <div class="profile-meta">
+        <p class="username">{YukinaConfig.username}</p>
+        <p class="slogan">{YukinaConfig.sign}</p>
+      </div>
+
+      {YukinaConfig.socialLinks.length > 0 && (
+        <div class="social-grid">
+          {YukinaConfig.socialLinks.map((item) => (
+            <SocialIcon name={item.icon} link={item.link} />
+          ))}
+        </div>
+      )}
+    </section>
+
     {
       categories.size !== 0 && (
-        <div
-          class="onload-animation space-y-2 rounded-3xl bg-[var(--card-color)] p-3"
+        <section
+          class="sidebar-card onload-animation"
           style="animation-delay: calc(var(--onload-animation-delay) + 1 * var(--onload-animation-interval));"
         >
-          <div class="title m-[0.375rem]">
-            <a
-              href="/categories/"
-              class="pl-4 text-xl font-bold text-[var(--text-color)] transition-colors hover:text-[var(--primary-color)]"
-            >
+          <header class="card-title-row">
+            <span class="title-marker"></span>
+            <a href="/categories/" class="card-title-link">
               {i18n(I18nKeys.side_bar_categories)}
             </a>
-          </div>
-          <div class="relative flex flex-col">
+          </header>
+
+          <div class="category-list">
             {categoryKeys
               .slice(0, YukinaConfig.maxSidebarCategoryChip + 1)
               .map((category) => (
-                <a
-                  href={`/categories/${category}`}
-                  class="category flex flex-row items-center justify-between rounded-lg px-3 py-2 transition-all hover:bg-[var(--primary-color-lighten)]"
-                >
-                  <p class="text-[var(--text-color)] transition-all">
-                    {categories.get(category)!.name}
-                  </p>
-                  <span class="rounded-md bg-[var(--primary-color-lighten)] px-2.5 py-0.5 text-[var(--primary-color)]">
-                    {categories.get(category)!.posts.length}
-                  </span>
+                <a href={`/categories/${category}`} class="category-item">
+                  <span class="category-text">{categories.get(category)!.name}</span>
+                  <span class="category-badge">{categories.get(category)!.posts.length}</span>
                 </a>
               ))}
-            {categoryKeys.length >= YukinaConfig.maxSidebarCategoryChip + 1 && (
-              <div class="absolute bottom-0 flex h-11 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
-                <a
-                  href="/categories/"
-                  class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
-                >
-                  <span>{i18n(I18nKeys.side_bar_view_more)}</span>
-                  <Icon name="mingcute:arrow-right-line" />
-                </a>
-              </div>
-            )}
           </div>
-        </div>
+
+          {categoryKeys.length >= YukinaConfig.maxSidebarCategoryChip + 1 && (
+            <a href="/categories/" class="view-more-link">
+              <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+              <Icon name="mingcute:arrow-right-line" size={16} />
+            </a>
+          )}
+        </section>
       )
     }
 
-    <!-- tags -->
     {
       tags.size !== 0 && (
-        <div
-          class="onload-animation space-y-2 rounded-3xl bg-[var(--card-color)] p-3"
+        <section
+          class="sidebar-card onload-animation"
           style="animation-delay: calc(var(--onload-animation-delay) + 2 * var(--onload-animation-interval));"
         >
-          <div class="title m-[0.375rem]">
-            <a
-              href="/tags/"
-              class="pl-4 text-xl font-bold text-[var(--text-color)] transition-colors hover:text-[var(--primary-color)]"
-            >
+          <header class="card-title-row">
+            <span class="title-marker"></span>
+            <a href="/tags/" class="card-title-link">
               {i18n(I18nKeys.side_bar_tags)}
             </a>
-          </div>
-          <div class="relative flex max-w-[224px] flex-row flex-wrap">
+          </header>
+
+          <div class="tag-grid">
             {tagKeys.slice(0, YukinaConfig.maxSidebarTagChip + 1).map((tag) => (
-              <a
-                href={`/tags/${tag}`}
-                class="tag m-1 grow rounded-md bg-[var(--primary-color-lighten)] px-2 py-1 transition-all hover:brightness-95"
-              >
-                <p class="text-center text-sm text-[var(--primary-color)]">
-                  {tags.get(tag)!.name}
-                </p>
-              </a>
+              <a href={`/tags/${tag}`} class="tag-item">{tags.get(tag)!.name}</a>
             ))}
-            {tagKeys.length >= YukinaConfig.maxSidebarTagChip + 1 && (
-              <div class="absolute bottom-0 flex h-10 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
-                <a
-                  href="/tags/"
-                  class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
-                >
-                  <span>{i18n(I18nKeys.side_bar_view_more)}</span>
-                  <Icon name="mingcute:arrow-right-line" />
-                </a>
-              </div>
-            )}
           </div>
-        </div>
+
+          {tagKeys.length >= YukinaConfig.maxSidebarTagChip + 1 && (
+            <a href="/tags/" class="view-more-link">
+              <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+              <Icon name="mingcute:arrow-right-line" size={16} />
+            </a>
+          )}
+        </section>
       )
     }
   </div>
 </div>
+
 <style>
   .sidebar-content {
     width: 100%;
   }
-  
-  .avatar-wrapper::after {
-    @apply absolute left-3 top-3 h-56 w-56 rounded-xl transition-all content-[''];
+
+  .sidebar-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
   }
 
-  .avatar-wrapper::after:hover {
-    @apply bg-black/25 dark:bg-black/50;
+  .sidebar-card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    background: var(--card-color);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: calc(var(--radius-card) - 2px);
+    border: 2px solid transparent;
+    transition: transform var(--transition-speed) var(--transition-timing),
+      border-color 0.3s ease;
+  }
+
+  .avatar-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: inherit;
+    background: var(--gradient-border);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .avatar-wrapper:hover {
+    transform: translateY(-2px);
+  }
+
+  .avatar-wrapper:hover::before {
+    opacity: 1;
   }
 
   .avatar {
-    @apply h-56 w-56 rounded-xl transition-all hover:cursor-pointer;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
   }
 
-  .username > p {
-    @apply text-center text-xl font-semibold text-[var(--text-color)];
+  .profile-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .username {
+    margin: 0;
     font-family: var(--title-font);
-  }
-
-  .username > div {
-    @apply mx-auto mt-1 h-1 w-8 rounded-full bg-[var(--primary-color)];
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-color);
   }
 
   .slogan {
-    font-family: var(--title-font);
+    margin: 0;
+    text-align: center;
+    color: var(--text-color-lighten);
+    font-size: 0.88rem;
+    line-height: 1.5;
   }
 
-  .twitter-timeline-container {
-    @apply w-full overflow-hidden;
-    max-height: 300px;
-  }
-
-  .title {
+  .social-grid {
     display: flex;
-    flex-direction: row;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xs);
+  }
+
+  .card-title-row {
+    display: flex;
     align-items: center;
-    position: relative;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
   }
 
-  .title::before {
-    position: absolute;
-    display: block;
-    content: " ";
-    background-color: var(--primary-color);
-    top: 3px;
-    bottom: 3px;
+  .title-marker {
+    display: inline-flex;
     width: 0.3rem;
-    border-radius: 4px;
+    height: 1.1rem;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-border);
   }
 
-  .title p {
-    font-family: var(--primary-font);
+  .card-title-link {
+    font-family: var(--title-font);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+    transition: color var(--transition-speed) var(--transition-timing);
   }
 
-  .category {
-    font-family: var(--primary-font);
+  .card-title-link:hover {
+    color: var(--primary-color);
   }
 
-  .category:hover > p {
-    @apply pl-2 text-[var(--primary-color)];
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
   }
 
-  .tag {
-    font-family: var(--primary-font);
+  .category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    border: 1px solid var(--border-color);
+    border-radius: 0.8rem;
+    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
+    padding: 0.5rem 0.65rem;
+    transition: background-color var(--transition-speed) var(--transition-timing),
+      border-color var(--transition-speed) var(--transition-timing);
+  }
+
+  .category-item:hover {
+    background: var(--primary-color-hover);
+    border-color: var(--primary-color-lighten);
+  }
+
+  .category-text {
+    font-size: 0.88rem;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.6rem;
+    border-radius: var(--radius-pill);
+    background: var(--primary-color-lighten);
+    color: var(--primary-color-darken);
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.55;
+    padding: 0 0.32rem;
+  }
+
+  .tag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .tag-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-pill);
+    background: var(--primary-color-hover);
+    color: var(--primary-color);
+    padding: 0.35rem 0.62rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition: filter var(--transition-speed) var(--transition-timing);
+  }
+
+  .tag-item:hover {
+    filter: brightness(0.98);
+  }
+
+  .view-more-link {
+    margin-top: var(--space-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--primary-color);
+    font-size: 0.84rem;
+    font-weight: 600;
+    transition: gap 0.3s ease;
+  }
+
+  .view-more-link:hover {
+    gap: var(--space-sm);
   }
 </style>

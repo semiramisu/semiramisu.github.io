@@ -1,7 +1,6 @@
 ---
 import { IdToSlug } from "../utils/hash";
 import { Icon } from "astro-icon/components";
-import PostCardInfoIcon from "./widgets/PostCardInfoIcon.astro";
 import { GetCoverURLForUnspecifiedEntry } from "../utils/cover";
 import { i18n } from "../locales/translation";
 import I18nKeys from "../locales/keys";
@@ -23,115 +22,245 @@ export interface Props {
 }
 
 const props = Astro.props;
-// IDが既にパスを含んでいる場合はそのまま使用し、そうでない場合はIdToSlugを適用
-const baseUrl = props.id.startsWith('/') ? props.id : `/posts/${IdToSlug(props.id)}`;
-const langParam = props.lang === 'en' ? '?lang=en' : '';
+const baseUrl = props.id.startsWith("/") ? props.id : `/posts/${IdToSlug(props.id)}`;
+const langParam = props.lang === "en" ? "?lang=en" : "";
 const contentUrl = `${baseUrl}${langParam}`;
-const entryID = props.id.startsWith('/') ? props.id.split('/').pop()! : IdToSlug(props.id);
+const entryID = props.id.startsWith("/") ? props.id.split("/").pop()! : IdToSlug(props.id);
 const { time = 0, wordCount = 0 } = props.readingMetadata ?? { time: 0, wordCount: 0 };
 
-// 画像URLを取得（外部URLの場合はそのまま使用）
 const imageUrl = props.image ?? GetCoverURLForUnspecifiedEntry(entryID);
-const isExternalImage = imageUrl.startsWith('http');
 ---
 
-<div
-  class="flex flex-col rounded-3xl bg-[var(--card-color)] overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full"
->
-  <a
-    href={contentUrl}
-    class="relative h-[200px] transition-all hover:brightness-90"
-  >
+<article class="post-card">
+  <a href={contentUrl} class="post-image-link">
     <ResponsiveImage
-      class="absolute left-0 top-0 h-full w-full object-cover"
+      class="post-image"
       src={imageUrl}
-      alt="CoverPost"
-      width={400}
-      height={200}
+      alt={props.title}
+      width={560}
+      height={320}
     />
-    <div class="absolute bottom-2 w-full">
-      <div class="mx-2 flex flex-row justify-between">
-        <div
-          class="flex flex-row items-center space-x-2 rounded-md bg-black/50 px-1.5 py-0.5 text-[var(--primary-color-lighten)] dark:text-[var(--text-color)]"
-        >
-          <Icon name="cuida:calendar-outline" />
-          <span class="select-none">
-            {formatDate(props.published, YukinaConfig.locale)}
-          </span>
-        </div>
-        {
-          props.category && (
-            <div class="flex flex-row items-center space-x-2 rounded-md bg-black/50 px-1.5 py-0.5 text-[var(--primary-color-lighten)] dark:text-[var(--text-color)]">
-              <Icon name="dashicons:category" />
-              <span class="max-w-28 select-none truncate">
-                {props.category}
-              </span>
-            </div>
-          )
-        }
-      </div>
+    <div class="post-meta-overline">
+      <span class="meta-chip">
+        <Icon name="cuida:calendar-outline" class="meta-icon" />
+        {formatDate(props.published, YukinaConfig.locale)}
+      </span>
+      {props.category && (
+        <span class="meta-chip">
+          <Icon name="dashicons:category" class="meta-icon" />
+          <span class="chip-text">{props.category}</span>
+        </span>
+      )}
     </div>
   </a>
-  <div class="flex flex-col h-auto min-h-[150px] p-5 flex-grow">
-    <div class="flex w-full flex-row items-center mb-3">
-        <div
-        class="mr-2 h-5 w-1 rounded-lg bg-[var(--primary-color)]"
-        >
-        </div>
-        <a href={contentUrl} class="title">
-        <p class="line-clamp-2">{props.title}</p>
-          <Icon
-            name="cuida:caret-right-outline"
-            class="translate-y-[0.07rem] text-[var(--primary-color)]"
-          />
-        </a>
+
+  <div class="post-content">
+    <a href={contentUrl} class="post-title-link">
+      <h3 class="post-title">{props.title}</h3>
+      <Icon name="cuida:caret-right-outline" class="title-arrow" />
+    </a>
+
+    <p class="post-description">{props.description}</p>
+
+    {props.tags && props.tags.length > 0 && (
+      <div class="tag-row">
+        {props.tags.slice(0, 3).map((tag) => (
+          <span class="tag-item">{tag}</span>
+        ))}
       </div>
-    
-    <div>
-        <p class="desc">{props.description}</p>
-      </div>
-    
-    <div class="mt-auto pt-3">
-      <div class="select-none">
-          <div class="reading-time">
-            <span>
-              {wordCount}
-              {i18n(I18nKeys.post_card_words)}
-            </span>
-            <span>|</span>
-            <span>
-              {time}
-              {i18n(I18nKeys.post_card_minutes)}
-            </span>
-          </div>
-        </div>
+    )}
+
+    <div class="reading-time" aria-label={props.lang === "ja" ? "読了時間" : "Reading metadata"}>
+      <span>
+        {wordCount}
+        {i18n(I18nKeys.post_card_words)}
+      </span>
+      <span class="separator">/</span>
+      <span>
+        {time}
+        {i18n(I18nKeys.post_card_minutes)}
+      </span>
     </div>
   </div>
-</div>
+</article>
+
 <style>
-  .title {
-    @apply flex w-full flex-row items-center space-x-1 align-top text-xl font-semibold text-[var(--text-color)];
-    @apply transition-all hover:text-[var(--primary-color)];
-    font-family: var(--primary-font);
+  .post-card {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.3s var(--transition-timing),
+      box-shadow 0.3s var(--transition-timing),
+      border-color 0.3s var(--transition-timing);
   }
 
-  .data {
-    font-family: var(--primary-font);
-    @apply flex flex-row items-center;
+  .post-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient-border);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
   }
 
-  .data > span {
-    @apply inline-block self-center truncate align-middle text-[var(--text-color-lighten)];
-    font-family: var(--primary-font);
+  .post-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: var(--shadow-dramatic);
+    border-color: transparent;
   }
 
-  .desc {
-    @apply line-clamp-2 text-[var(--text-color-lighten)];
-    font-family: var(--primary-font);
+  .post-card:hover::before {
+    opacity: 1;
+  }
+
+  .post-image-link {
+    position: relative;
+    display: block;
+    min-height: 220px;
+    text-decoration: none;
+  }
+
+  .post-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s var(--transition-timing), filter 0.4s ease;
+  }
+
+  .post-card:hover .post-image {
+    transform: scale(1.05);
+    filter: brightness(1.05);
+  }
+
+  .post-meta-overline {
+    position: absolute;
+    inset: auto 0.65rem 0.65rem;
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklch, var(--background-color) 22%, transparent);
+    background: color-mix(in oklch, var(--text-color) 32%, transparent);
+    color: color-mix(in oklch, var(--background-color) 94%, var(--card-color));
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+
+  .chip-text {
+    max-width: 10.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .meta-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .post-content {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .post-title-link {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.25rem;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+
+  .post-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 1.1rem;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.3s ease;
+  }
+
+  .post-card:hover .post-title {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .title-arrow {
+    margin-top: 0.1rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .post-card:hover .title-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .post-description {
+    margin: 0;
+    color: var(--text-color-lighten);
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 4.95rem;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .tag-item {
+    border-radius: 9999px;
+    padding: 0.16rem 0.55rem;
+    border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--primary-color-lighten) 72%, var(--card-color));
+    color: var(--primary-color);
+    font-size: 0.74rem;
+    line-height: 1.1;
   }
 
   .reading-time {
-    @apply space-x-3 align-middle text-sm text-[var(--text-color-lighten)];
-    font-family: var(--primary-font);
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-color-lighten);
+    font-size: 0.8rem;
+  }
+
+  .separator {
+    opacity: 0.6;
   }
 </style>

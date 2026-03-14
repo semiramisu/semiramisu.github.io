@@ -1,143 +1,202 @@
 ---
-// スタイルはlink要素で非同期読み込みする
 import "../styles/mobile-typography.css";
 import "../styles/mobile-performance.css";
+import "../styles/design-system.css";
 ---
 
 <style is:global>
-  /* テーマの基本設定 */
   :root {
-    --hue: 240;
-    
-    /* アクセントカラー（より鮮やかで目立つ色） */
-    --accent-hue: 340;
-    --success-hue: 140;
-    --warning-hue: 45;
-    --error-hue: 10;
+    --hue-primary: 240;
+    --hue-accent: 165;
 
-    /* ライトモードとダークモードの両方で使う共通変数 */
-    --primary-font: "Noto Sans SC", sans-serif;
-    --brand-font: "Raleway", "Noto Sans SC", sans-serif;
+    /* Typography tokens */
+    --brand-font: "Playfair Display", "Noto Serif JP", serif;
+    --title-font: "Space Grotesk", "Noto Sans JP", sans-serif;
+    --subtitle-font: "Space Grotesk", "Noto Sans JP", sans-serif;
+    --primary-font: "Inter", "Noto Sans JP", sans-serif;
     --code-font: "JetBrains Mono", "Fira Code", monospace;
-    --page-width-lg: 992px;
-    --page-width-xl: 1264px;
+
+    /* Layout and motion tokens */
+    --page-width-lg: 1120px;
+    --page-width-xl: 1280px;
     --banner-height: 55vh;
-    --title-font: var(--brand-font);
-    --subtitle-font: var(--brand-font);
-    --onload-animation-delay: 100ms;
-    --onload-animation-interval: 100ms;
-    --transition-speed: 0.3s;
-    --transition-timing: ease;
-    
-    /* ライトモード用の色設定（コントラスト比改善） */
-    --light-primary-color: oklch(55% 0.22 var(--hue));
-    --light-primary-color-lighten: oklch(92% 0.05 var(--hue));
-    --light-primary-color-darken: oklch(35% 0.25 var(--hue));
-    --light-primary-color-hover: oklch(88% 0.035 var(--hue));
-    --light-primary-color-transparent: oklch(55% 0.22 var(--hue) / 15%);
-    --light-text-color: oklch(15% 0 0);
-    --light-text-color-lighten: oklch(40% 0 0);
-    --light-card-color: oklch(100% 0 0);
-    --light-card-color-transparent: oklch(100% 0 0 / 90%);
-    --light-background-color: oklch(98% 0.005 var(--hue));
-    --light-border-color: oklch(92% 0.015 var(--hue));
-    --light-title-color: oklch(100% 0 0 / 98%);
-    --light-subtitle-color: oklch(100% 0 0 / 90%);
-    
-    /* アクセントカラー（ライトモード） */
-    --light-accent-color: oklch(60% 0.25 var(--accent-hue));
-    --light-success-color: oklch(55% 0.18 var(--success-hue));
-    --light-warning-color: oklch(65% 0.15 var(--warning-hue));
-    --light-error-color: oklch(55% 0.22 var(--error-hue));
-    
-    /* ダークモード用の色設定（より良いコントラスト） */
-    --dark-primary-color: oklch(70% 0.18 var(--hue));
-    --dark-primary-color-lighten: oklch(35% 0.06 var(--hue));
-    --dark-primary-color-darken: oklch(55% 0.25 var(--hue));
-    --dark-primary-color-hover: oklch(25% 0.04 var(--hue));
-    --dark-text-color: oklch(98% 0.002 var(--hue));
-    --dark-text-color-lighten: oklch(88% 0.002 var(--hue));
-    --dark-card-color: oklch(18% 0.015 var(--hue));
-    --dark-card-color-lighten: oklch(28% 0.03 var(--hue));
-    --dark-card-color-transparent: oklch(20% 0.02 var(--hue) / 90%);
-    --dark-background-color: oklch(12% 0.01 var(--hue));
-    --dark-border-color: oklch(25% 0.025 var(--hue));
-    --dark-title-color: oklch(100% 0 0 / 98%);
-    --dark-subtitle-color: oklch(100% 0 0 / 90%);
-    
-    /* アクセントカラー（ダークモード） */
-    --dark-accent-color: oklch(75% 0.22 var(--accent-hue));
-    --dark-success-color: oklch(70% 0.16 var(--success-hue));
-    --dark-warning-color: oklch(75% 0.18 var(--warning-hue));
-    --dark-error-color: oklch(70% 0.20 var(--error-hue));
-    
-    /* デフォルトはライトモード */
+    --onload-animation-delay: 120ms;
+    --onload-animation-interval: 90ms;
+    --transition-speed: 0.24s;
+    --transition-timing: cubic-bezier(0.2, 0.75, 0.2, 1);
+
+    /* Spacing scale */
+    --space-xs: 0.375rem;
+    --space-sm: 0.625rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2.25rem;
+    --space-2xl: 3.5rem;
+
+    /* Radius and shadow tokens */
+    --radius-card: 14px;
+    --radius-pill: 9999px;
+    --shadow-soft: 0 0.75rem 2rem color-mix(in oklch, var(--text-main) 8%, transparent);
+    --shadow-hover: 0 1rem 2.4rem color-mix(in oklch, var(--text-main) 12%, transparent);
+    --shadow-subtle: 0 1px 3px color-mix(in oklch, var(--text-main) 6%, transparent);
+    --shadow-medium: 0 4px 16px color-mix(in oklch, var(--text-main) 10%, transparent);
+    --shadow-dramatic: 0 1.5rem 3rem color-mix(in oklch, var(--text-main) 16%, transparent);
+
+    /* Design tokens (source of truth) */
+    --token-primary: oklch(0.55 0.18 240);
+    --token-primary-darken: oklch(0.45 0.20 240);
+    --token-primary-lighten: oklch(0.72 0.10 240);
+    --token-accent: oklch(0.68 0.14 165);
+    --token-accent-darken: oklch(0.55 0.14 165);
+    --token-accent-lighten: oklch(0.82 0.08 165);
+    --token-background: oklch(0.98 0.01 250);
+    --token-surface: oklch(0.99 0.01 250);
+    --token-text-main: oklch(0.28 0.03 255);
+    --token-text-sub: oklch(0.46 0.02 255);
+    --token-border: oklch(0.86 0.01 255);
+
+    /* Gradient tokens */
+    --gradient-hero: linear-gradient(135deg, var(--token-primary) 0%, var(--token-accent) 100%);
+    --gradient-text: linear-gradient(135deg, var(--token-primary) 0%, var(--token-accent) 100%);
+    --gradient-border: linear-gradient(135deg, var(--token-primary), var(--token-accent));
+    --gradient-angle: 135deg;
+
+    /* Light theme aliases */
+    --light-primary-color: var(--token-primary);
+    --light-primary-color-darken: var(--token-primary-darken);
+    --light-primary-color-lighten: var(--token-primary-lighten);
+    --light-primary-color-hover: color-mix(in oklch, var(--token-primary) 14%, transparent);
+    --light-primary-color-transparent: color-mix(
+      in oklch,
+      var(--token-primary) 16%,
+      transparent
+    );
+    --light-text-color: var(--token-text-main);
+    --light-text-color-lighten: var(--token-text-sub);
+    --light-card-color: var(--token-surface);
+    --light-card-color-lighten: color-mix(in oklch, var(--token-surface) 74%, var(--token-background));
+    --light-card-color-transparent: color-mix(in oklch, var(--token-surface) 90%, transparent);
+    --light-background-color: var(--token-background);
+    --light-border-color: var(--token-border);
+    --light-title-color: var(--token-text-main);
+    --light-subtitle-color: var(--token-text-sub);
+
+    /* Dark theme aliases */
+    --dark-primary-color: var(--token-primary-lighten);
+    --dark-primary-color-darken: var(--token-primary);
+    --dark-primary-color-lighten: color-mix(
+      in oklch,
+      var(--token-primary-lighten) 70%,
+      var(--token-background)
+    );
+    --dark-primary-color-hover: color-mix(
+      in oklch,
+      var(--token-primary-lighten) 18%,
+      transparent
+    );
+    --dark-primary-color-transparent: color-mix(
+      in oklch,
+      var(--token-primary-lighten) 20%,
+      transparent
+    );
+    --dark-text-color: var(--token-background);
+    --dark-text-color-lighten: color-mix(in oklch, var(--token-background) 76%, var(--token-surface));
+    --dark-card-color: color-mix(in oklch, var(--token-text-main) 88%, var(--token-text-sub));
+    --dark-card-color-lighten: color-mix(in oklch, var(--token-text-main) 72%, var(--token-text-sub));
+    --dark-card-color-transparent: color-mix(
+      in oklch,
+      color-mix(in oklch, var(--token-text-main) 88%, var(--token-text-sub)) 86%,
+      transparent
+    );
+    --dark-background-color: var(--token-text-main);
+    --dark-border-color: color-mix(in oklch, var(--token-border) 38%, var(--token-background));
+    --dark-title-color: var(--token-background);
+    --dark-subtitle-color: color-mix(in oklch, var(--token-background) 82%, var(--token-surface));
+
+    /* Semantic tokens used across components */
     --primary-color: var(--light-primary-color);
-    --primary-color-lighten: var(--light-primary-color-lighten);
     --primary-color-darken: var(--light-primary-color-darken);
+    --primary-color-lighten: var(--light-primary-color-lighten);
     --primary-color-hover: var(--light-primary-color-hover);
     --primary-color-transparent: var(--light-primary-color-transparent);
+
+    --background-color: var(--light-background-color);
+    --card-color: var(--light-card-color);
+    --card-color-lighten: var(--light-card-color-lighten);
+    --card-color-transparent: var(--light-card-color-transparent);
+    --border-color: var(--light-border-color);
+
     --text-color: var(--light-text-color);
     --text-color-lighten: var(--light-text-color-lighten);
-    --card-color: var(--light-card-color);
-    --card-color-transparent: var(--light-card-color-transparent);
-    --background-color: var(--light-background-color);
-    --border-color: var(--light-border-color);
     --title-color: var(--light-title-color);
     --subtitle-color: var(--light-subtitle-color);
-    --accent-color: var(--light-accent-color);
-    --success-color: var(--light-success-color);
-    --warning-color: var(--light-warning-color);
-    --error-color: var(--light-error-color);
-    
-    /* RGBバージョン（透明度操作用） */
-    --primary-color-rgb: 88, 104, 255;
-    --accent-color-rgb: 255, 64, 129;
+
+    --accent-color: var(--token-accent);
+    --accent-color-darken: var(--token-accent-darken);
+    --accent-color-lighten: var(--token-accent-lighten);
+    --success-color: var(--token-accent-darken);
+    --warning-color: var(--primary-color-lighten);
+    --error-color: var(--primary-color-darken);
+
+    --primary-color-rgb: 79, 70, 229;
+    --accent-color-rgb: 45, 212, 191;
   }
 
-  /* ダークモード設定 */
-  :root.dark {
+  :root.dark,
+  html[data-theme="dark"] {
     --primary-color: var(--dark-primary-color);
-    --primary-color-lighten: var(--dark-primary-color-lighten);
     --primary-color-darken: var(--dark-primary-color-darken);
+    --primary-color-lighten: var(--dark-primary-color-lighten);
     --primary-color-hover: var(--dark-primary-color-hover);
-    --text-color: var(--dark-text-color);
-    --text-color-lighten: var(--dark-text-color-lighten);
+    --primary-color-transparent: var(--dark-primary-color-transparent);
+
+    --background-color: var(--dark-background-color);
     --card-color: var(--dark-card-color);
     --card-color-lighten: var(--dark-card-color-lighten);
     --card-color-transparent: var(--dark-card-color-transparent);
-    --background-color: var(--dark-background-color);
     --border-color: var(--dark-border-color);
+
+    --text-color: var(--dark-text-color);
+    --text-color-lighten: var(--dark-text-color-lighten);
     --title-color: var(--dark-title-color);
     --subtitle-color: var(--dark-subtitle-color);
-    --accent-color: var(--dark-accent-color);
-    --success-color: var(--dark-success-color);
-    --warning-color: var(--dark-warning-color);
-    --error-color: var(--dark-error-color);
-    
-    /* RGBバージョン（透明度操作用） */
-    --primary-color-rgb: 139, 157, 255;
-    --accent-color-rgb: 255, 119, 170;
-  }
-  
-  /* 読書モード（暖色系） */
-  :root.reading-mode {
-    --hue: 35;
-    --background-color: oklch(96% 0.02 var(--hue));
-    --text-color: oklch(20% 0.02 var(--hue));
-    --card-color: oklch(98% 0.01 var(--hue));
-    --primary-color: oklch(50% 0.15 var(--hue));
-  }
-  
-  :root.dark.reading-mode {
-    --hue: 35;
-    --background-color: oklch(15% 0.02 var(--hue));
-    --text-color: oklch(92% 0.01 var(--hue));
-    --card-color: oklch(20% 0.015 var(--hue));
-    --primary-color: oklch(65% 0.12 var(--hue));
+
+    --accent-color: var(--token-accent-lighten);
+    --accent-color-darken: var(--token-accent);
+    --accent-color-lighten: color-mix(in oklch, var(--token-accent-lighten) 80%, white);
+    --success-color: var(--token-accent);
+    --warning-color: var(--dark-primary-color-lighten);
+    --error-color: var(--dark-primary-color-darken);
   }
 
-  /* HTML属性でデータテーマを指定した場合の対応 */
+  :root.reading-mode,
+  html.reading-mode {
+    --background-color: color-mix(in oklch, var(--token-background) 88%, var(--token-primary-lighten));
+    --card-color: color-mix(in oklch, var(--token-surface) 88%, var(--token-primary-lighten));
+    --card-color-lighten: color-mix(in oklch, var(--card-color) 82%, var(--token-background));
+    --border-color: color-mix(in oklch, var(--token-border) 72%, var(--token-primary-lighten));
+    --text-color: color-mix(in oklch, var(--token-text-main) 92%, var(--token-primary-darken));
+    --text-color-lighten: color-mix(in oklch, var(--token-text-sub) 88%, var(--token-primary-darken));
+    --primary-color: var(--token-primary-darken);
+    --primary-color-lighten: color-mix(in oklch, var(--token-primary-lighten) 84%, var(--token-background));
+    --primary-color-hover: color-mix(in oklch, var(--token-primary) 12%, transparent);
+    --primary-color-transparent: color-mix(in oklch, var(--token-primary) 16%, transparent);
+  }
+
+  :root.dark.reading-mode,
+  html[data-theme="dark"].reading-mode,
+  html.dark.reading-mode {
+    --background-color: color-mix(in oklch, var(--dark-background-color) 92%, var(--token-primary-darken));
+    --card-color: color-mix(in oklch, var(--dark-card-color) 90%, var(--token-primary-darken));
+    --card-color-lighten: color-mix(in oklch, var(--dark-card-color-lighten) 80%, var(--token-primary-darken));
+    --text-color: color-mix(in oklch, var(--dark-text-color) 94%, var(--token-background));
+    --text-color-lighten: color-mix(in oklch, var(--dark-text-color-lighten) 88%, var(--token-surface));
+    --primary-color: color-mix(in oklch, var(--dark-primary-color) 92%, var(--token-background));
+    --primary-color-lighten: color-mix(in oklch, var(--dark-primary-color-lighten) 82%, var(--token-background));
+    --primary-color-hover: color-mix(in oklch, var(--dark-primary-color) 18%, transparent);
+    --primary-color-transparent: color-mix(in oklch, var(--dark-primary-color) 22%, transparent);
+  }
+
   html[data-theme="dark"] {
     color-scheme: dark;
   }
@@ -146,18 +205,62 @@ import "../styles/mobile-performance.css";
     color-scheme: light;
   }
 
-  /* 進捗バー */
-  .swup-progress-bar {
-    height: 5px;
-    background-color: var(--primary-color);
-  }
-  
   html {
     scroll-behavior: smooth;
+    font-family: var(--primary-font);
+    background-color: var(--background-color);
+    color: var(--text-color);
   }
-  
+
+  body {
+    font-family: var(--primary-font);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    text-rendering: optimizeLegibility;
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--title-font);
+    letter-spacing: 0.01em;
+    color: var(--text-color);
+  }
+
+  a {
+    color: var(--primary-color);
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--code-font);
+  }
+
+  ::selection {
+    color: var(--text-color);
+    background-color: var(--primary-color-transparent);
+  }
+
   *:focus-visible {
     outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+    outline-offset: 3px;
+  }
+
+  @property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 135deg;
+    inherits: false;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 </style>

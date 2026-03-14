@@ -59,7 +59,7 @@
   .mobile-post-card-compact,
   .mobile-bottom-nav,
   .smart-header {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px color-mix(in oklch, var(--text-color) 12%, transparent);
   }
 
   /* Use GPU acceleration for transforms */
@@ -139,7 +139,7 @@
   /* Remove decorative shadows */
   .mobile-post-card,
   .mobile-post-card-compact {
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 1px color-mix(in oklch, var(--text-color) 12%, transparent);
   }
 }
 

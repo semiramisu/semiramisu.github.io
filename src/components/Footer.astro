@@ -12,197 +12,354 @@ const categoryKeys = [...categories.keys()];
 const tagKeys = [...tags.keys()];
 ---
 
-<div class="mx-3 space-y-4">
-  <!-- Owner info card -->
-  <div class="rounded-3xl bg-[var(--card-color)] transition-all lg:hidden">
-    <div class="flex flex-row md:flex-col md:pt-4">
-      <a href="/about" class="relative h-40 w-40 md:hidden">
-        <img
-          class="lozad absolute left-0 top-0 h-40 rounded-l-3xl"
-          data-src={YukinaConfig.avatarUrl}
-          alt="Avatar"
-        />
-        <div
-          class="absolute right-0 top-0 h-40 w-20 bg-gradient-to-l from-[var(--card-color)]"
-        >
+<div class="footer-stack">
+  <section class="mobile-support lg:hidden" aria-label="Footer support cards">
+    <article class="support-card profile-card">
+      <div class="profile-row">
+        <a href="/about" class="avatar-link" aria-label="About">
+          <img
+            class="lozad avatar"
+            data-src={YukinaConfig.avatarUrl}
+            alt={YukinaConfig.username}
+          />
+        </a>
+        <div class="profile-meta">
+          <a href="/about" class="profile-name">{YukinaConfig.username}</a>
+          <p class="profile-sign">{YukinaConfig.sign}</p>
+          <ul class="social-list">
+            {
+              YukinaConfig.socialLinks.map((item) => (
+                <li>
+                  <a href={item.link} class="social-link" aria-label={item.icon}>
+                    <Icon name={item.icon} size={18} />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
         </div>
-      </a>
-      <a
-        class="mx-auto hidden h-40 w-40 cursor-pointer rounded-3xl transition-all hover:brightness-75 md:block"
-      >
-        <img
-          class="lozad h-40 rounded-3xl"
-          data-src={YukinaConfig.avatarUrl}
-          alt="Avatar"
-        />
-      </a>
-      <div class="flex grow flex-col justify-center space-y-4 p-4">
-        <div class="flex flex-col items-center">
-          <a
-            href="/about"
-            class="line-clamp-1 text-xl font-semibold text-[var(--text-color)]"
-          >
-            {YukinaConfig.username}
-          </a>
-          <span class="mb-2 mt-1 h-1 w-8 rounded-full bg-[var(--primary-color)]"
-          ></span>
-          <p class="line-clamp-1 text-[var(--text-color-lighten)]">
-            {YukinaConfig.sign}
-          </p>
+      </div>
+    </article>
+
+    {categoryKeys.length > 0 && (
+      <article class="support-card">
+        <div class="support-title-row">
+          <span class="title-bar" aria-hidden="true"></span>
+          <h3>{i18n(I18nKeys.side_bar_categories)}</h3>
         </div>
-        <ul class="flex flex-row items-center justify-center space-x-6">
+        <div class="category-grid">
           {
-            YukinaConfig.socialLinks.map((item) => (
-              <li>
-                <a href={item.link} class="text-[var(--primary-color)]">
-                  <Icon name={item.icon} size={24} />
-                </a>
-              </li>
+            categoryKeys.slice(0, YukinaConfig.maxFooterCategoryChip).map((category) => (
+              <a href={`/categories/${category}`} class="category-link">
+                <span class="category-name">{categories.get(category)!.name}</span>
+                <span class="category-count">{categories.get(category)!.posts.length}</span>
+              </a>
             ))
           }
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Category card -->
-  <div class="rounded-3xl bg-[var(--card-color)] p-4 transition-all lg:hidden">
-    <div class="mb-2 flex flex-row items-center space-x-2 pl-1.5">
-      <span class="h-6 w-1 rounded-full bg-[var(--primary-color)]"></span>
-      <span class="text-xl font-semibold text-[var(--text-color)]">
-        {i18n(I18nKeys.side_bar_categories)}
-      </span>
-    </div>
-    <div class="relative grid grid-cols-2 gap-1 md:grid-cols-3">
-      {
-        categoryKeys
-          .slice(0, YukinaConfig.maxFooterCategoryChip)
-          .map((category) => (
-            <a
-              href={`/categories/${category}`}
-              class="category flex flex-row items-center justify-between rounded-lg px-2 py-1.5 transition-all hover:bg-[var(--primary-color-lighten)]"
-            >
-              <p class="line-clamp-1 text-[var(--text-color)] transition-all">
-                {categories.get(category)!.name}
-              </p>
-              <span class="rounded-md bg-[var(--primary-color-lighten)] px-2.5 py-0.5 text-[var(--primary-color)]">
-                {categories.get(category)!.posts.length}
-              </span>
-            </a>
-          ))
-      }
-      {
-        categoryKeys.length > YukinaConfig.maxFooterCategoryChip && (
-          <a
-            href={`/categories/${categoryKeys[YukinaConfig.maxFooterCategoryChip]}`}
-            class="category col-span-2 flex flex-row items-center justify-between rounded-lg px-2 py-1.5 transition-all hover:bg-[var(--primary-color-lighten)] md:col-span-3"
-          >
-            <p class="line-clamp-1 text-[var(--text-color)] transition-all">
-              {
-                categories.get(
-                  categoryKeys[YukinaConfig.maxFooterCategoryChip],
-                )!.name
-              }
-            </p>
-            <span class="rounded-md bg-[var(--primary-color-lighten)] px-2.5 py-0.5 text-[var(--primary-color)]">
-              {
-                categories.get(
-                  categoryKeys[YukinaConfig.maxFooterCategoryChip],
-                )!.posts.length
-              }
-            </span>
-          </a>
-          <div class="absolute bottom-0 flex h-11 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
-            <a
-              href="/categories/"
-              class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
-            >
+        </div>
+        {categoryKeys.length > YukinaConfig.maxFooterCategoryChip && (
+          <a href="/categories/" class="view-more-link">
             <span>{i18n(I18nKeys.side_bar_view_more)}</span>
-                <Icon name="mingcute:arrow-right-line" />
-            </a>
-          </div>
-        )
-      }
-    </div>
-  </div>
-
-  <!-- Tag card -->
-  <div class="relative rounded-3xl bg-[var(--card-color)] p-4 transition-all lg:hidden">
-    <div class="mb-2 flex flex-row items-center space-x-2 pl-1.5">
-      <span class="h-6 w-1 rounded-full bg-[var(--primary-color)]"></span>
-      <span class="text-xl font-semibold text-[var(--text-color)]">
-        {i18n(I18nKeys.side_bar_tags)}
-      </span>
-    </div>
-    <div class="flex flex-row flex-wrap">
-      {
-        tagKeys.slice(0, YukinaConfig.maxFooterTagChip + 1).map((tag) => (
-          <a
-            href={`/tags/${tag}`}
-            class="tag m-1 rounded-md bg-[var(--primary-color-lighten)] px-2 py-1 transition-all hover:brightness-95"
-          >
-            <p class="text-sm text-[var(--primary-color)]">
-              {tags.get(tag)!.name}
-            </p>
+            <Icon name="mingcute:arrow-right-line" size={16} />
           </a>
-        ))
-      }
-      {
-        tagKeys.length >= YukinaConfig.maxFooterCategoryChip + 1 && (
-          <div class="absolute bottom-0 flex h-14 w-full flex-row items-center justify-center bg-gradient-to-t from-[var(--card-color)] from-25% to-transparent backdrop-blur-sm">
-            <a
-              href="/tags/"
-              class="flex flex-row items-center space-x-1 text-[var(--primary-color)] transition-colors hover:brightness-75 dark:hover:brightness-125"
-            >
-              <span>{i18n(I18nKeys.side_bar_view_more)}</span>
-              <Icon name="mingcute:arrow-right-line" />
-            </a>
-          </div>
-        )
-      }
-    </div>
-  </div>
+        )}
+      </article>
+    )}
 
-  <!-- Site footer -->
-  <footer>
-    <div
-      class="divide-y divide-dashed divide-black/25 py-4 lg:pt-0 dark:divide-white/25"
-    >
-      <div></div>
-      <div></div>
-    </div>
-    <div
-      class="flex w-full flex-col items-center text-sm text-[var(--text-color-lighten)]"
-    >
-      <p>
-        © {new Date().getFullYear()}
-        {YukinaConfig.username} All Rights Reserved.
-      </p>
-      <p>
-        Powered By <a
-          class="link"
-          href="https://github.com/WhitePaper233/yukina">Yukina</a
-        > & <a class="link" href="https://astro.build/">Astro</a>
-      </p>
-      <p>
-        <a class="link" href={new URL("sitemap-index.xml", YukinaConfig.site)}
-          >SiteMap</a
-        > / <a class="link" href="/rss.xml">RSS</a>
-      </p>
+    {tagKeys.length > 0 && (
+      <article class="support-card">
+        <div class="support-title-row">
+          <span class="title-bar" aria-hidden="true"></span>
+          <h3>{i18n(I18nKeys.side_bar_tags)}</h3>
+        </div>
+        <div class="tag-list">
+          {
+            tagKeys.slice(0, YukinaConfig.maxFooterTagChip + 1).map((tag) => (
+              <a href={`/tags/${tag}`} class="tag-chip">{tags.get(tag)!.name}</a>
+            ))
+          }
+        </div>
+        {tagKeys.length > YukinaConfig.maxFooterTagChip + 1 && (
+          <a href="/tags/" class="view-more-link">
+            <span>{i18n(I18nKeys.side_bar_view_more)}</span>
+            <Icon name="mingcute:arrow-right-line" size={16} />
+          </a>
+        )}
+      </article>
+    )}
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <p class="brand-label">{YukinaConfig.brandTitle}</p>
+        <p class="brand-copy">© {new Date().getFullYear()} {YukinaConfig.username}</p>
+      </div>
+
+      <div class="footer-links">
+        <a class="link" href="https://github.com/WhitePaper233/yukina">Yukina</a>
+        <a class="link" href="https://astro.build/">Astro</a>
+        <a class="link" href={new URL("sitemap-index.xml", YukinaConfig.site)}>SiteMap</a>
+        <a class="link" href="/rss.xml">RSS</a>
+      </div>
     </div>
   </footer>
 </div>
 
 <style>
+  .footer-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .mobile-support {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .support-card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
+    background: var(--card-color);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .avatar-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+  }
+
+  .avatar {
+    height: 5.2rem;
+    width: 5.2rem;
+    object-fit: cover;
+  }
+
+  .profile-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .profile-name {
+    font-family: var(--title-font);
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  .profile-sign {
+    margin: 0;
+    color: var(--text-color-lighten);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .social-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2rem;
+    width: 2rem;
+    border-radius: var(--radius-pill);
+    color: var(--primary-color);
+    background: var(--primary-color-hover);
+    transition: transform var(--transition-speed) var(--transition-timing),
+      filter var(--transition-speed) var(--transition-timing);
+  }
+
+  .social-link:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+  }
+
+  .support-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .support-title-row h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+
+  .title-bar {
+    height: 1.2rem;
+    width: 0.3rem;
+    border-radius: var(--radius-pill);
+    background: var(--gradient-border);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-xs);
+  }
+
+  .category-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    border-radius: 0.8rem;
+    border: 1px solid var(--border-color);
+    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
+    padding: 0.45rem 0.65rem;
+    transition: background-color var(--transition-speed) var(--transition-timing),
+      border-color var(--transition-speed) var(--transition-timing);
+  }
+
+  .category-link:hover {
+    background: var(--primary-color-hover);
+    border-color: var(--primary-color-lighten);
+  }
+
+  .category-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-color);
+    font-size: 0.9rem;
+  }
+
+  .category-count {
+    min-width: 1.65rem;
+    border-radius: var(--radius-pill);
+    background: var(--primary-color-lighten);
+    color: var(--primary-color-darken);
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-pill);
+    background: var(--primary-color-hover);
+    color: var(--primary-color);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.36rem 0.72rem;
+    transition: filter var(--transition-speed) var(--transition-timing);
+  }
+
+  .tag-chip:hover {
+    filter: brightness(0.98);
+  }
+
+  .view-more-link {
+    margin-top: var(--space-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--primary-color);
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .site-footer {
+    position: relative;
+    border-top: none;
+    padding-top: calc(var(--space-lg) + 2px);
+    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-border);
+    border-radius: 1px;
+  }
+
+  .footer-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .brand-label {
+    margin: 0;
+    font-family: var(--brand-font);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .brand-copy {
+    margin: 0;
+    color: var(--text-color-lighten);
+    font-size: 0.88rem;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
   .link {
-    @apply text-[var(--primary-color)] transition-all hover:brightness-110;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: color 0.3s ease, transform 0.3s ease;
   }
 
-  .category {
-    font-family: var(--primary-font);
+  .link:hover {
+    color: var(--accent-color);
+    transform: translateY(-1px);
   }
 
-  .category:hover > p {
-    @apply pl-2 text-[var(--primary-color)];
+  @media (min-width: 768px) {
+    .footer-grid {
+      flex-direction: row;
+      align-items: center;
+    }
   }
 </style>
