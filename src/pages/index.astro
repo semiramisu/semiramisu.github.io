@@ -69,13 +69,13 @@ const categoryPicks: Array<{ category: any; post: any }> = topCategories
 
 const spotlightTags = allTags.slice(0, 24);
 
-const heroTitle = lang === "ja" ? "意図から選べる読み口へ" : "Choose by reading intent";
+const heroTitle = lang === "ja" ? "日々の発見と思いを綴る場所" : "A place for daily discoveries";
 const heroCopy =
   lang === "ja"
-    ? "固定キュレーション、今週の更新、カテゴリ別ピックの3つの導線で、読みたい記事へ最短で辿れるトップに再構成しました。"
-    : "The top page now offers three clear entry points: curated starters, weekly updates, and category picks.";
+    ? "IT、健康、仕事、趣味——さまざまなテーマについての考察や体験を記録しています。気になるテーマから読んでみてください。"
+    : "Reflections and experiences on IT, health, work, and hobbies. Pick a topic that catches your eye.";
 
-const weekWindowLabel = lang === "ja" ? "直近7日を優先表示" : "Prioritizing the last 7 days";
+const weekWindowLabel = lang === "ja" ? "最近の記事から" : "From the past week";
 ---
 
 <MainLayout isHome={true}>
@@ -112,7 +112,7 @@ const weekWindowLabel = lang === "ja" ? "直近7日を優先表示" : "Prioritiz
     <section id="must-read" class="major-section" aria-labelledby="must-read-title">
       <div class="section-head">
         <h2 id="must-read-title" class="section-title">{lang === "ja" ? "まず読む3本" : "Start with these 3"}</h2>
-        <p class="section-kicker">{lang === "ja" ? "固定候補ID + フォールバック" : "Fixed candidate IDs + fallback"}</p>
+        <p class="section-kicker">{lang === "ja" ? "おすすめの記事をピックアップ" : "Hand-picked recommendations"}</p>
       </div>
 
       <FeaturedPostsCarousel posts={mustReadPosts} lang={lang} />
@@ -181,7 +181,7 @@ const weekWindowLabel = lang === "ja" ? "直近7日を優先表示" : "Prioritiz
     <section id="category-picks" class="major-section" aria-labelledby="category-picks-title">
       <div class="section-head">
         <h2 id="category-picks-title" class="section-title">{lang === "ja" ? "カテゴリ別ピック" : "Category picks"}</h2>
-        <p class="section-kicker">{lang === "ja" ? "カテゴリごとに代表1件" : "One representative post per category"}</p>
+        <p class="section-kicker">{lang === "ja" ? "各カテゴリの最新記事" : "Latest from each category"}</p>
       </div>
 
       <div class="category-pick-grid desktop-only">
