@@ -165,3 +165,8 @@ revenue-data/
 paypay-qr.png
 .revenue-backup/
 
+
+# Netlify build artifacts
+.netlify/
+output/
+banner-check.png
