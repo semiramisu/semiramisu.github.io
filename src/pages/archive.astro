@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import PostList from "../components/PostList.astro";
+import { getPublishedPosts } from "../utils/content";
+
+const posts = await getPublishedPosts();
+---
+
+<BaseLayout title="アーカイブ">
+  <div class="container list-page">
+    <PathBreadcrumb segments={[{ label: "posts" }]} />
+    <h1 class="prompt page-title">git log --oneline ~/posts</h1>
+    <p class="comment-line">// {posts.length} posts</p>
+    <div class="timeline-wrap">
+      <PostList posts={posts} variant="timeline" />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .list-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .page-title {
+    margin-block: 1.5rem 0.4rem;
+  }
+
+  .timeline-wrap {
+    margin-top: 2rem;
+  }
+</style>

@@ -1,11 +1,132 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PostList from "../components/PostList.astro";
+import { SITE } from "../site.config";
+import { getPublishedPosts, countCategories } from "../utils/content";
 
-const posts = await getCollection("posts", ({ data }) => !data.draft);
+const posts = await getPublishedPosts();
+const latest = posts.slice(0, 8);
+const categories = countCategories(posts);
+const topCategories = [...categories].slice(0, 8);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.title,
+  description: SITE.description,
+  url: new URL("/", Astro.site).toString(),
+  author: { "@type": "Person", name: SITE.author },
+  inLanguage: "ja",
+};
 ---
 
 <BaseLayout>
-  <h1>セミラミスの庭</h1>
-  <p>{posts.length} posts</p>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <div class="container">
+    <section class="hero">
+      <p class="prompt">whoami</p>
+      <p class="hero-intro">
+        <span data-i18n="hero.intro">セミラミスです。データサイエンスの仕事、読んだ本、日々考えたことを、親友に話すみたいに書いています。</span><span class="cursor-blink" aria-hidden="true"></span>
+      </p>
+      <p class="comment-line">// {SITE.sign}</p>
+    </section>
+
+    <section class="latest">
+      <h2 class="prompt">ls ~/posts --latest</h2>
+      <PostList posts={latest} variant="detail" />
+      <p class="view-all mono">
+        <a href="/archive/">→ <span data-i18n="list.viewAll">すべての記事を見る</span> ({posts.length})</a>
+      </p>
+    </section>
+
+    <section class="categories">
+      <h2 class="prompt">tree ~/categories</h2>
+      <ul class="category-chips">
+        {
+          topCategories.map(([name, count]) => (
+            <li>
+              <a href={`/categories/${name}/`} class="category-chip mono">
+                {name} <span class="count">({count})</span>
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/categories/" class="category-chip mono more">…</a>
+        </li>
+      </ul>
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .hero {
+    padding-block: 4rem 3rem;
+  }
+
+  .hero-intro {
+    margin-top: 1rem;
+    font-size: clamp(1.25rem, 1rem + 1.5vw, 1.75rem);
+    font-weight: 600;
+    line-height: 1.7;
+    max-width: 32em;
+  }
+
+  .hero .comment-line {
+    margin-top: 1rem;
+  }
+
+  .latest {
+    margin-top: 2rem;
+  }
+
+  .latest :global(.post-list) {
+    margin-top: 1rem;
+  }
+
+  .view-all {
+    margin-top: 1.5rem;
+    text-align: right;
+    font-size: var(--text-sm);
+  }
+
+  .view-all a {
+    color: var(--text-secondary);
+  }
+
+  .view-all a:hover {
+    color: var(--accent);
+  }
+
+  .categories {
+    margin-top: 4rem;
+  }
+
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+  }
+
+  .category-chip {
+    display: inline-block;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 0.25rem 0.8rem;
+  }
+
+  .category-chip:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .count {
+    color: var(--text-muted);
+  }
+</style>

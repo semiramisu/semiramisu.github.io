@@ -1,0 +1,53 @@
+---
+/**
+ * giscus comments. data-mapping="pathname" means threads are bound to URLs,
+ * so keeping the old URL structure preserves every existing comment.
+ */
+---
+
+<section class="comments" data-pagefind-ignore>
+  <h2 class="prompt" data-i18n="comments.title">コメント</h2>
+  <div class="giscus-container"></div>
+</section>
+
+<style>
+  .comments {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .giscus-container {
+    margin-top: 1.5rem;
+  }
+</style>
+
+<script>
+  const container = document.querySelector(".giscus-container");
+  if (container) {
+    const theme =
+      document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    const script = document.createElement("script");
+    const config: Record<string, string> = {
+      src: "https://giscus.app/client.js",
+      "data-repo": "semiramisu/semiramisu.github.io",
+      "data-repo-id": "R_kgDOOD4A8A",
+      "data-category": "Announcements",
+      "data-category-id": "DIC_kwDOOD4A8M4CsJLk",
+      "data-mapping": "pathname",
+      "data-strict": "0",
+      "data-reactions-enabled": "1",
+      "data-emit-metadata": "0",
+      "data-input-position": "top",
+      "data-theme": theme,
+      "data-lang": "ja",
+      "data-loading": "lazy",
+      crossorigin: "anonymous",
+    };
+    for (const [key, value] of Object.entries(config)) {
+      script.setAttribute(key, value);
+    }
+    script.async = true;
+    container.appendChild(script);
+  }
+</script>

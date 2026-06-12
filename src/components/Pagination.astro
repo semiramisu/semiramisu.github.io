@@ -1,0 +1,108 @@
+---
+interface Props {
+  currentPage: number;
+  lastPage: number;
+  prevUrl: string | undefined;
+  nextUrl: string | undefined;
+}
+
+const { currentPage, lastPage, prevUrl, nextUrl } = Astro.props;
+
+// compact window: 1 … c-1 c c+1 … last
+const pages: (number | "…")[] = [];
+for (let i = 1; i <= lastPage; i++) {
+  if (i === 1 || i === lastPage || Math.abs(i - currentPage) <= 1) {
+    pages.push(i);
+  } else if (pages[pages.length - 1] !== "…") {
+    pages.push("…");
+  }
+}
+
+const pageUrl = (n: number) => (n === 1 ? "/" : `/${n}/`);
+---
+
+<nav class="pagination mono" aria-label="ページネーション">
+  {
+    prevUrl ? (
+      <a href={prevUrl} class="page-nav" rel="prev">
+        ← prev
+      </a>
+    ) : (
+      <span class="page-nav disabled">← prev</span>
+    )
+  }
+  <span class="pages">
+    {
+      pages.map((p) =>
+        p === "…" ? (
+          <span class="ellipsis">…</span>
+        ) : p === currentPage ? (
+          <span class="page current" aria-current="page">
+            {p}
+          </span>
+        ) : (
+          <a href={pageUrl(p)} class="page">
+            {p}
+          </a>
+        ),
+      )
+    }
+  </span>
+  {
+    nextUrl ? (
+      <a href={nextUrl} class="page-nav" rel="next">
+        next →
+      </a>
+    ) : (
+      <span class="page-nav disabled">next →</span>
+    )
+  }
+</nav>
+
+<style>
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    font-size: var(--text-sm);
+  }
+
+  .pages {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .page,
+  .ellipsis {
+    min-width: 1.8rem;
+    text-align: center;
+    padding: 0.2rem 0.3rem;
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
+
+  .page:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .page.current {
+    color: var(--accent-text-on);
+    background-color: var(--accent);
+    font-weight: 700;
+  }
+
+  .page-nav {
+    color: var(--text-secondary);
+  }
+
+  .page-nav:hover {
+    color: var(--accent);
+  }
+
+  .page-nav.disabled {
+    color: var(--border-strong);
+  }
+</style>

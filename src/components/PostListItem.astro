@@ -1,0 +1,147 @@
+---
+import type { Post } from "../utils/content";
+import { formatDate, formatDateShort } from "../utils/content";
+
+interface Props {
+  post: Post;
+  /**
+   * detail: date + title + category + one-line description (home)
+   * log: dense single line, date without year (archive / category / tag)
+   */
+  variant?: "detail" | "log";
+}
+
+const { post, variant = "detail" } = Astro.props;
+const href = `/posts/${post.id}/`;
+---
+
+{
+  variant === "detail" ? (
+    <li class="post-item detail">
+      <a href={href} class="post-link">
+        <div class="post-row">
+          <time class="mono date" datetime={post.data.published.toISOString()}>
+            {formatDate(post.data.published)}
+          </time>
+          <span class="title">{post.data.title}</span>
+          {post.data.category && (
+            <span class="mono category">[{post.data.category}]</span>
+          )}
+        </div>
+        {post.data.description && (
+          <p class="description">{post.data.description}</p>
+        )}
+      </a>
+    </li>
+  ) : (
+    <li class="post-item log">
+      <a href={href} class="post-link">
+        <div class="post-row">
+          <time class="mono date" datetime={post.data.published.toISOString()}>
+            {formatDateShort(post.data.published)}
+          </time>
+          <span class="title">{post.data.title}</span>
+          {post.data.category && (
+            <span class="mono category">[{post.data.category}]</span>
+          )}
+        </div>
+      </a>
+    </li>
+  )
+}
+
+<style>
+  .post-item {
+    list-style: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .post-link {
+    display: block;
+    padding: 0.85rem 0.6rem;
+    border-radius: 6px;
+    color: inherit;
+  }
+
+  .post-link:hover {
+    background-color: var(--bg-elevated);
+    color: inherit;
+  }
+
+  .post-link:hover .title {
+    color: var(--accent);
+  }
+
+  .post-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+  }
+
+  .date {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .title {
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color 150ms ease;
+  }
+
+  .category {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .description {
+    margin: 0.25rem 0 0;
+    padding-left: calc(0.9rem + 5.5em);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .log .post-link {
+    padding-block: 0.5rem;
+  }
+
+  .log .title {
+    font-weight: 400;
+  }
+
+  @media (max-width: 640px) {
+    .detail .post-row {
+      flex-wrap: wrap;
+      gap: 0.3rem 0.9rem;
+    }
+
+    .detail .date {
+      order: 1;
+    }
+
+    .detail .category {
+      order: 2;
+      margin-left: 0;
+    }
+
+    .detail .title {
+      order: 3;
+      width: 100%;
+    }
+
+    .description {
+      padding-left: 0;
+    }
+
+    .log .category {
+      display: none;
+    }
+  }
+</style>

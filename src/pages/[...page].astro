@@ -1,0 +1,44 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostList from "../components/PostList.astro";
+import Pagination from "../components/Pagination.astro";
+import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import { SITE } from "../site.config";
+import { getPublishedPosts } from "../utils/content";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  // pageSize must stay 6 so /2/ ... /41/ keep the same content ranges as the
+  // old site. Page 1 ("/") is rendered by index.astro instead.
+  return paginate(posts, { pageSize: SITE.pageSize }).filter(
+    (route) => route.params.page !== undefined,
+  );
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title={`記事一覧 (${page.currentPage}/${page.lastPage})`}>
+  <div class="container list-page">
+    <PathBreadcrumb segments={[{ label: "posts", href: "/archive/" }, { label: `page ${page.currentPage}` }]} />
+    <h1 class="prompt page-title">ls ~/posts --page {page.currentPage}</h1>
+    <PostList posts={page.data} variant="detail" />
+    <Pagination
+      currentPage={page.currentPage}
+      lastPage={page.lastPage}
+      prevUrl={page.url.prev ?? (page.currentPage === 2 ? "/" : undefined)}
+      nextUrl={page.url.next}
+    />
+  </div>
+</BaseLayout>
+
+<style>
+  .list-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .page-title {
+    margin-block: 1.5rem 1rem;
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import type { Post } from "../utils/content";
+import { groupByYear } from "../utils/content";
+import PostListItem from "./PostListItem.astro";
+
+interface Props {
+  posts: Post[];
+  /**
+   * detail: flat list with descriptions (home)
+   * log: dense flat list (paginated pages)
+   * timeline: log items grouped under year headings (archive / category / tag)
+   */
+  variant?: "detail" | "log" | "timeline";
+}
+
+const { posts, variant = "detail" } = Astro.props;
+const years = variant === "timeline" ? groupByYear(posts) : [];
+---
+
+{
+  variant === "timeline" ? (
+    <div class="timeline">
+      {years.map(([year, yearPosts]) => (
+        <section class="year-group">
+          <h2 class="mono year-heading">{year}</h2>
+          <ul class="post-list">
+            {yearPosts.map((post) => (
+              <PostListItem post={post} variant="log" />
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  ) : (
+    <ul class="post-list">
+      {posts.map((post) => (
+        <PostListItem
+          post={post}
+          variant={variant === "log" ? "log" : "detail"}
+        />
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .post-list {
+    margin: 0;
+    padding: 0;
+  }
+
+  .year-group {
+    margin-top: 2.5rem;
+  }
+
+  .year-group:first-child {
+    margin-top: 0;
+  }
+
+  .year-heading {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .year-heading::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid var(--border-subtle);
+  }
+</style>

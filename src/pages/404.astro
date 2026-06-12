@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="404 Not Found">
+  <div class="container notfound mono">
+    <p class="cmd"><span class="ps">$</span> open <span id="requested-path">/requested/path</span></p>
+    <p class="error-line">zsh: command not found: <span id="requested-path-2">/requested/path</span></p>
+    <p class="comment-line">// 404 - <span data-i18n="notfound.message">ページが見つかりませんでした</span></p>
+
+    <div class="suggestions">
+      <a href="/" class="suggestion">
+        <span class="ps">$</span> cd ~ <span class="hint" data-i18n="notfound.home">ホームへ戻る</span>
+      </a>
+      <a href="/archive/" class="suggestion">
+        <span class="ps">$</span> ls ~/posts <span class="hint" data-i18n="notfound.archive">記事一覧を見る</span>
+      </a>
+      <a href="/search/" class="suggestion">
+        <span class="ps">$</span> grep -r ... <span class="hint" data-i18n="action.search">検索</span>
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .notfound {
+    padding-block: 6rem;
+    font-size: var(--text-base);
+  }
+
+  .ps {
+    color: var(--accent);
+    user-select: none;
+  }
+
+  .error-line {
+    margin-top: 0.8rem;
+    color: var(--danger);
+  }
+
+  .comment-line {
+    margin-top: 0.8rem;
+  }
+
+  .suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 3rem;
+  }
+
+  .suggestion {
+    color: var(--text-secondary);
+    width: fit-content;
+  }
+
+  .suggestion:hover {
+    color: var(--text-primary);
+  }
+
+  .hint {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-left: 1rem;
+  }
+
+  .suggestion:hover .hint {
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  const path = location.pathname;
+  document.getElementById("requested-path")!.textContent = path;
+  document.getElementById("requested-path-2")!.textContent = path;
+</script>

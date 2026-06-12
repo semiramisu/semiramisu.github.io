@@ -1,0 +1,52 @@
+---
+const paypayId = import.meta.env.PUBLIC_PAYPAY_ID;
+const buyMeACoffeeUrl = import.meta.env.PUBLIC_BUYMEACOFFEE_URL;
+const hasAny = Boolean(paypayId || buyMeACoffeeUrl);
+---
+
+{
+  hasAny && (
+    <aside class="donation" data-pagefind-ignore>
+      <p class="prompt">support --coffee</p>
+      <p class="donation-text" data-i18n="donation.text">
+        この記事が役に立ったら、コーヒーを1杯ごちそうしてください ☕
+      </p>
+      <div class="donation-links mono">
+        {buyMeACoffeeUrl && (
+          <a href={buyMeACoffeeUrl} target="_blank" rel="noopener">
+            Buy Me a Coffee →
+          </a>
+        )}
+        {paypayId && <span class="paypay">PayPay: {paypayId}</span>}
+      </div>
+    </aside>
+  )
+}
+
+<style>
+  .donation {
+    margin-top: 3rem;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+  }
+
+  .donation-text {
+    margin-top: 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .donation-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 0.8rem;
+    font-size: var(--text-sm);
+  }
+
+  .paypay {
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import { getPublishedPosts, countTags } from "../../utils/content";
+
+const posts = await getPublishedPosts();
+const tags = countTags(posts);
+---
+
+<BaseLayout title="タグ一覧">
+  <div class="container chip-page">
+    <PathBreadcrumb segments={[{ label: "tags" }]} />
+    <h1 class="prompt page-title">grep -r "#" ~/tags</h1>
+    <ul class="chips">
+      {
+        [...tags].map(([name, count]) => (
+          <li>
+            <a href={`/tags/${name}/`} class="tag-chip">
+              {name} <span class="count">({count})</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .chip-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .page-title {
+    margin-block: 1.5rem 1.5rem;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .count {
+    opacity: 0.7;
+  }
+</style>

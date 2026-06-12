@@ -1,24 +1,286 @@
 ---
-import { getCollection, render } from "astro:content";
+import "katex/dist/katex.min.css";
+
+import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
+import ShareButtons from "../../components/ShareButtons.astro";
+import DonationBox from "../../components/DonationBox.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import NewsletterForm from "../../components/NewsletterForm.astro";
+import Comments from "../../components/Comments.astro";
+import { SITE } from "../../site.config";
+import {
+  getPublishedPosts,
+  getRelatedPosts,
+  formatDate,
+  type Post,
+} from "../../utils/content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  const posts = await getPublishedPosts();
   // post.id is the raw filename (e.g. "2025_03_05"), which must stay the slug
   // so that existing URLs, giscus threads, and search rankings are preserved.
-  return posts.map((post) => ({
+  return posts.map((post, i) => ({
     params: { slug: post.id },
-    props: { post },
+    props: {
+      post,
+      // posts are newest-first: prev = older, next = newer
+      prevPost: posts[i + 1] ?? null,
+      nextPost: posts[i - 1] ?? null,
+    },
   }));
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
+interface Props {
+  post: Post;
+  prevPost: Post | null;
+  nextPost: Post | null;
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+const allPosts = await getPublishedPosts();
+const related = getRelatedPosts(post, allPosts);
+const readingTime = remarkPluginFrontmatter.readingMetadata?.time ?? 1;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description ?? SITE.description,
+  datePublished: post.data.published.toISOString(),
+  inLanguage: "ja",
+  url: canonical.toString(),
+  author: {
+    "@type": "Person",
+    name: SITE.author,
+    url: new URL("/about/", Astro.site).toString(),
+  },
+};
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description}>
-  <article>
-    <h1>{post.data.title}</h1>
-    <Content />
-  </article>
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  publishedTime={post.data.published.toISOString()}
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <div class="container post-page">
+    <PathBreadcrumb
+      segments={[
+        { label: "posts", href: "/archive/" },
+        ...(post.data.category
+          ? [
+              {
+                label: post.data.category,
+                href: `/categories/${post.data.category}/`,
+              },
+            ]
+          : []),
+        { label: post.data.title },
+      ]}
+    />
+
+    <div class="post-grid">
+      <div class="article-col">
+        <article data-pagefind-body>
+          <header class="post-header">
+            <h1 class="post-title">{post.data.title}</h1>
+            <p class="comment-line" data-pagefind-ignore>
+              // <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+              · {readingTime} min
+              {
+                post.data.category && (
+                  <>
+                    ·
+                    <a
+                      href={`/categories/${post.data.category}/`}
+                      class="category-link"
+                    >
+                      {post.data.category}
+                    </a>
+                  </>
+                )
+              }
+            </p>
+          </header>
+
+          <TableOfContents headings={headings} mode="mobile" />
+
+          <div class="prose">
+            <Content />
+          </div>
+        </article>
+
+        {
+          post.data.tags.length > 0 && (
+            <div class="post-tags" data-pagefind-ignore>
+              {post.data.tags.map((tag) => (
+                <a href={`/tags/${tag}/`} class="tag-chip">
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
+
+        <ShareButtons title={post.data.title} url={canonical} />
+        <DonationBox />
+        <RelatedPosts posts={related} />
+        <NewsletterForm />
+        <Comments />
+
+        <nav class="post-nav mono" aria-label="前後の記事" data-pagefind-ignore>
+          {
+            prevPost ? (
+              <a href={`/posts/${prevPost.id}/`} class="nav-prev" rel="prev">
+                <span class="nav-label" data-i18n="post.prev">
+                  ← 前の記事
+                </span>
+                <span class="nav-title">{prevPost.data.title}</span>
+              </a>
+            ) : (
+              <span />
+            )
+          }
+          {
+            nextPost && (
+              <a href={`/posts/${nextPost.id}/`} class="nav-next" rel="next">
+                <span class="nav-label" data-i18n="post.next">
+                  次の記事 →
+                </span>
+                <span class="nav-title">{nextPost.data.title}</span>
+              </a>
+            )
+          }
+        </nav>
+      </div>
+
+      <aside class="toc-col" data-pagefind-ignore>
+        <TableOfContents headings={headings} mode="desktop" />
+      </aside>
+    </div>
+  </div>
 </BaseLayout>
+
+<style>
+  .post-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .post-grid {
+    margin-top: 2rem;
+  }
+
+  .article-col {
+    max-width: var(--measure);
+    margin-inline: auto;
+    min-width: 0;
+  }
+
+  .toc-col {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .post-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 14rem;
+      gap: 3rem;
+    }
+
+    .toc-col {
+      display: block;
+    }
+  }
+
+  .post-title {
+    font-size: clamp(1.75rem, 1.3rem + 2vw, 2.25rem);
+    line-height: 1.4;
+    font-weight: 700;
+  }
+
+  .post-header .comment-line {
+    margin-top: 0.8rem;
+  }
+
+  .category-link {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .category-link:hover {
+    color: var(--accent);
+  }
+
+  .post-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: var(--text-sm);
+  }
+
+  .post-nav a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: 45%;
+    color: var(--text-secondary);
+  }
+
+  .nav-next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .nav-label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .post-nav a:hover .nav-title {
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  // copy button for code blocks
+  document.querySelectorAll<HTMLPreElement>("pre.astro-code").forEach((pre) => {
+    const button = document.createElement("button");
+    button.className = "code-copy-button mono";
+    button.type = "button";
+    button.textContent = "copy";
+    button.addEventListener("click", async () => {
+      const code = pre.querySelector("code")?.innerText ?? "";
+      await navigator.clipboard.writeText(code);
+      button.textContent = "✓ copied";
+      button.classList.add("copied");
+      setTimeout(() => {
+        button.textContent = "copy";
+        button.classList.remove("copied");
+      }, 1500);
+    });
+    pre.appendChild(button);
+  });
+</script>

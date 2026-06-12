@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import { getPublishedPosts, countCategories } from "../../utils/content";
+
+const posts = await getPublishedPosts();
+const categories = countCategories(posts);
+---
+
+<BaseLayout title="カテゴリ一覧">
+  <div class="container chip-page">
+    <PathBreadcrumb segments={[{ label: "categories" }]} />
+    <h1 class="prompt page-title">tree ~/categories</h1>
+    <ul class="chips">
+      {
+        [...categories].map(([name, count]) => (
+          <li>
+            <a href={`/categories/${name}/`} class="chip mono">
+              {name} <span class="count">({count})</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .chip-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .page-title {
+    margin-block: 1.5rem 1.5rem;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .chip {
+    display: inline-block;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 0.35rem 0.9rem;
+  }
+
+  .chip:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .count {
+    color: var(--text-muted);
+  }
+</style>

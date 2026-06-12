@@ -1,0 +1,74 @@
+---
+interface Props {
+  title: string;
+  url: URL | string;
+}
+
+const { title, url } = Astro.props;
+const encodedUrl = encodeURIComponent(url.toString());
+const encodedTitle = encodeURIComponent(title);
+---
+
+<div class="share mono" data-pagefind-ignore>
+  <span class="share-label" data-i18n="share.title">この記事をシェア</span>
+  <a
+    href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+    target="_blank"
+    rel="noopener"
+    class="share-link"
+  >
+    X
+  </a>
+  <a
+    href={`https://b.hatena.ne.jp/entry/${url.toString().replace(/^https?:\/\//, "")}`}
+    target="_blank"
+    rel="noopener"
+    class="share-link"
+  >
+    はてブ
+  </a>
+  <button type="button" class="share-link" id="copy-url" data-url={url.toString()}>
+    copy url
+  </button>
+</div>
+
+<style>
+  .share {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    font-size: var(--text-sm);
+  }
+
+  .share-label {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .share-link {
+    color: var(--text-secondary);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 0.2rem 0.8rem;
+    font-size: var(--text-sm);
+  }
+
+  .share-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+</style>
+
+<script>
+  const button = document.getElementById("copy-url");
+  button?.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(button.dataset.url ?? location.href);
+    const original = button.textContent;
+    button.textContent = "✓ copied";
+    setTimeout(() => {
+      button.textContent = original;
+    }, 1500);
+  });
+</script>

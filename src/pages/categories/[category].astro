@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import PostList from "../../components/PostList.astro";
+import { getPublishedPosts, countCategories } from "../../utils/content";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  // raw Japanese category names as params, matching the old URL scheme
+  return [...countCategories(posts).keys()].map((category) => ({
+    params: { category },
+    props: { posts: posts.filter((p) => p.data.category === category) },
+  }));
+}
+
+const { category } = Astro.params;
+const { posts } = Astro.props;
+---
+
+<BaseLayout title={`カテゴリ: ${category}`}>
+  <div class="container list-page">
+    <PathBreadcrumb
+      segments={[{ label: "categories", href: "/categories/" }, { label: category! }]}
+    />
+    <h1 class="prompt page-title">ls ~/categories/{category}</h1>
+    <p class="comment-line">// {posts.length} posts</p>
+    <div class="timeline-wrap">
+      <PostList posts={posts} variant="timeline" />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .list-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .page-title {
+    margin-block: 1.5rem 0.4rem;
+  }
+
+  .timeline-wrap {
+    margin-top: 2rem;
+  }
+</style>

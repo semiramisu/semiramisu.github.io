@@ -1,0 +1,51 @@
+---
+import Search from "astro-pagefind/components/Search.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+---
+
+<BaseLayout title="検索" description="サイト内全文検索">
+  <div class="container search-page">
+    <PathBreadcrumb segments={[{ label: "search" }]} />
+    <h1 class="prompt page-title">grep -r "..." ~/posts</h1>
+    <div class="search-wrap">
+      <Search
+        className="site-search"
+        searchboxOptions={{ placeholder: "記事を検索…", autofocus: true }}
+      />
+    </div>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .search-page {
+    padding-block: 2rem 4rem;
+    max-width: 48rem;
+  }
+
+  .search-page .page-title {
+    margin-block: 1.5rem 1.5rem;
+  }
+
+  /* theme the Pagefind component UI to match the design tokens */
+  .search-wrap {
+    --pf-font: var(--font-sans);
+    --pf-background: var(--bg-surface);
+    --pf-text: var(--text-primary);
+    --pf-text-secondary: var(--text-secondary);
+    --pf-text-muted: var(--text-muted);
+    --pf-border: var(--border-strong);
+    --pf-border-focus: var(--accent);
+    --pf-outline-focus: var(--accent);
+    --pf-border-radius: 8px;
+    --pf-hover: var(--bg-elevated);
+    --pf-mark: var(--accent-muted);
+    --pf-skeleton: var(--bg-elevated);
+    --pf-skeleton-shine: var(--border-subtle);
+  }
+
+  .search-wrap mark {
+    background-color: var(--accent-muted);
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,145 @@
+---
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+  /** mobile: collapsible <details> above the article. desktop: sticky aside. */
+  mode: "mobile" | "desktop";
+}
+
+const { headings, mode } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length > 0 && mode === "mobile" && (
+    <details class="toc-mobile">
+      <summary class="mono" data-i18n="toc.title">
+        目次
+      </summary>
+      <ul>
+        {items.map((h) => (
+          <li class:list={["toc-item", `depth-${h.depth}`]}>
+            <a href={`#${h.slug}`}>{h.text}</a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+{
+  items.length > 0 && mode === "desktop" && (
+    <nav class="toc-desktop" aria-label="目次">
+      <p class="mono toc-title" data-i18n="toc.title">
+        目次
+      </p>
+      <ul>
+        {items.map((h) => (
+          <li class:list={["toc-item", `depth-${h.depth}`]}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-item a {
+    display: block;
+    padding: 0.25rem 0.75rem;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    line-height: 1.6;
+  }
+
+  .toc-item.depth-3 a {
+    padding-left: 1.75rem;
+  }
+
+  .toc-item a:hover {
+    color: var(--text-primary);
+  }
+
+  .toc-item a.active {
+    color: var(--text-primary);
+    border-left-color: var(--accent);
+  }
+
+  /* ---------- mobile ---------- */
+  .toc-mobile {
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    background-color: var(--bg-surface);
+    padding: 0.6rem 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .toc-mobile summary {
+    cursor: pointer;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .toc-mobile ul {
+    margin-top: 0.5rem;
+  }
+
+  /* ---------- desktop ---------- */
+  .toc-desktop {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .toc-desktop {
+      display: block;
+      position: sticky;
+      top: calc(var(--header-height) + 2rem);
+      max-height: calc(100dvh - var(--header-height) - 4rem);
+      overflow-y: auto;
+    }
+
+    .toc-title {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      padding-left: 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  // highlight the section currently in view (desktop TOC)
+  const links = document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]");
+  if (links.length > 0) {
+    const map = new Map<string, HTMLAnchorElement>();
+    links.forEach((link) => map.set(link.dataset.tocLink!, link));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          links.forEach((l) => l.classList.remove("active"));
+          map.get(entry.target.id)?.classList.add("active");
+        }
+      },
+      { rootMargin: "-80px 0px -70% 0px" },
+    );
+
+    map.forEach((_, slug) => {
+      const heading = document.getElementById(slug);
+      if (heading) observer.observe(heading);
+    });
+  }
+</script>
