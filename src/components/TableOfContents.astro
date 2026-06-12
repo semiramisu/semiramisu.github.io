@@ -8,7 +8,10 @@ interface Props {
 }
 
 const { headings, mode } = Astro.props;
-const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// heading text includes the "#" appended by rehype-autolink-headings — strip it
+const items = headings
+  .filter((h) => h.depth === 2 || h.depth === 3)
+  .map((h) => ({ ...h, text: h.text.replace(/#$/, "") }));
 ---
 
 {

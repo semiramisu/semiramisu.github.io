@@ -9,6 +9,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeKatex from "rehype-katex";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
+import { remarkDemoteHeadings } from "./src/plugins/remark-demote-headings.mjs";
 
 import { SITE } from "./src/site.config.ts";
 
@@ -26,7 +27,7 @@ export default defineConfig({
       },
       defaultColor: false,
     },
-    remarkPlugins: [remarkReadingTime, remarkMath],
+    remarkPlugins: [remarkReadingTime, remarkDemoteHeadings, remarkMath],
     rehypePlugins: [
       rehypeSlug,
       rehypeKatex,

@@ -13,6 +13,11 @@ interface Props {
 
 const { post, variant = "detail" } = Astro.props;
 const href = `/posts/${post.id}/`;
+// some old posts have description identical to the title — showing it twice is noise
+const description =
+  post.data.description && post.data.description !== post.data.title
+    ? post.data.description
+    : undefined;
 ---
 
 {
@@ -28,9 +33,7 @@ const href = `/posts/${post.id}/`;
             <span class="mono category">[{post.data.category}]</span>
           )}
         </div>
-        {post.data.description && (
-          <p class="description">{post.data.description}</p>
-        )}
+        {description && <p class="description">{description}</p>}
       </a>
     </li>
   ) : (
