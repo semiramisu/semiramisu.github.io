@@ -1,0 +1,227 @@
+/*
+ * Article body typography. The prose area is deliberately motif-free:
+ * plain sans-serif, high contrast, no terminal decoration.
+ */
+.prose {
+  max-width: min(var(--measure), 100%);
+  line-height: 1.9;
+  letter-spacing: 0.015em;
+  overflow-wrap: break-word;
+}
+
+.prose > * + * {
+  margin-top: 1.5em;
+}
+
+/* ---------- headings ---------- */
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.5;
+  scroll-margin-top: calc(var(--header-height) + 1.5rem);
+}
+
+.prose h2 {
+  font-size: var(--text-2xl);
+  margin-top: 2.5em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.prose h3 {
+  font-size: var(--text-xl);
+  margin-top: 2em;
+}
+
+.prose h4 {
+  font-size: var(--text-lg);
+  margin-top: 2em;
+}
+
+/* markdown-style heading markers — muted, not accent (keep prose calm) */
+.prose h2::before,
+.prose h3::before {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.prose h2::before {
+  content: "## ";
+}
+
+.prose h3::before {
+  content: "### ";
+}
+
+/* anchor links appended by rehype-autolink-headings */
+.prose .heading-anchor {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 0.4em;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h4:hover .heading-anchor,
+.prose .heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* ---------- links: always underlined inside prose ---------- */
+.prose a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in oklab, var(--accent) 40%, transparent);
+}
+
+.prose a:hover {
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
+}
+
+/* ---------- lists / quotes / rules ---------- */
+.prose ul,
+.prose ol {
+  padding-left: 1.5em;
+}
+
+.prose li + li {
+  margin-top: 0.4em;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 1em;
+  color: var(--text-secondary);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin-block: 3em;
+}
+
+/* ---------- tables ---------- */
+.prose table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--border-subtle);
+  padding: 0.5em 0.9em;
+}
+
+.prose th {
+  background-color: var(--bg-surface);
+  font-weight: 700;
+}
+
+/* ---------- images ---------- */
+.prose img {
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  margin-inline: auto;
+}
+
+/* ---------- code ---------- */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--code-inline-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+}
+
+.prose pre.astro-code {
+  position: relative;
+  background-color: var(--code-bg) !important;
+  border: 1px solid var(--code-border);
+  border-radius: 8px;
+  padding: 2.4rem 1.1rem 1.1rem;
+  overflow-x: auto;
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.prose pre.astro-code code {
+  font-family: var(--font-mono);
+}
+
+/* Shiki dual themes (defaultColor: false): pick per [data-theme] */
+.astro-code span {
+  color: var(--shiki-dark);
+}
+
+html[data-theme="light"] .astro-code span {
+  color: var(--shiki-light);
+}
+
+/* language label, from the data-language attribute Astro emits */
+.prose pre.astro-code::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.55rem;
+  left: 1.1rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  user-select: none;
+}
+
+/* copy button injected by client script */
+.code-copy-button {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.prose pre.astro-code:hover .code-copy-button,
+.code-copy-button:focus-visible {
+  opacity: 1;
+}
+
+.code-copy-button:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.code-copy-button.copied {
+  color: var(--accent);
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .code-copy-button {
+    opacity: 1;
+  }
+}
+
+/* ---------- KaTeX ---------- */
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.5em;
+}

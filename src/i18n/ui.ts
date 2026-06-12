@@ -1,0 +1,60 @@
+/**
+ * UI label dictionary for the client-side ?lang=en switcher.
+ * Most chrome (prompts like `$ ls ~/posts`, nav, dates) is language-neutral
+ * by design, so only human-language labels live here.
+ * Build output is always Japanese; English is applied client-side.
+ */
+export type Lang = "ja" | "en";
+
+export const translations: Record<Lang, Record<string, string>> = {
+  ja: {
+    "a11y.skip": "本文へスキップ",
+    "action.search": "検索",
+    "action.theme": "テーマ切り替え",
+    "action.menu": "メニューを開く",
+    "hero.intro": "セミラミスです。データサイエンスの仕事、読んだ本、日々考えたことを、親友に話すみたいに書いています。",
+    "list.viewAll": "すべての記事を見る",
+    "toc.title": "目次",
+    "comments.title": "コメント",
+    "share.title": "この記事をシェア",
+    "post.prev": "前の記事",
+    "post.next": "次の記事",
+    "donation.text": "この記事が役に立ったら、コーヒーを1杯ごちそうしてください ☕",
+    "newsletter.text": "新着記事の通知を受け取る",
+    "newsletter.submit": "登録",
+    "contact.name": "お名前",
+    "contact.email": "メールアドレス",
+    "contact.subject": "件名",
+    "contact.message": "メッセージ",
+    "contact.send": "送信",
+    "search.placeholder": "記事を検索…",
+    "notfound.message": "ページが見つかりませんでした",
+    "notfound.home": "ホームへ戻る",
+    "notfound.archive": "記事一覧を見る",
+  },
+  en: {
+    "a11y.skip": "Skip to content",
+    "action.search": "Search",
+    "action.theme": "Toggle theme",
+    "action.menu": "Open menu",
+    "hero.intro": "I'm Semiramisu. I write about my work in data science, books I read, and everyday thoughts — as if talking to a close friend.",
+    "list.viewAll": "View all posts",
+    "toc.title": "Table of Contents",
+    "comments.title": "Comments",
+    "share.title": "Share this post",
+    "post.prev": "Previous",
+    "post.next": "Next",
+    "donation.text": "If this post helped you, consider buying me a coffee ☕",
+    "newsletter.text": "Get notified about new posts",
+    "newsletter.submit": "Subscribe",
+    "contact.name": "Name",
+    "contact.email": "Email",
+    "contact.subject": "Subject",
+    "contact.message": "Message",
+    "contact.send": "Send",
+    "search.placeholder": "Search posts…",
+    "notfound.message": "Page not found",
+    "notfound.home": "Back to home",
+    "notfound.archive": "Browse all posts",
+  },
+};

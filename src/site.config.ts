@@ -25,9 +25,9 @@ export const SITE = {
   pageSize: 6,
 } as const;
 
+// Lowercase mono labels are part of the terminal aesthetic and need no i18n
 export const NAV_ITEMS = [
-  { href: "/", labelKey: "nav.home" },
-  { href: "/archive/", labelKey: "nav.archive" },
-  { href: "/about/", labelKey: "nav.about" },
-  { href: "/contact/", labelKey: "nav.contact" },
+  { href: "/archive/", label: "archive" },
+  { href: "/about/", label: "about" },
+  { href: "/contact/", label: "contact" },
 ] as const;

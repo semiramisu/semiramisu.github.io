@@ -1,0 +1,92 @@
+/*
+ * Terminal Garden — design tokens.
+ * Dark is the default theme; light overrides via html[data-theme="light"].
+ * All text/background pairs verified WCAG AA or better.
+ */
+:root {
+  /* backgrounds (3 layers) */
+  --bg-base: #0b0e14;
+  --bg-surface: #11151c;
+  --bg-elevated: #161b24;
+
+  /* text (3 layers) */
+  --text-primary: #e6edf3;
+  --text-secondary: #98a4b3;
+  --text-muted: #7d8896;
+
+  /* borders */
+  --border-subtle: #1d2430;
+  --border-strong: #2c3542;
+
+  /* accent: terminal green — ties to the "garden" in the site name */
+  --accent: #4ade80;
+  --accent-hover: #86efac;
+  --accent-muted: color-mix(in oklab, #4ade80 12%, transparent);
+  --accent-text-on: #08130b;
+
+  /* code */
+  --code-bg: #0a0d12;
+  --code-border: #1d2430;
+  --code-inline-bg: #161b24;
+
+  /* semantic */
+  --link: var(--accent);
+  --link-hover: var(--accent-hover);
+  --selection: color-mix(in oklab, #4ade80 30%, transparent);
+  --focus-ring: var(--accent);
+  --danger: #f87171;
+
+  /* typography */
+  --font-sans:
+    "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    "BIZ UDPGothic", "Yu Gothic Medium", "Yu Gothic", Meiryo, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+    "Hiragino Sans", monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* prose line length: ~38 full-width chars, the sweet spot for Japanese */
+  --measure: 38em;
+
+  /* layout */
+  --container-max: 72rem;
+  --header-height: 3.5rem;
+
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --bg-base: #fafaf9;
+  --bg-surface: #f2f3f4;
+  --bg-elevated: #ffffff;
+
+  --text-primary: #1c232e;
+  --text-secondary: #57606e;
+  --text-muted: #67707e;
+
+  --border-subtle: #e5e8eb;
+  --border-strong: #cdd3da;
+
+  --accent: #15803d;
+  --accent-hover: #166534;
+  --accent-muted: color-mix(in oklab, #15803d 10%, transparent);
+  --accent-text-on: #ffffff;
+
+  --code-bg: #f4f5f7;
+  --code-border: #e5e8eb;
+  --code-inline-bg: #edeff1;
+
+  --selection: color-mix(in oklab, #15803d 20%, transparent);
+  --danger: #b91c1c;
+
+  color-scheme: light;
+}

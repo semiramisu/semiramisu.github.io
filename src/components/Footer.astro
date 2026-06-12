@@ -1,0 +1,45 @@
+---
+import { SITE } from "../site.config";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner mono">
+    <p class="copyright">
+      © 2025-{year}
+      {SITE.author} ·
+      <a href={SITE.license.url} rel="license noopener" target="_blank">{SITE.license.name}</a>
+       ·
+      <a href="/rss.xml">RSS</a>
+    </p>
+    <p class="sign">// {SITE.sign}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 5rem;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    justify-content: space-between;
+    padding-block: 2rem;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .footer-inner a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .footer-inner a:hover {
+    color: var(--accent);
+  }
+</style>
