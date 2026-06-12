@@ -26,6 +26,7 @@ const pageTitle = title ? `${title} | ${SITE.title}` : `${SITE.title} - ${SITE.s
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL("/icon.jpg", Astro.site);
 const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT;
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 ---
 
 <!doctype html>
@@ -84,6 +85,26 @@ const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT;
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
           crossorigin="anonymous"
         />
+      )
+    }
+
+    {
+      gaId && (
+        <>
+          <script
+            is:inline
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+          />
+          <script is:inline define:vars={{ gaId }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+              dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
+            gtag("config", gaId);
+          </script>
+        </>
       )
     }
 
