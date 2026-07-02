@@ -9,11 +9,11 @@ const isCurrent = (href: string) =>
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="/" class="brand mono" aria-label={SITE.title}>
-      <span class="brand-tilde">~/</span>{SITE.brand}
+    <a href="/" class="brand" aria-label={SITE.title}>
+      {SITE.title}<span class="brand-dot" aria-hidden="true"></span>
     </a>
 
-    <nav class="desktop-nav mono" aria-label="メインナビゲーション">
+    <nav class="desktop-nav" aria-label="メインナビゲーション">
       {
         NAV_ITEMS.map((item) => (
           <a
@@ -33,13 +33,14 @@ const isCurrent = (href: string) =>
       </a>
       <button
         id="theme-toggle"
-        class="icon-button mono"
+        class="icon-button"
         aria-label="テーマ切り替え"
         data-i18n-aria="action.theme"
       >
-        <span aria-hidden="true">◐</span>
+        <span class="theme-icon theme-icon-moon"><Icon name="moon" size={17} /></span>
+        <span class="theme-icon theme-icon-sun"><Icon name="sun" size={17} /></span>
       </button>
-      <button id="lang-toggle" class="icon-button mono lang-button" aria-label="Switch language">
+      <button id="lang-toggle" class="icon-button lang-button" aria-label="Switch language">
         ja
       </button>
       <a href={SITE.github} class="icon-button external" rel="me noopener" target="_blank" aria-label="GitHub">
@@ -63,13 +64,13 @@ const isCurrent = (href: string) =>
 
 <div id="mobile-menu" class="mobile-menu" hidden>
   <div class="mobile-menu-header container">
-    <a href="/" class="brand mono"><span class="brand-tilde">~/</span>{SITE.brand}</a>
+    <a href="/" class="brand">{SITE.title}<span class="brand-dot" aria-hidden="true"></span></a>
     <button id="menu-close" class="icon-button" aria-label="メニューを閉じる">
       <Icon name="close" size={20} />
     </button>
   </div>
-  <nav class="mobile-nav mono container" aria-label="モバイルナビゲーション">
-    <a href="/" class:list={["mobile-link", { current: pathname === "/" }]}>home</a>
+  <nav class="mobile-nav container" aria-label="モバイルナビゲーション">
+    <a href="/" class:list={["mobile-link", { current: pathname === "/" }]}>Home</a>
     {
       NAV_ITEMS.map((item) => (
         <a
@@ -80,7 +81,7 @@ const isCurrent = (href: string) =>
         </a>
       ))
     }
-    <a href="/search/" class="mobile-link">search</a>
+    <a href="/search/" class="mobile-link">Search</a>
     <div class="mobile-social">
       <a href={SITE.github} rel="me noopener" target="_blank" aria-label="GitHub"><Icon name="github" /></a>
       <a href={SITE.x} rel="me noopener" target="_blank" aria-label="X (Twitter)"><Icon name="x" size={18} /></a>
@@ -89,15 +90,14 @@ const isCurrent = (href: string) =>
 </div>
 
 <style>
+  /* opaque masthead topped onto a double rule: hairline over heavy ink */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 50;
     height: var(--header-height);
-    background-color: color-mix(in oklab, var(--bg-base) 85%, transparent);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border-subtle);
+    background-color: var(--bg-base);
+    border-bottom: 3px solid var(--rule-ink);
   }
 
   .header-inner {
@@ -105,33 +105,44 @@ const isCurrent = (href: string) =>
     align-items: center;
     gap: 1.5rem;
     height: 100%;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .brand {
-    font-weight: 700;
-    font-size: var(--text-base);
+    font-size: var(--text-lg);
+    font-weight: 800;
     color: var(--text-primary);
     flex-shrink: 0;
+    letter-spacing: 0.02em;
   }
 
-  .brand-tilde {
-    color: var(--accent);
+  /* the vermilion full stop — the site's new signature mark */
+  .brand-dot {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.42em;
+    margin-left: 0.18em;
+    background-color: var(--accent);
   }
 
   .brand:hover {
-    color: var(--accent-hover);
+    color: var(--text-primary);
+    opacity: 0.75;
   }
 
   .desktop-nav {
     display: none;
-    gap: 1.25rem;
-    font-size: var(--text-sm);
+    gap: 1.4rem;
     margin-left: auto;
   }
 
   .nav-link {
+    font-family: var(--font-display);
+    font-size: var(--kicker-size);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-secondary);
-    padding-block: 0.2rem;
+    padding-block: 0.3rem;
   }
 
   .nav-link:hover {
@@ -139,8 +150,8 @@ const isCurrent = (href: string) =>
   }
 
   .nav-link.current {
-    color: var(--accent);
-    border-bottom: 1px solid var(--accent);
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent);
   }
 
   .header-actions {
@@ -171,17 +182,32 @@ const isCurrent = (href: string) =>
     justify-content: center;
     width: 2.1rem;
     height: 2.1rem;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     color: var(--text-secondary);
   }
 
   .icon-button:hover {
     color: var(--text-primary);
-    background-color: var(--bg-elevated);
+    background-color: var(--bg-surface);
+  }
+
+  /* show the theme you would switch to */
+  .theme-icon {
+    display: none;
+    line-height: 0;
+  }
+
+  :global(html[data-theme="light"]) .theme-icon-moon {
+    display: block;
+  }
+
+  :global(html[data-theme="dark"]) .theme-icon-sun {
+    display: block;
   }
 
   .lang-button {
     font-size: var(--text-xs);
+    font-weight: 700;
     width: auto;
     padding-inline: 0.4rem;
   }
@@ -197,7 +223,7 @@ const isCurrent = (href: string) =>
     position: fixed;
     inset: 0;
     z-index: 60;
-    background-color: var(--bg-surface);
+    background-color: var(--bg-base);
     overflow-y: auto;
   }
 
@@ -206,32 +232,31 @@ const isCurrent = (href: string) =>
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
+    border-bottom: 3px solid var(--rule-ink);
   }
 
   .mobile-nav {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    padding-top: 1.5rem;
+    padding-top: 1.75rem;
   }
 
   .mobile-link {
-    font-size: var(--text-xl);
-    color: var(--text-secondary);
-    padding: 0.6rem 0;
-  }
-
-  .mobile-link::before {
-    content: "> ";
-    color: var(--border-strong);
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .mobile-link.current {
     color: var(--accent);
   }
 
-  .mobile-link.current::before,
-  .mobile-link:hover::before {
+  .mobile-link:hover {
     color: var(--accent);
   }
 
@@ -239,8 +264,6 @@ const isCurrent = (href: string) =>
     display: flex;
     gap: 1.25rem;
     margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-subtle);
   }
 
   .mobile-social a {

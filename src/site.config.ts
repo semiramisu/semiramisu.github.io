@@ -25,9 +25,10 @@ export const SITE = {
   pageSize: 6,
 } as const;
 
-// Lowercase mono labels are part of the terminal aesthetic and need no i18n
+// Uppercase Latin labels are part of the magazine masthead and need no i18n
 export const NAV_ITEMS = [
-  { href: "/archive/", label: "archive" },
-  { href: "/about/", label: "about" },
-  { href: "/contact/", label: "contact" },
+  { href: "/archive/", label: "Archive" },
+  { href: "/categories/", label: "Categories" },
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
 ] as const;

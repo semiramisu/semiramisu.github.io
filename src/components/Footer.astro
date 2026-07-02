@@ -2,44 +2,147 @@
 import { SITE } from "../site.config";
 
 const year = new Date().getFullYear();
+
+const indexLinks = [
+  { href: "/archive/", label: "記事一覧" },
+  { href: "/categories/", label: "カテゴリ" },
+  { href: "/tags/", label: "タグ" },
+  { href: "/search/", label: "検索" },
+];
+
+const infoLinks = [
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
+  { href: "/privacy-policy/", label: "プライバシーポリシー" },
+  { href: "/rss.xml", label: "RSS" },
+];
 ---
 
 <footer class="site-footer">
-  <div class="container footer-inner mono">
+  <div class="container footer-inner">
+    <div class="colophon">
+      <p class="footer-brand">
+        {SITE.title}<span class="brand-dot" aria-hidden="true"></span>
+      </p>
+      <p class="footer-description">{SITE.description}</p>
+    </div>
+
+    <nav class="footer-links" aria-label="フッターナビゲーション">
+      <div class="link-group">
+        <p class="kicker link-heading">Index</p>
+        <ul>
+          {indexLinks.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+      <div class="link-group">
+        <p class="kicker link-heading">Info</p>
+        <ul>
+          {infoLinks.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container footer-bottom">
     <p class="copyright">
       © 2025-{year}
       {SITE.author} ·
       <a href={SITE.license.url} rel="license noopener" target="_blank">{SITE.license.name}</a>
-       ·
-      <a href="/rss.xml">RSS</a>
     </p>
-    <p class="sign">// {SITE.sign}</p>
+    <p class="kicker sign">{SITE.sign}</p>
   </div>
 </footer>
 
 <style>
   .site-footer {
     margin-top: 5rem;
-    border-top: 1px solid var(--border-subtle);
+    border-top: 3px solid var(--rule-ink);
+    background-color: var(--bg-surface);
   }
 
   .footer-inner {
     display: flex;
     flex-wrap: wrap;
+    gap: 2.5rem 4rem;
+    justify-content: space-between;
+    padding-block: 2.75rem 2.25rem;
+  }
+
+  .footer-brand {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .brand-dot {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.42em;
+    margin-left: 0.18em;
+    background-color: var(--accent);
+  }
+
+  .footer-description {
+    margin-top: 0.6rem;
+    max-width: 26em;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 3.5rem;
+  }
+
+  .link-heading {
+    color: var(--text-muted);
+  }
+
+  .link-group ul {
+    list-style: none;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .link-group a {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .link-group a:hover {
+    color: var(--accent);
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem 2rem;
     justify-content: space-between;
-    padding-block: 2rem;
+    align-items: baseline;
+    padding-block: 1.1rem;
+    border-top: 1px solid var(--border-subtle);
     font-size: var(--text-xs);
     color: var(--text-muted);
   }
 
-  .footer-inner a {
+  .copyright a {
     color: var(--text-secondary);
     text-decoration: underline;
     text-underline-offset: 0.2em;
   }
 
-  .footer-inner a:hover {
+  .copyright a:hover {
     color: var(--accent);
+  }
+
+  .sign {
+    color: var(--text-muted);
   }
 </style>
