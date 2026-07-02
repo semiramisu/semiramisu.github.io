@@ -2,6 +2,7 @@
 import { getEntry, render } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import PageHeader from "../components/PageHeader.astro";
 
 const policy = await getEntry("specs", "privacy-policy");
 if (!policy) throw new Error("specs/privacy-policy.md not found");
@@ -10,8 +11,8 @@ const { Content } = await render(policy);
 
 <BaseLayout title="プライバシーポリシー" description={policy.data.description}>
   <div class="container spec-page">
-    <PathBreadcrumb segments={[{ label: "privacy-policy.md" }]} />
-    <h1 class="prompt page-title">cat ~/privacy-policy.md</h1>
+    <PathBreadcrumb segments={[{ label: "privacy-policy" }]} />
+    <PageHeader kicker="Policy" title="プライバシーポリシー" />
     <div class="prose">
       <Content />
     </div>
@@ -23,7 +24,7 @@ const { Content } = await render(policy);
     padding-block: 2rem 4rem;
   }
 
-  .page-title {
-    margin-block: 1.5rem 2rem;
+  .spec-page .prose {
+    margin-top: 2rem;
   }
 </style>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import PageHeader from "../components/PageHeader.astro";
 import Icon from "../components/Icon.astro";
 import { SITE } from "../site.config";
 ---
@@ -8,9 +9,9 @@ import { SITE } from "../site.config";
 <BaseLayout title="Contact" description="お問い合わせフォーム">
   <div class="container contact-page">
     <PathBreadcrumb segments={[{ label: "contact" }]} />
-    <h1 class="prompt page-title">contact --new</h1>
+    <PageHeader kicker="Contact" title="お問い合わせ" />
 
-    <p id="sent-message" class="sent-message mono" hidden>
+    <p id="sent-message" class="sent-message" hidden>
       ✓ 送信しました。ありがとうございます！
     </p>
 
@@ -28,32 +29,32 @@ import { SITE } from "../site.config";
       </p>
 
       <div class="field">
-        <label for="name" class="mono" data-i18n="contact.name">お名前</label>
+        <label for="name" data-i18n="contact.name">お名前</label>
         <input type="text" id="name" name="name" required autocomplete="name" />
       </div>
 
       <div class="field">
-        <label for="email" class="mono" data-i18n="contact.email">メールアドレス</label>
+        <label for="email" data-i18n="contact.email">メールアドレス</label>
         <input type="email" id="email" name="email" required autocomplete="email" />
       </div>
 
       <div class="field">
-        <label for="subject" class="mono" data-i18n="contact.subject">件名</label>
+        <label for="subject" data-i18n="contact.subject">件名</label>
         <input type="text" id="subject" name="subject" required />
       </div>
 
       <div class="field">
-        <label for="message" class="mono" data-i18n="contact.message">メッセージ</label>
+        <label for="message" data-i18n="contact.message">メッセージ</label>
         <textarea id="message" name="message" rows="8" required></textarea>
       </div>
 
-      <button type="submit" class="mono submit-button">
-        $ <span data-i18n="contact.send">送信</span>
+      <button type="submit" class="submit-button">
+        <span data-i18n="contact.send">送信</span>
       </button>
     </form>
 
-    <div class="alt-contacts mono">
-      <p class="comment-line">// または</p>
+    <div class="alt-contacts">
+      <span class="kicker">Or</span>
       <a href={SITE.x} target="_blank" rel="noopener"><Icon name="x" size={16} /> @sekine_DS</a>
       <a href={SITE.github} target="_blank" rel="noopener"><Icon name="github" size={16} /> GitHub</a>
     </div>
@@ -66,19 +67,17 @@ import { SITE } from "../site.config";
     max-width: 44rem;
   }
 
-  .page-title {
-    margin-block: 1.5rem 2rem;
-  }
-
   .sent-message {
     color: var(--accent);
-    margin-bottom: 1.5rem;
+    font-weight: 700;
+    margin-block: 1.5rem 0;
   }
 
   .contact-form {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    margin-top: 2rem;
   }
 
   .hidden-field {
@@ -93,14 +92,15 @@ import { SITE } from "../site.config";
 
   .field label {
     font-size: var(--text-sm);
+    font-weight: 700;
     color: var(--text-secondary);
   }
 
   .field input,
   .field textarea {
-    background-color: var(--bg-surface);
+    background-color: var(--bg-elevated);
     border: 1px solid var(--border-strong);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     padding: 0.55rem 0.8rem;
     color: var(--text-primary);
   }
@@ -117,8 +117,8 @@ import { SITE } from "../site.config";
     background-color: var(--accent);
     color: var(--accent-text-on);
     font-weight: 700;
-    border-radius: 6px;
-    padding: 0.55rem 1.6rem;
+    border-radius: var(--radius-pill);
+    padding: 0.55rem 1.8rem;
   }
 
   .submit-button:hover {

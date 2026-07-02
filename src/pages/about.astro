@@ -11,15 +11,17 @@ const { Content } = await render(about);
 
 <BaseLayout title="About" description={`${SITE.author}について`}>
   <div class="container spec-page">
-    <PathBreadcrumb segments={[{ label: "about.md" }]} />
-    <h1 class="prompt page-title">cat ~/about.md</h1>
-    <div class="profile">
-      <img src="/icon.jpg" alt={`${SITE.author}のアバター`} width="72" height="72" class="avatar" loading="lazy" />
-      <div>
-        <p class="mono name">{SITE.author}</p>
-        <p class="comment-line">// {SITE.sign}</p>
+    <PathBreadcrumb segments={[{ label: "about" }]} />
+
+    <header class="profile">
+      <img src="/icon.jpg" alt={`${SITE.author}のアバター`} width="96" height="96" class="avatar" loading="lazy" />
+      <div class="profile-text">
+        <p class="kicker">About</p>
+        <h1 class="name">{SITE.author}</h1>
+        <p class="kicker sign">{SITE.sign}</p>
       </div>
-    </div>
+    </header>
+
     <div class="prose">
       <Content />
     </div>
@@ -31,15 +33,16 @@ const { Content } = await render(about);
     padding-block: 2rem 4rem;
   }
 
-  .page-title {
-    margin-block: 1.5rem 2rem;
-  }
-
+  /* editorial profile header framed by heavy rules */
   .profile {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.75rem;
+    margin-top: 1.5rem;
     margin-bottom: 2.5rem;
+    padding-block: 1.75rem;
+    border-top: 3px solid var(--rule-ink);
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .avatar {
@@ -48,8 +51,15 @@ const { Content } = await render(about);
   }
 
   .name {
-    font-weight: 700;
-    font-size: var(--text-lg);
+    margin-top: 0.2rem;
+    font-size: var(--display-page);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .sign {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
   }
 
   .spec-page .prose {

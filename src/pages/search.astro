@@ -2,12 +2,13 @@
 import Search from "astro-pagefind/components/Search.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import PageHeader from "../components/PageHeader.astro";
 ---
 
 <BaseLayout title="検索" description="サイト内全文検索">
   <div class="container search-page">
     <PathBreadcrumb segments={[{ label: "search" }]} />
-    <h1 class="prompt page-title">grep -r "..." ~/posts</h1>
+    <PageHeader kicker="Search" title="検索" titleI18n="action.search" />
     <div class="search-wrap">
       <Search
         className="site-search"
@@ -23,8 +24,8 @@ import PathBreadcrumb from "../components/PathBreadcrumb.astro";
     max-width: 48rem;
   }
 
-  .search-page .page-title {
-    margin-block: 1.5rem 1.5rem;
+  .search-page .search-wrap {
+    margin-top: 2rem;
   }
 
   /* theme the Pagefind component UI to match the design tokens */
@@ -37,7 +38,7 @@ import PathBreadcrumb from "../components/PathBreadcrumb.astro";
     --pf-border: var(--border-strong);
     --pf-border-focus: var(--accent);
     --pf-outline-focus: var(--accent);
-    --pf-border-radius: 8px;
+    --pf-border-radius: 2px;
     --pf-hover: var(--bg-elevated);
     --pf-mark: var(--accent-muted);
     --pf-skeleton: var(--bg-elevated);

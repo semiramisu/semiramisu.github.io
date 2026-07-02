@@ -3,74 +3,93 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="404 Not Found">
-  <div class="container notfound mono">
-    <p class="cmd"><span class="ps">$</span> open <span id="requested-path">/requested/path</span></p>
-    <p class="error-line">zsh: command not found: <span id="requested-path-2">/requested/path</span></p>
-    <p class="comment-line">// 404 - <span data-i18n="notfound.message">ページが見つかりませんでした</span></p>
+  <div class="container notfound">
+    <p class="kicker">Missing Issue</p>
+    <p class="big display" aria-hidden="true">
+      <span>4</span><span>0</span><span>4</span>
+    </p>
+    <h1 class="lead" data-i18n="notfound.lead">お探しのページは欠番です。</h1>
+    <p class="meta-line path-line">
+      <span id="requested-path"></span>
+      <span data-i18n="notfound.message">ページが見つかりませんでした</span>
+    </p>
 
-    <div class="suggestions">
-      <a href="/" class="suggestion">
-        <span class="ps">$</span> cd ~ <span class="hint" data-i18n="notfound.home">ホームへ戻る</span>
-      </a>
-      <a href="/archive/" class="suggestion">
-        <span class="ps">$</span> ls ~/posts <span class="hint" data-i18n="notfound.archive">記事一覧を見る</span>
-      </a>
-      <a href="/search/" class="suggestion">
-        <span class="ps">$</span> grep -r ... <span class="hint" data-i18n="action.search">検索</span>
-      </a>
+    <div class="actions">
+      <a href="/" class="action" data-i18n="notfound.home">ホームへ戻る</a>
+      <a href="/archive/" class="action" data-i18n="notfound.archive">記事一覧を見る</a>
+      <a href="/search/" class="action" data-i18n="action.search">検索</a>
     </div>
   </div>
 </BaseLayout>
 
 <style>
   .notfound {
-    padding-block: 6rem;
-    font-size: var(--text-base);
+    padding-block: 5rem 6rem;
+    text-align: center;
   }
 
-  .ps {
+  /* the missing issue number, stamped in category inks */
+  .big {
+    font-size: clamp(6rem, 3rem + 18vw, 13rem);
+    line-height: 1;
+    margin-top: 0.5rem;
+    letter-spacing: 0.02em;
+  }
+
+  .big span:nth-child(1) {
+    color: var(--cat-work);
+  }
+
+  .big span:nth-child(2) {
     color: var(--accent);
-    user-select: none;
   }
 
-  .error-line {
+  .big span:nth-child(3) {
+    color: var(--cat-book);
+  }
+
+  .lead {
+    margin-top: 1.5rem;
+    font-size: var(--text-xl);
+    font-weight: 800;
+  }
+
+  .path-line {
     margin-top: 0.8rem;
-    color: var(--danger);
   }
 
-  .comment-line {
-    margin-top: 0.8rem;
+  #requested-path {
+    overflow-wrap: anywhere;
   }
 
-  .suggestions {
+  #requested-path:not(:empty)::after {
+    content: " — ";
+  }
+
+  .actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-top: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 2.5rem;
   }
 
-  .suggestion {
-    color: var(--text-secondary);
-    width: fit-content;
-  }
-
-  .suggestion:hover {
-    color: var(--text-primary);
-  }
-
-  .hint {
-    color: var(--text-muted);
+  .action {
+    padding: 0.5rem 1.4rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
     font-size: var(--text-sm);
-    margin-left: 1rem;
+    font-weight: 700;
+    color: var(--text-secondary);
   }
 
-  .suggestion:hover .hint {
+  .action:hover {
     color: var(--accent);
+    border-color: var(--accent);
   }
 </style>
 
 <script>
-  const path = location.pathname;
-  document.getElementById("requested-path")!.textContent = path;
-  document.getElementById("requested-path-2")!.textContent = path;
+  const el = document.getElementById("requested-path");
+  if (el) el.textContent = location.pathname;
 </script>
