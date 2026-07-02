@@ -22,7 +22,7 @@ const years = variant === "timeline" ? groupByYear(posts) : [];
     <div class="timeline">
       {years.map(([year, yearPosts]) => (
         <section class="year-group">
-          <h2 class="mono year-heading">{year}</h2>
+          <h2 class="display year-heading">{year}</h2>
           <ul class="post-list">
             {yearPosts.map((post) => (
               <PostListItem post={post} variant="log" />
@@ -57,13 +57,14 @@ const years = variant === "timeline" ? groupByYear(posts) : [];
     margin-top: 0;
   }
 
+  /* back-number numerals: oversized, printed in pale ink */
   .year-heading {
-    font-size: var(--text-base);
-    font-weight: 700;
-    color: var(--text-muted);
+    font-size: var(--text-5xl);
+    line-height: 1.1;
+    color: color-mix(in oklab, var(--text-muted) 45%, transparent);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
   .year-heading::after {

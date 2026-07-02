@@ -34,11 +34,11 @@ const jsonLd = {
 };
 ---
 
-<nav class="breadcrumb mono" aria-label="パンくずリスト">
-  <a href="/" class="segment">~</a>{
+<nav class="breadcrumb" aria-label="パンくずリスト">
+  <a href="/" class="segment" data-i18n="breadcrumb.home">ホーム</a>{
     segments.map((seg) => (
       <>
-        <span class="separator">/</span>
+        <span class="separator">›</span>
         {seg.href ? (
           <a href={seg.href} class="segment">
             {seg.label}
@@ -69,7 +69,7 @@ const jsonLd = {
   }
 
   .separator {
-    margin-inline: 0.15em;
+    margin-inline: 0.4em;
     color: var(--border-strong);
   }
 

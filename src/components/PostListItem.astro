@@ -1,11 +1,12 @@
 ---
 import type { Post } from "../utils/content";
 import { formatDate, formatDateShort } from "../utils/content";
+import { getCategoryGroup } from "../utils/categories";
 
 interface Props {
   post: Post;
   /**
-   * detail: date + title + category + one-line description (home)
+   * detail: date + title + category + one-line description
    * log: dense single line, date without year (archive / category / tag)
    */
   variant?: "detail" | "log";
@@ -13,6 +14,7 @@ interface Props {
 
 const { post, variant = "detail" } = Astro.props;
 const href = `/posts/${post.id}/`;
+const cat = getCategoryGroup(post.data.category);
 // some old posts have description identical to the title — showing it twice is noise
 const description =
   post.data.description && post.data.description !== post.data.title
@@ -22,30 +24,36 @@ const description =
 
 {
   variant === "detail" ? (
-    <li class="post-item detail">
+    <li class="post-item detail" data-cat={cat}>
       <a href={href} class="post-link">
         <div class="post-row">
-          <time class="mono date" datetime={post.data.published.toISOString()}>
+          <time class="date" datetime={post.data.published.toISOString()}>
             {formatDate(post.data.published)}
           </time>
           <span class="title">{post.data.title}</span>
           {post.data.category && (
-            <span class="mono category">[{post.data.category}]</span>
+            <span class="category">
+              <span class="cat-dot" aria-hidden="true" />
+              {post.data.category}
+            </span>
           )}
         </div>
         {description && <p class="description">{description}</p>}
       </a>
     </li>
   ) : (
-    <li class="post-item log">
+    <li class="post-item log" data-cat={cat}>
       <a href={href} class="post-link">
         <div class="post-row">
-          <time class="mono date" datetime={post.data.published.toISOString()}>
+          <time class="date" datetime={post.data.published.toISOString()}>
             {formatDateShort(post.data.published)}
           </time>
           <span class="title">{post.data.title}</span>
           {post.data.category && (
-            <span class="mono category">[{post.data.category}]</span>
+            <span class="category">
+              <span class="cat-dot" aria-hidden="true" />
+              {post.data.category}
+            </span>
           )}
         </div>
       </a>
@@ -62,7 +70,6 @@ const description =
   .post-link {
     display: block;
     padding: 0.85rem 0.6rem;
-    border-radius: 6px;
     color: inherit;
   }
 
@@ -72,7 +79,10 @@ const description =
   }
 
   .post-link:hover .title {
-    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: var(--cat, var(--accent));
   }
 
   .post-row {
@@ -84,20 +94,30 @@ const description =
   .date {
     font-size: var(--text-sm);
     color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
 
   .title {
     font-weight: 600;
     color: var(--text-primary);
-    transition: color 150ms ease;
   }
 
   .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
     font-size: var(--text-xs);
+    font-weight: 700;
     color: var(--text-muted);
     margin-left: auto;
     flex-shrink: 0;
+  }
+
+  .cat-dot {
+    width: 0.6em;
+    height: 0.6em;
+    background-color: var(--cat, var(--accent));
   }
 
   .description {

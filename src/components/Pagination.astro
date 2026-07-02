@@ -1,4 +1,6 @@
 ---
+import Icon from "./Icon.astro";
+
 interface Props {
   currentPage: number;
   lastPage: number;
@@ -21,14 +23,16 @@ for (let i = 1; i <= lastPage; i++) {
 const pageUrl = (n: number) => (n === 1 ? "/" : `/${n}/`);
 ---
 
-<nav class="pagination mono" aria-label="ページネーション">
+<nav class="pagination" aria-label="ページネーション">
   {
     prevUrl ? (
-      <a href={prevUrl} class="page-nav" rel="prev">
-        ← prev
+      <a href={prevUrl} class="page-nav" rel="prev" aria-label="前のページ">
+        <Icon name="arrow-left" size={18} />
       </a>
     ) : (
-      <span class="page-nav disabled">← prev</span>
+      <span class="page-nav disabled" aria-hidden="true">
+        <Icon name="arrow-left" size={18} />
+      </span>
     )
   }
   <span class="pages">
@@ -50,11 +54,13 @@ const pageUrl = (n: number) => (n === 1 ? "/" : `/${n}/`);
   </span>
   {
     nextUrl ? (
-      <a href={nextUrl} class="page-nav" rel="next">
-        next →
+      <a href={nextUrl} class="page-nav" rel="next" aria-label="次のページ">
+        <Icon name="arrow-right" size={18} />
       </a>
     ) : (
-      <span class="page-nav disabled">next →</span>
+      <span class="page-nav disabled" aria-hidden="true">
+        <Icon name="arrow-right" size={18} />
+      </span>
     )
   }
 </nav>
@@ -64,22 +70,24 @@ const pageUrl = (n: number) => (n === 1 ? "/" : `/${n}/`);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
     margin-top: 3rem;
     font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
   }
 
   .pages {
     display: flex;
+    align-items: center;
     gap: 0.4rem;
   }
 
   .page,
   .ellipsis {
-    min-width: 1.8rem;
+    min-width: 2rem;
     text-align: center;
-    padding: 0.2rem 0.3rem;
-    border-radius: 4px;
+    padding: 0.25rem 0.35rem;
+    border-radius: var(--radius-sm);
     color: var(--text-secondary);
   }
 
@@ -88,21 +96,31 @@ const pageUrl = (n: number) => (n === 1 ? "/" : `/${n}/`);
     color: var(--text-primary);
   }
 
+  /* current page = solid ink square, the editorial stamp */
   .page.current {
-    color: var(--accent-text-on);
-    background-color: var(--accent);
+    color: var(--bg-base);
+    background-color: var(--rule-ink);
     font-weight: 700;
   }
 
   .page-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
     color: var(--text-secondary);
   }
 
   .page-nav:hover {
     color: var(--accent);
+    border-color: var(--accent);
   }
 
   .page-nav.disabled {
     color: var(--border-strong);
+    border-color: var(--border-subtle);
   }
 </style>

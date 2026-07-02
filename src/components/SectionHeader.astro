@@ -1,0 +1,85 @@
+---
+import type { CatKey } from "../utils/categories";
+
+interface Props {
+  /** uppercase Latin label (FEATURE / LATEST / CATEGORY …) — language-neutral */
+  kicker?: string;
+  title: string;
+  count?: number;
+  /** when set, a "view all" link is rendered on the right edge */
+  href?: string;
+  /** custom link text; defaults to the i18n-aware すべて見る */
+  hrefLabel?: string;
+  /** colors the heavy rule, kicker and count with the category color */
+  catKey?: CatKey;
+}
+
+const { kicker, title, count, href, hrefLabel, catKey } = Astro.props;
+---
+
+<header class="section-header" data-cat={catKey}>
+  <div class="row">
+    <div class="heading">
+      {kicker && <span class="kicker section-kicker">{kicker}</span>}
+      <h2 class="section-title">
+        {title}
+        {count !== undefined && <span class="count">{count}</span>}
+      </h2>
+    </div>
+    {
+      href && (
+        <a href={href} class="view-all">
+          {hrefLabel ?? <span data-i18n="section.viewAll">すべて見る</span>}
+          <span aria-hidden="true"> →</span>
+        </a>
+      )
+    }
+  </div>
+</header>
+
+<style>
+  .section-header {
+    border-top: 3px solid var(--cat, var(--rule-ink));
+    padding-top: 0.8rem;
+  }
+
+  .row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .section-kicker {
+    display: block;
+    color: var(--cat, var(--accent));
+  }
+
+  .section-title {
+    margin: 0.15rem 0 0;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  .count {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--cat, var(--text-muted));
+    margin-left: 0.35rem;
+    vertical-align: 0.35em;
+  }
+
+  .view-all {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding-bottom: 0.2rem;
+  }
+
+  .view-all:hover {
+    color: var(--accent);
+  }
+</style>
