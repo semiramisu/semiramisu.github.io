@@ -1,93 +1,45 @@
-# Yukina
+# セミラミスの庭
 
-Simple and Elegant Astro Blog Template
+https://semiramisu.com/
 
+データサイエンスの仕事、読書、日々の考察を綴る個人ブログ。
+Astro 6 によるフルスクラッチ構成、デザインシステムは「Terminal Garden」(ダークファースト・ターミナル風)。
 
-[日本語](https://github.com/WhitePaper233/yukina/blob/main/README_ja.md)
-
-## Demo Preview Links
-
-[🖥️ Live Demo (Vercel)](https://yukina-blog.vercel.app) |
-[🖥️ WhitePaper233's Blog (possibly not the latest version)](https://whitepaper233.top/)
-
-## 🛠️ Build Guide
-
-### 1. Install Node.js version 22 or above
-
-Go to the [Node.js official website](https://nodejs.org/) to download and install the latest version of Node.js.
-
-### 2. Enable Corepack
-
-```bash
-corepack enable
-```
-
-### 3. Install pnpm
-
-```bash
-corepack enable pnpm
-```
-
-### 4. Install Dependencies
+## 開発
 
 ```bash
 pnpm install
+pnpm dev          # localhost:4321
+pnpm build        # 本番ビルド (Pagefindインデックス生成込み)
+pnpm preview      # ビルド結果のプレビュー
+pnpm check        # 型チェック
 ```
 
-### 5. Build Search Index
+Node 22 以上が必要(`.nvmrc` 参照)。
 
-```bash
-pnpm build
+## 記事の書き方
+
+`src/content/posts/YYYY_MM_DD.md` を作成:
+
+```markdown
+---
+title: 記事タイトル
+published: 2026-06-12
+description: 一覧やOGPに使われる説明文
+tags: [タグ1, タグ2]
+category: カテゴリ名
+draft: false
+---
+
+本文(Markdown)。数式は $KaTeX$ 記法、コードブロックはシンタックスハイライト対応。
 ```
 
-### 6. Start Development Server
+ファイル名がそのままURLスラグになる(`/posts/YYYY_MM_DD/`)。
+画像は `src/content/posts/media/` に置き `./media/ファイル名` で相対参照。
 
-```bash
-pnpm dev
-```
+## 構成
 
-### 7. Build Project
-
-```bash
-pnpm build
-```
-
-### 8. Preview Project
-
-```bash
-pnpm preview
-```
-
-## 🗺️ Roadmap
-
-### Recent
-
-✅ - Completed | 🧪 - In Testing | 🚧 - In Progress | ⏳ - Planned
-
-| Status | Project                                             |
-| ------ | --------------------------------------------------- |
-| 🧪     | Basic feature implementation                        |
-| 🧪     | Refactoring some code, optimizing overall structure |
-| 🧪     | Optimizing animation effects                        |
-| 🧪     | Mobile adaptation                                   |
-| 🚧     | Optimizing website performance                      |
-| 🧪     | Adjustable colors                                   |
-| 🧪     | Adding RSS, SiteMap, and other features             |
-| 🧪     | More build options (e.g., SLUG generation methods)  |
-| ⏳     | Adding Live2D character                             |
-| 🧪     | Search functionality                                |
-| 🧪     | i18n                                                |
-
-### Long-term
-
-| Status | Project                                        |
-| ------ | ---------------------------------------------- |
-| ⏳     | Developing an easy-to-manage CLI and small CMS |
-| ⏳     | Slidev components                              |
-| ⏳     | More Markdown components                       |
-
-## 🙏 Special Thanks
-
-- [Hexo Shoka Theme](https://github.com/amehime/hexo-theme-shoka) for providing design ideas
-
-- [Astro Fuwari Template](https://github.com/saicaca/fuwari) for providing the main design ideas and some code implementations
+- ホスティング: Netlify(mainブランチへのpushで自動デプロイ)
+- 検索: Pagefind / コメント: giscus / フォーム: Netlify Forms
+- 収益化(AdSense/寄付)とGAはNetlifyの環境変数で制御(`.env.example` 参照)
+- 詳細は `CLAUDE.md` を参照

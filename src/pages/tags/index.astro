@@ -1,17 +1,47 @@
 ---
-import ChipLayout from "../../layouts/ChipLayout.astro";
-import I18nKeys from "../../locales/keys";
-import { i18n } from "../../locales/translation";
-import { GetTags } from "../../utils/content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getPublishedPosts, countTags } from "../../utils/content";
 
-const tags = [...(await GetTags()).values()].sort();
-const chips = tags.map((tag) => {
-  return {
-    name: tag.name,
-    slug: tag.slug,
-    subChip: tag.posts.length.toString(),
-  };
-});
+const posts = await getPublishedPosts();
+const tags = countTags(posts);
 ---
 
-<ChipLayout chips={chips} title={i18n(I18nKeys.pages_tags_title)} />
+<BaseLayout title="タグ一覧">
+  <div class="container chip-page">
+    <PathBreadcrumb segments={[{ label: "tags" }]} />
+    <PageHeader kicker="Index" title="タグ一覧" count={tags.size} />
+    <ul class="chips">
+      {
+        [...tags].map(([name, count]) => (
+          <li>
+            <a href={`/tags/${name}/`} class="chip">
+              {name} <span class="chip-count">{count}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .chip-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+  }
+
+  .chip-count {
+    opacity: 0.65;
+    font-size: var(--text-xs);
+  }
+</style>

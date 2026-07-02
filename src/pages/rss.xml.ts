@@ -1,69 +1,46 @@
 import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
-import YukinaConfig from "../../yukina.config";
-import sanitizeHtml from "sanitize-html";
+import type { APIContext } from "astro";
 import MarkdownIt from "markdown-it";
+import sanitizeHtml from "sanitize-html";
+import { SITE } from "../site.config";
+import { getPublishedPosts } from "../utils/content";
 
 const parser = new MarkdownIt();
 
-function getExcerpt(content: string, maxLength: number = 200): string {
-  // Markdownをプレーンテキストに変換
+/** Plain-text excerpt for posts without a description. */
+function getExcerpt(content: string, maxLength = 200): string {
   const html = parser.render(content);
-  const plainText = sanitizeHtml(html, {
-    allowedTags: [],
-    allowedAttributes: {}
-  });
-  
-  // 改行と余分な空白を削除
-  const cleaned = plainText
-    .replace(/\n+/g, ' ')
-    .replace(/\s+/g, ' ')
+  const plain = sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} })
+    .replace(/\s+/g, " ")
     .trim();
-  
-  // 指定文字数で切り取り
-  if (cleaned.length <= maxLength) {
-    return cleaned;
-  }
-  
-  // 文の区切りで自然に切る
-  const truncated = cleaned.substring(0, maxLength);
-  const lastPeriod = truncated.lastIndexOf('。');
-  const lastSpace = truncated.lastIndexOf(' ');
-  
-  let cutIndex = maxLength;
-  if (lastPeriod > maxLength * 0.8) {
-    cutIndex = lastPeriod + 1;
-  } else if (lastSpace > maxLength * 0.8) {
-    cutIndex = lastSpace;
-  }
-  
-  return cleaned.substring(0, cutIndex) + '...';
+
+  if (plain.length <= maxLength) return plain;
+
+  const truncated = plain.substring(0, maxLength);
+  const lastPeriod = truncated.lastIndexOf("。");
+  const cutIndex = lastPeriod > maxLength * 0.8 ? lastPeriod + 1 : maxLength;
+  return plain.substring(0, cutIndex) + "...";
 }
 
-export async function GET(context: { site: string }) {
-  const posts = await getCollection("posts");
-  
-  // 投稿を公開日順にソート（新しい順）
-  const sortedPosts = posts.sort((a, b) => 
-    b.data.published.getTime() - a.data.published.getTime()
-  );
-  
+export async function GET(context: APIContext) {
+  const posts = await getPublishedPosts();
+
   return rss({
-    title: YukinaConfig.title,
-    description: YukinaConfig.description,
-    site: context.site,
-    items: sortedPosts.map((post) => ({
+    title: SITE.title,
+    description: SITE.description,
+    site: context.site!,
+    items: posts.map((post) => ({
       title: post.data.title,
-      description: post.data.description || getExcerpt(post.body),
+      description: post.data.description || getExcerpt(post.body ?? ""),
       pubDate: post.data.published,
-      link: `/posts/${post.slug}/`,
+      // post.id, not post.slug — content-layer entries have no slug property
+      link: `/posts/${post.id}/`,
       categories: [
         ...(post.data.category ? [post.data.category] : []),
-        ...(post.data.tags || [])
+        ...post.data.tags,
       ],
-      author: YukinaConfig.username,
+      author: SITE.author,
     })),
-    customData: `<language>${YukinaConfig.locale}</language>`,
-    stylesheet: '/rss-styles.xsl',
+    customData: `<language>${SITE.locale}</language>`,
   });
 }

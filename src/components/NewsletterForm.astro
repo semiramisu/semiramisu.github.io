@@ -1,0 +1,103 @@
+---
+/**
+ * Email signup via Netlify Forms (replaces the old non-functional Web Push
+ * stub). The form must exist in static HTML for Netlify to register it.
+ */
+---
+
+<aside class="newsletter" data-pagefind-ignore>
+  <p class="kicker">Newsletter</p>
+  <p class="newsletter-text" data-i18n="newsletter.text">新着記事の通知を受け取る</p>
+  <form
+    name="newsletter"
+    method="POST"
+    action="/?subscribed=1"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    class="newsletter-form"
+  >
+    <input type="hidden" name="form-name" value="newsletter" />
+    <p class="hidden-field">
+      <label>Don't fill this out: <input name="bot-field" /></label>
+    </p>
+    <input
+      type="email"
+      name="email"
+      required
+      placeholder="email@example.com"
+      class="email-input"
+      aria-label="メールアドレス"
+      data-i18n-aria="contact.email"
+    />
+    <button type="submit" class="submit-button" data-i18n="newsletter.submit">
+      登録
+    </button>
+  </form>
+  <p class="rss-alt">
+    or <a href="/rss.xml">RSS →</a>
+  </p>
+</aside>
+
+<style>
+  .newsletter {
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-top: 3px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
+  }
+
+  .newsletter-text {
+    margin-top: 0.6rem;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .newsletter-form {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .hidden-field {
+    display: none;
+  }
+
+  .email-input {
+    flex: 1;
+    min-width: 12rem;
+    background-color: var(--bg-base);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.8rem;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+
+  .email-input:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 0;
+    border-color: transparent;
+  }
+
+  .submit-button {
+    background-color: var(--accent);
+    color: var(--accent-text-on);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-pill);
+    padding: 0.4rem 1.2rem;
+  }
+
+  .submit-button:hover {
+    background-color: var(--accent-hover);
+  }
+
+  .rss-alt {
+    margin-top: 0.7rem;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+</style>

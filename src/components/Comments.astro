@@ -1,81 +1,58 @@
 ---
-export interface Props {
-  lang?: string;
-}
-
-const { lang = 'ja' } = Astro.props;
+/**
+ * giscus comments. data-mapping="pathname" means threads are bound to URLs,
+ * so keeping the old URL structure preserves every existing comment.
+ */
 ---
 
-<div class="comments-container">
-  <h2 class="comments-title">コメント</h2>
-  <div class="giscus"></div>
-</div>
-
-<script
-  src="https://giscus.app/client.js"
-  data-repo="semiramisu/semiramisu.github.io"
-  data-repo-id="R_kgDOOD4A8A"
-  data-category="Announcements"
-  data-category-id="DIC_kwDOOD4A8M4CsJLk"
-  data-mapping="pathname"
-  data-strict="0"
-  data-reactions-enabled="1"
-  data-emit-metadata="0"
-  data-input-position="top"
-  data-theme="preferred_color_scheme"
-  data-lang="ja"
-  data-loading="lazy"
-  crossorigin="anonymous"
-  async
->
-</script>
+<section class="comments" data-pagefind-ignore>
+  <h2 class="comments-title" data-i18n="comments.title">コメント</h2>
+  <div class="giscus-container"></div>
+</section>
 
 <style>
-  .comments-container {
-    @apply max-w-4xl mx-auto px-4 py-8 mt-12;
+  .comments {
+    margin-top: 4rem;
+    padding-top: 1rem;
+    border-top: 3px solid var(--rule-ink);
   }
-  
+
   .comments-title {
-    @apply text-2xl font-bold mb-6 text-[var(--text-color)];
-    font-family: var(--primary-font);
+    font-size: var(--text-2xl);
+    font-weight: 800;
   }
-  
-  .giscus {
-    @apply w-full;
-  }
-  
-  /* Giscusのテーマ調整 */
-  :global(.giscus-frame) {
-    @apply rounded-lg;
+
+  .giscus-container {
+    margin-top: 1.5rem;
   }
 </style>
 
 <script>
-  // テーマ切り替えに対応
-  function updateGiscusTheme() {
-    const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
-    if (!iframe) return;
-    
-    const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-    
-    iframe.contentWindow?.postMessage(
-      { giscus: { setConfig: { theme } } },
-      'https://giscus.app'
-    );
+  const container = document.querySelector(".giscus-container");
+  if (container) {
+    const theme =
+      document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+    const script = document.createElement("script");
+    const config: Record<string, string> = {
+      src: "https://giscus.app/client.js",
+      "data-repo": "semiramisu/semiramisu.github.io",
+      "data-repo-id": "R_kgDOOD4A8A",
+      "data-category": "Announcements",
+      "data-category-id": "DIC_kwDOOD4A8M4CsJLk",
+      "data-mapping": "pathname",
+      "data-strict": "0",
+      "data-reactions-enabled": "1",
+      "data-emit-metadata": "0",
+      "data-input-position": "top",
+      "data-theme": theme,
+      "data-lang": "ja",
+      "data-loading": "lazy",
+      crossorigin: "anonymous",
+    };
+    for (const [key, value] of Object.entries(config)) {
+      script.setAttribute(key, value);
+    }
+    script.async = true;
+    container.appendChild(script);
   }
-  
-  // テーマ変更を監視
-  const observer = new MutationObserver(() => {
-    updateGiscusTheme();
-  });
-  
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme']
-  });
-  
-  // 初期化時にもテーマを設定
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(updateGiscusTheme, 1000);
-  });
 </script>

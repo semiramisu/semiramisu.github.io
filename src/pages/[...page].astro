@@ -1,53 +1,64 @@
 ---
-// Component imports
-import MainLayout from "../layouts/MainLayout.astro";
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHeader from "../components/PageHeader.astro";
 import PostCard from "../components/PostCard.astro";
-import Pagination from "../components/controllers/Pagination.astro";
-// Utils
-import type { PaginateFunction } from "astro";
-import { GetSortedPosts } from "../utils/content";
+import Pagination from "../components/Pagination.astro";
+import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import { SITE } from "../site.config";
+import { getPublishedPosts } from "../utils/content";
 
-export async function getStaticPaths({
-  paginate,
-}: {
-  paginate: PaginateFunction;
-}) {
-  const postCollections = await GetSortedPosts();
-  return paginate(postCollections, { pageSize: 6 });
-}
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  // pageSize must stay 6 so /2/ ... /41/ keep the same content ranges as the
+  // old site. Page 1 ("/") is rendered by index.astro instead.
+  return paginate(posts, { pageSize: SITE.pageSize }).filter(
+    (route) => route.params.page !== undefined,
+  );
+}) satisfies GetStaticPaths;
+
 const { page } = Astro.props;
 ---
 
-<MainLayout>
-  <div class="space-y-8">
-    <div class="w-full space-y-4">
-      {
-        page.data.map((entry, index) => (
-          <div
-            class="onload-animation"
-            style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
-          >
-            <PostCard
-              id={entry.id}
-              title={entry.data.title}
-              published={entry.data.published}
-              category={entry.data.category}
-              tags={entry.data.tags}
-              description={entry.data.description}
-              image={entry.data.cover}
-              readingMetadata={entry.readingMetadata}
-            />
-          </div>
-        ))
-      }
+<BaseLayout title={`記事一覧 (${page.currentPage}/${page.lastPage})`}>
+  <div class="container list-page">
+    <PathBreadcrumb segments={[{ label: "posts", href: "/archive/" }, { label: `page ${page.currentPage}` }]} />
+    <PageHeader
+      kicker={`Page ${page.currentPage} / ${page.lastPage}`}
+      title="記事一覧"
+    />
+    <div class="card-grid">
+      {page.data.map((post) => <PostCard post={post} variant="standard" />)}
     </div>
     <Pagination
-      class="onload-animation"
+      currentPage={page.currentPage}
       lastPage={page.lastPage}
-      current={page.currentPage}
-      prevURL={page.url.prev}
-      nextURL={page.url.next}
-      style={`animation-delay: calc(var(--onload-animation-delay) + ${page.data.length + 1} * var(--onload-animation-interval));`}
+      prevUrl={page.url.prev ?? (page.currentPage === 2 ? "/" : undefined)}
+      nextUrl={page.url.next}
     />
   </div>
-</MainLayout>
+</BaseLayout>
+
+<style>
+  .list-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .card-grid {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .card-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

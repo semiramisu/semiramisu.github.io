@@ -1,0 +1,135 @@
+/*
+ * Magazine Grid — design tokens.
+ * Light (paper) is the default theme; dark overrides via html[data-theme="dark"].
+ * All text/background pairs verified WCAG AA or better.
+ */
+:root {
+  /* surfaces: paper (3 layers) */
+  --bg-base: #faf9f6;
+  --bg-surface: #f1efe9;
+  --bg-elevated: #ffffff;
+
+  /* ink (3 layers) */
+  --text-primary: #17191d;
+  --text-secondary: #4c525b;
+  --text-muted: #6b7280;
+
+  /* rules: hairline / medium / heavy editorial ink rule */
+  --border-subtle: #e6e3db;
+  --border-strong: #c9c5bb;
+  --rule-ink: var(--text-primary);
+
+  /* accent: vermilion — the editorial red of the new masthead */
+  --accent: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-muted: color-mix(in oklab, #c2410c 10%, transparent);
+  --accent-text-on: #ffffff;
+
+  /* category palette (display layer only — URLs and labels stay raw) */
+  --cat-work: #1d4ed8;
+  --cat-chat: #b45309;
+  --cat-book: #15803d;
+  --cat-holiday: #0e7490;
+  --cat-career: #7e22ce;
+  --cat-money: #a16207;
+  --cat-tech: #4338ca;
+  --cat-health: #be185d;
+  --cat-misc: #52525b;
+
+  /* code */
+  --code-bg: #f4f2ec;
+  --code-border: #e6e3db;
+  --code-inline-bg: #edeae2;
+
+  /* semantic */
+  --link: var(--accent);
+  --link-hover: var(--accent-hover);
+  --selection: color-mix(in oklab, #c2410c 18%, transparent);
+  --focus-ring: var(--accent);
+  --danger: #b91c1c;
+
+  /* typography */
+  --font-sans:
+    "Helvetica Neue", Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "BIZ UDPGothic", "Yu Gothic Medium", "Yu Gothic", Meiryo, sans-serif;
+  --font-display:
+    "Archivo Black", "Helvetica Neue", Arial, "Hiragino Sans",
+    "Yu Gothic", Meiryo, sans-serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+    "Hiragino Sans", monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 4rem;
+
+  /* display sizes: feature hero / page & article titles / uppercase kicker */
+  --display-hero: clamp(1.9rem, 1.2rem + 3vw, 3.25rem);
+  --display-page: clamp(1.7rem, 1.25rem + 2vw, 2.5rem);
+  --kicker-size: 0.72rem;
+
+  /* elevation: flat by default, lift on hover only */
+  --shadow-card: 0 1px 2px rgb(23 25 29 / 0.06);
+  --shadow-lift: 0 10px 28px rgb(23 25 29 / 0.1);
+
+  --radius-sm: 2px;
+  --radius-pill: 999px;
+
+  /* prose line length: ~38 full-width chars, the sweet spot for Japanese */
+  --measure: 38em;
+
+  /* layout */
+  --container-max: 72rem;
+  --header-height: 3.75rem;
+
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --bg-base: #14161a;
+  --bg-surface: #1a1d22;
+  --bg-elevated: #1f2329;
+
+  --text-primary: #ecedee;
+  --text-secondary: #a3a9b3;
+  --text-muted: #82878f;
+
+  --border-subtle: #2a2e35;
+  --border-strong: #3c4149;
+  --rule-ink: #ecedee;
+
+  --accent: #fb923c;
+  --accent-hover: #fdba74;
+  --accent-muted: color-mix(in oklab, #fb923c 14%, transparent);
+  --accent-text-on: #201207;
+
+  --cat-work: #60a5fa;
+  --cat-chat: #fbbf24;
+  --cat-book: #4ade80;
+  --cat-holiday: #22d3ee;
+  --cat-career: #c084fc;
+  --cat-money: #facc15;
+  --cat-tech: #818cf8;
+  --cat-health: #f472b6;
+  --cat-misc: #a1a1aa;
+
+  --code-bg: #17191d;
+  --code-border: #2a2e35;
+  --code-inline-bg: #262a31;
+
+  --selection: color-mix(in oklab, #fb923c 30%, transparent);
+  --danger: #f87171;
+
+  --shadow-card: none;
+  --shadow-lift: 0 10px 28px rgb(0 0 0 / 0.5);
+
+  color-scheme: dark;
+}

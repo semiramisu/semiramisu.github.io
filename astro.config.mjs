@@ -1,56 +1,42 @@
 import { defineConfig } from "astro/config";
 
-import icon from "astro-icon";
+import netlify from "@astrojs/netlify";
 import sitemap from "@astrojs/sitemap";
-import tailwind from "@astrojs/tailwind";
-import svelte from "@astrojs/svelte";
+import pagefind from "astro-pagefind";
 
+import remarkMath from "remark-math";
 import rehypeSlug from "rehype-slug";
 import rehypeKatex from "rehype-katex";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import remarkMath from "remark-math";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
+import { remarkDemoteHeadings } from "./src/plugins/remark-demote-headings.mjs";
 
-import YukinaConfig from "./yukina.config";
+import { SITE } from "./src/site.config.ts";
 
-import pagefind from "astro-pagefind";
-
-import netlify from "@astrojs/netlify";
-
-// https://astro.build/config
 export default defineConfig({
-  site: YukinaConfig.site,
+  site: SITE.url,
 
-  integrations: [
-    tailwind(),
-    svelte(),
-    icon(),
-    sitemap(),
-    pagefind(),
-  ],
-
-  image: {
-    // 画像最適化の設定
-    service: {
-      entrypoint: 'astro/assets/services/sharp',
-      config: {
-        limitInputPixels: false,
-      },
-    },
-  },
+  integrations: [sitemap(), pagefind()],
 
   markdown: {
     shikiConfig: {
-      theme: "github-dark-default",
+      // Dual themes: CSS in prose.css switches via [data-theme]
+      themes: {
+        light: "github-light",
+        dark: "github-dark-default",
+      },
+      defaultColor: false,
     },
-    remarkPlugins: [remarkReadingTime, remarkMath],
+    remarkPlugins: [remarkReadingTime, remarkDemoteHeadings, remarkMath],
     rehypePlugins: [
       rehypeSlug,
       rehypeKatex,
       [
         rehypeAutolinkHeadings,
         {
-          behavior: "prepend",
+          behavior: "append",
+          properties: { className: ["heading-anchor"], ariaHidden: "true", tabIndex: -1 },
+          content: { type: "text", value: "#" },
         },
       ],
     ],

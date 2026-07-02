@@ -1,54 +1,68 @@
 ---
-import MainLayout from "../layouts/MainLayout.astro";
-import { getEntry } from "astro:content";
-
-// Get language from URL parameter
-const url = new URL(Astro.request.url);
-const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
+import { getEntry, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import { SITE } from "../site.config";
 
 const about = await getEntry("specs", "about");
+if (!about) throw new Error("specs/about.md not found");
+const { Content } = await render(about);
 ---
 
-<MainLayout title={lang === 'ja' ? "自己紹介" : "About Me"}>
-  <article class="prose prose-lg max-w-none">
-    <div class="about-content" set:html={about.rendered.html} />
-  </article>
-</MainLayout>
+<BaseLayout title="About" description={`${SITE.author}について`}>
+  <div class="container spec-page">
+    <PathBreadcrumb segments={[{ label: "about" }]} />
+
+    <header class="profile">
+      <img src="/icon.jpg" alt={`${SITE.author}のアバター`} width="96" height="96" class="avatar" loading="lazy" />
+      <div class="profile-text">
+        <p class="kicker">About</p>
+        <h1 class="name">{SITE.author}</h1>
+        <p class="kicker sign">{SITE.sign}</p>
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </div>
+</BaseLayout>
 
 <style>
-  article {
-    @apply px-6 py-8;
+  .spec-page {
+    padding-block: 2rem 4rem;
   }
 
-  :global(.about-content h1) {
-    @apply text-3xl font-bold mb-6 text-[var(--text-color)];
+  /* editorial profile header framed by heavy rules */
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding-block: 1.75rem;
+    border-top: 3px solid var(--rule-ink);
+    border-bottom: 1px solid var(--border-subtle);
   }
 
-  :global(.about-content h2) {
-    @apply text-2xl font-semibold mt-8 mb-4 text-[var(--text-color)];
+  .avatar {
+    border-radius: 50%;
+    border: 2px solid var(--border-strong);
   }
 
-  :global(.about-content h3) {
-    @apply text-xl font-semibold mt-6 mb-3 text-[var(--text-color)];
+  .name {
+    margin-top: 0.2rem;
+    font-size: var(--display-page);
+    font-weight: 800;
+    line-height: 1.2;
   }
 
-  :global(.about-content p) {
-    @apply mb-4 text-[var(--text-color-lighten)] leading-relaxed;
+  .sign {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
   }
 
-  :global(.about-content ul) {
-    @apply list-disc list-inside mb-4 text-[var(--text-color-lighten)];
-  }
-
-  :global(.about-content li) {
-    @apply mb-2;
-  }
-
-  :global(.about-content a) {
-    @apply text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] underline;
-  }
-
-  :global(.about-content hr) {
-    @apply my-8 border-[var(--border-color)];
+  .spec-page .prose {
+    margin-inline: 0;
   }
 </style>

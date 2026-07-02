@@ -1,82 +1,328 @@
 ---
-import { getCollection } from "astro:content";
-import { IdToSlug } from "../../utils/hash";
-import PostLayout from "../../layouts/PostLayout.astro";
+import "katex/dist/katex.min.css";
+
 import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
+import ShareButtons from "../../components/ShareButtons.astro";
+import DonationBox from "../../components/DonationBox.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+import NewsletterForm from "../../components/NewsletterForm.astro";
+import Comments from "../../components/Comments.astro";
+import { SITE } from "../../site.config";
+import {
+  getPublishedPosts,
+  getRelatedPosts,
+  formatDate,
+  type Post,
+} from "../../utils/content";
+import { getCategoryGroup } from "../../utils/categories";
 
 export async function getStaticPaths() {
-  const postEntries = await getCollection("posts");
-  return postEntries.map((entry) => ({
-    params: { slug: IdToSlug(entry.id) },
-    props: { entry },
+  const posts = await getPublishedPosts();
+  // post.id is the raw filename (e.g. "2025_03_05"), which must stay the slug
+  // so that existing URLs, giscus threads, and search rankings are preserved.
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      // posts are newest-first: prev = older, next = newer
+      prevPost: posts[i + 1] ?? null,
+      nextPost: posts[i - 1] ?? null,
+    },
   }));
 }
 
-const { entry } = Astro.props;
-const { Content, headings } = await render(entry);
-const readingMetadata =
-  (entry.rendered?.metadata as any)?.frontmatter?.readingMetadata;
-const { wordCount, time: readingTime } = readingMetadata ?? {};
-const slug = IdToSlug(entry.id);
+interface Props {
+  post: Post;
+  prevPost: Post | null;
+  nextPost: Post | null;
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const { Content, headings, remarkPluginFrontmatter } = await render(post);
+
+const allPosts = await getPublishedPosts();
+const related = getRelatedPosts(post, allPosts);
+const readingTime = remarkPluginFrontmatter.readingMetadata?.time ?? 1;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const cat = getCategoryGroup(post.data.category);
+// the deck (standfirst): description shown as the lead-in, unless it just repeats the title
+const deck =
+  post.data.description && post.data.description !== post.data.title
+    ? post.data.description
+    : undefined;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description ?? SITE.description,
+  datePublished: post.data.published.toISOString(),
+  inLanguage: "ja",
+  url: canonical.toString(),
+  author: {
+    "@type": "Person",
+    name: SITE.author,
+    url: new URL("/about/", Astro.site).toString(),
+  },
+};
 ---
 
-{
-  !entry.data.licenseName && (
-    <PostLayout
-      title={entry.data.title}
-      subTitle={entry.data.description}
-      description={entry.data.description}
-      bannerImage={entry.data.cover}
-      published={entry.data.published}
-      headings={headings}
-      slug={slug}
-      currentPost={entry}
-      wordCount={wordCount}
-      readingTime={readingTime}
-    >
-      <div
-        class="hidden"
-        data-pagefind-body
-        data-pagefind-weight="10"
-        data-pagefind-meta="title"
-      >
-        {entry.data.title}
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  ogType="article"
+  publishedTime={post.data.published.toISOString()}
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <div class="container post-page">
+    <PathBreadcrumb
+      segments={[
+        { label: "posts", href: "/archive/" },
+        ...(post.data.category
+          ? [
+              {
+                label: post.data.category,
+                href: `/categories/${post.data.category}/`,
+              },
+            ]
+          : []),
+        { label: post.data.title },
+      ]}
+    />
+
+    <div class="post-grid">
+      <div class="article-col">
+        <article data-pagefind-body data-cat={cat}>
+          <header class="post-header">
+            {
+              post.data.category && (
+                <a
+                  href={`/categories/${post.data.category}/`}
+                  class="category-kicker"
+                  data-pagefind-ignore
+                >
+                  {post.data.category}
+                </a>
+              )
+            }
+            <h1 class="post-title">{post.data.title}</h1>
+            {deck && <p class="post-deck">{deck}</p>}
+            <p class="meta-line" data-pagefind-ignore>
+              <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+              <span class="meta-sep" aria-hidden="true">·</span>
+              {readingTime} min
+            </p>
+            <hr class="rule-heavy post-rule" />
+          </header>
+
+          <TableOfContents headings={headings} mode="mobile" />
+
+          <div class="prose">
+            <Content />
+          </div>
+        </article>
+
+        {
+          post.data.tags.length > 0 && (
+            <div class="post-tags" data-pagefind-ignore>
+              {post.data.tags.map((tag) => (
+                <a href={`/tags/${tag}/`} class="chip">
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
+
+        <ShareButtons title={post.data.title} url={canonical} />
+        <DonationBox />
+        <RelatedPosts posts={related} />
+        <NewsletterForm />
+        <Comments />
+
+        <nav class="post-nav" aria-label="前後の記事" data-pagefind-ignore>
+          {
+            prevPost ? (
+              <a href={`/posts/${prevPost.id}/`} class="nav-prev" rel="prev">
+                <span class="nav-label" data-i18n="post.prev">
+                  ← 前の記事
+                </span>
+                <span class="nav-title">{prevPost.data.title}</span>
+              </a>
+            ) : (
+              <span />
+            )
+          }
+          {
+            nextPost && (
+              <a href={`/posts/${nextPost.id}/`} class="nav-next" rel="next">
+                <span class="nav-label" data-i18n="post.next">
+                  次の記事 →
+                </span>
+                <span class="nav-title">{nextPost.data.title}</span>
+              </a>
+            )
+          }
+        </nav>
       </div>
-      <div data-pagefind-body>
-        <Content />
-      </div>
-    </PostLayout>
-  )
-}
-{
-  entry.data.licenseName && (
-    <PostLayout
-      title={entry.data.title}
-      subTitle={entry.data.description}
-      description={entry.data.description}
-      bannerImage={entry.data.cover}
-      published={entry.data.published}
-      license={{ name: entry.data.licenseName, url: entry.data.licenseUrl }}
-      author={entry.data.author}
-      sourceLink={entry.data.sourceLink}
-      headings={headings}
-      slug={slug}
-      currentPost={entry}
-      wordCount={wordCount}
-      readingTime={readingTime}
-    >
-      <div
-        class="hidden"
-        data-pagefind-body
-        data-pagefind-weight="10"
-        data-pagefind-meta="title"
-      >
-        {entry.data.title}
-      </div>
-      <div data-pagefind-body>
-        <Content />
-      </div>
-    </PostLayout>
-  )
-}
-<!-- <Fragment set:html={tocHTMLString} /> -->
+
+      <aside class="toc-col" data-pagefind-ignore>
+        <TableOfContents headings={headings} mode="desktop" />
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .post-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .post-grid {
+    margin-top: 2rem;
+  }
+
+  .article-col {
+    max-width: var(--measure);
+    margin-inline: auto;
+    min-width: 0;
+  }
+
+  .toc-col {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .post-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 14rem;
+      gap: 3rem;
+    }
+
+    .toc-col {
+      display: block;
+    }
+  }
+
+  .category-kicker {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--cat, var(--accent));
+  }
+
+  .category-kicker:hover {
+    color: var(--cat, var(--accent));
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .post-title {
+    margin-top: 0.5rem;
+    font-size: var(--display-page);
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  /* the deck: the standfirst under the headline, in quiet gray */
+  .post-deck {
+    margin-top: 1rem;
+    font-size: var(--text-lg);
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  .post-header .meta-line {
+    margin-top: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meta-sep {
+    margin-inline: 0.15em;
+  }
+
+  .post-rule {
+    margin-top: 1.5rem;
+  }
+
+  .post-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    font-size: var(--text-sm);
+  }
+
+  .post-nav a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    max-width: 48%;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-top: 2px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-elevated);
+    color: var(--text-secondary);
+  }
+
+  .nav-next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .nav-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .nav-title {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .post-nav a:hover .nav-title {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--accent);
+  }
+</style>
+
+<script>
+  // copy button for code blocks
+  document.querySelectorAll<HTMLPreElement>("pre.astro-code").forEach((pre) => {
+    const button = document.createElement("button");
+    button.className = "code-copy-button";
+    button.type = "button";
+    button.textContent = "copy";
+    button.addEventListener("click", async () => {
+      const code = pre.querySelector("code")?.innerText ?? "";
+      await navigator.clipboard.writeText(code);
+      button.textContent = "✓ copied";
+      button.classList.add("copied");
+      setTimeout(() => {
+        button.textContent = "copy";
+        button.classList.remove("copied");
+      }, 1500);
+    });
+    pre.appendChild(button);
+  });
+</script>

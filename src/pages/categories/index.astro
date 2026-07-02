@@ -1,17 +1,103 @@
 ---
-import ChipLayout from "../../layouts/ChipLayout.astro";
-import I18nKeys from "../../locales/keys";
-import { i18n } from "../../locales/translation";
-import { GetCategories } from "../../utils/content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import { getPublishedPosts, countCategories } from "../../utils/content";
+import { getCategoryGroup } from "../../utils/categories";
 
-const categories = [...(await GetCategories()).values()].sort();
-const chips = categories.map((category) => {
-  return {
-    name: category.name,
-    slug: category.slug,
-    subChip: category.posts.length.toString(),
-  };
-});
+const posts = await getPublishedPosts();
+const categories = [...countCategories(posts)];
+// big categories get a color card; the long tail becomes a chip cloud
+const cardCategories = categories.filter(([, count]) => count >= 3);
+const chipCategories = categories.filter(([, count]) => count < 3);
 ---
 
-<ChipLayout chips={chips} title={i18n(I18nKeys.pages_categories_title)} />
+<BaseLayout title="カテゴリ一覧">
+  <div class="container chip-page">
+    <PathBreadcrumb segments={[{ label: "categories" }]} />
+    <PageHeader kicker="Index" title="カテゴリ一覧" count={categories.length} />
+
+    <ul class="cat-cards">
+      {
+        cardCategories.map(([name, count]) => (
+          <li data-cat={getCategoryGroup(name)}>
+            <a href={`/categories/${name}/`} class="cat-card">
+              <span class="cat-count display">{count}</span>
+              <span class="cat-name">{name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      chipCategories.length > 0 && (
+        <ul class="chips">
+          {chipCategories.map(([name, count]) => (
+            <li data-cat={getCategoryGroup(name)}>
+              <a href={`/categories/${name}/`} class="chip chip--cat">
+                {name} <span class="chip-count">{count}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .chip-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .cat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+  }
+
+  .cat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1.1rem 1.2rem;
+    background-color: color-mix(in oklab, var(--cat, var(--accent)) 10%, var(--bg-elevated));
+    border-top: 3px solid var(--cat, var(--accent));
+    border-radius: var(--radius-sm);
+    color: inherit;
+  }
+
+  .cat-card:hover {
+    background-color: color-mix(in oklab, var(--cat, var(--accent)) 18%, var(--bg-elevated));
+    color: inherit;
+  }
+
+  .cat-count {
+    font-size: var(--text-2xl);
+    color: var(--cat, var(--accent));
+    line-height: 1.1;
+  }
+
+  .cat-name {
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+  }
+
+  .chip-count {
+    opacity: 0.65;
+    font-size: var(--text-xs);
+  }
+</style>

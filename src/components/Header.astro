@@ -1,0 +1,317 @@
+---
+import { SITE, NAV_ITEMS } from "../site.config";
+import Icon from "./Icon.astro";
+
+const pathname = Astro.url.pathname;
+const isCurrent = (href: string) =>
+  href === "/" ? pathname === "/" : pathname.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label={SITE.title}>
+      {SITE.title}<span class="brand-dot" aria-hidden="true"></span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="メインナビゲーション">
+      {
+        NAV_ITEMS.map((item) => (
+          <a
+            href={item.href}
+            class:list={["nav-link", { current: isCurrent(item.href) }]}
+            aria-current={isCurrent(item.href) ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-actions">
+      <a href="/search/" class="icon-button" aria-label="検索" data-i18n-aria="action.search">
+        <Icon name="search" size={18} />
+      </a>
+      <button
+        id="theme-toggle"
+        class="icon-button"
+        aria-label="テーマ切り替え"
+        data-i18n-aria="action.theme"
+      >
+        <span class="theme-icon theme-icon-moon"><Icon name="moon" size={17} /></span>
+        <span class="theme-icon theme-icon-sun"><Icon name="sun" size={17} /></span>
+      </button>
+      <button id="lang-toggle" class="icon-button lang-button" aria-label="Switch language">
+        ja
+      </button>
+      <a href={SITE.github} class="icon-button external" rel="me noopener" target="_blank" aria-label="GitHub">
+        <Icon name="github" size={18} />
+      </a>
+      <a href={SITE.x} class="icon-button external" rel="me noopener" target="_blank" aria-label="X (Twitter)">
+        <Icon name="x" size={16} />
+      </a>
+      <button
+        id="menu-open"
+        class="icon-button mobile-only"
+        aria-label="メニューを開く"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <Icon name="menu" size={20} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu" class="mobile-menu" hidden>
+  <div class="mobile-menu-header container">
+    <a href="/" class="brand">{SITE.title}<span class="brand-dot" aria-hidden="true"></span></a>
+    <button id="menu-close" class="icon-button" aria-label="メニューを閉じる">
+      <Icon name="close" size={20} />
+    </button>
+  </div>
+  <nav class="mobile-nav container" aria-label="モバイルナビゲーション">
+    <a href="/" class:list={["mobile-link", { current: pathname === "/" }]}>Home</a>
+    {
+      NAV_ITEMS.map((item) => (
+        <a
+          href={item.href}
+          class:list={["mobile-link", { current: isCurrent(item.href) }]}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+    <a href="/search/" class="mobile-link">Search</a>
+    <div class="mobile-social">
+      <a href={SITE.github} rel="me noopener" target="_blank" aria-label="GitHub"><Icon name="github" /></a>
+      <a href={SITE.x} rel="me noopener" target="_blank" aria-label="X (Twitter)"><Icon name="x" size={18} /></a>
+    </div>
+  </nav>
+</div>
+
+<style>
+  /* opaque masthead topped onto a double rule: hairline over heavy ink */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: var(--header-height);
+    background-color: var(--bg-base);
+    border-bottom: 3px solid var(--rule-ink);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 100%;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .brand {
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: var(--text-primary);
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  /* the vermilion full stop — the site's new signature mark */
+  .brand-dot {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.42em;
+    margin-left: 0.18em;
+    background-color: var(--accent);
+  }
+
+  .brand:hover {
+    color: var(--text-primary);
+    opacity: 0.75;
+  }
+
+  .desktop-nav {
+    display: none;
+    gap: 1.4rem;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    font-family: var(--font-display);
+    font-size: var(--kicker-size);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    padding-block: 0.3rem;
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+
+  .nav-link.current {
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+  }
+
+  @media (min-width: 768px) {
+    .desktop-nav {
+      display: flex;
+    }
+
+    .header-actions {
+      margin-left: 0;
+    }
+
+    /* .icon-button is declared later in this file; win by specificity */
+    .icon-button.mobile-only {
+      display: none;
+    }
+  }
+
+  .icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+  }
+
+  .icon-button:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+  }
+
+  /* show the theme you would switch to */
+  .theme-icon {
+    display: none;
+    line-height: 0;
+  }
+
+  :global(html[data-theme="light"]) .theme-icon-moon {
+    display: block;
+  }
+
+  :global(html[data-theme="dark"]) .theme-icon-sun {
+    display: block;
+  }
+
+  .lang-button {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    width: auto;
+    padding-inline: 0.4rem;
+  }
+
+  @media (max-width: 480px) {
+    .external {
+      display: none;
+    }
+  }
+
+  /* ---------- mobile menu ---------- */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background-color: var(--bg-base);
+    overflow-y: auto;
+  }
+
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+    border-bottom: 3px solid var(--rule-ink);
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: 1.75rem;
+  }
+
+  .mobile-link {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .mobile-link.current {
+    color: var(--accent);
+  }
+
+  .mobile-link:hover {
+    color: var(--accent);
+  }
+
+  .mobile-social {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 2rem;
+  }
+
+  .mobile-social a {
+    color: var(--text-secondary);
+  }
+
+  .mobile-social a:hover {
+    color: var(--text-primary);
+  }
+</style>
+
+<script>
+  // --- theme toggle ---
+  const toggle = document.getElementById("theme-toggle");
+  toggle?.addEventListener("click", () => {
+    const root = document.documentElement;
+    const next = root.dataset.theme === "dark" ? "light" : "dark";
+    root.classList.add("theme-transition");
+    root.dataset.theme = next;
+    localStorage.setItem("theme", next);
+    setTimeout(() => root.classList.remove("theme-transition"), 250);
+
+    // keep giscus in sync
+    const frame = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
+    frame?.contentWindow?.postMessage(
+      { giscus: { setConfig: { theme: next } } },
+      "https://giscus.app",
+    );
+  });
+
+  // --- mobile menu ---
+  const menu = document.getElementById("mobile-menu");
+  const openButton = document.getElementById("menu-open");
+  const closeButton = document.getElementById("menu-close");
+
+  function setMenu(open: boolean) {
+    if (!menu || !openButton) return;
+    menu.hidden = !open;
+    openButton.setAttribute("aria-expanded", String(open));
+    document.body.style.overflow = open ? "hidden" : "";
+  }
+
+  openButton?.addEventListener("click", () => setMenu(true));
+  closeButton?.addEventListener("click", () => setMenu(false));
+  menu?.addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest("a")) setMenu(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menu && !menu.hidden) setMenu(false);
+  });
+</script>

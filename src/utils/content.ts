@@ -1,265 +1,86 @@
 import { getCollection, type CollectionEntry } from "astro:content";
-import { IdToSlug } from "./hash";
-import { calculateReadingTimeFromContent, type ReadingMetadata } from "./reading-time";
 
-/**
- * Extracts date from filename pattern (e.g., "2025_07_01.md")
- * and determines if the post should be published
- */
-function shouldPublishPost(filename: string): boolean {
-  // Extract date from filename pattern YYYY_MM_DD
-  const match = filename.match(/(\d{4})_(\d{2})_(\d{2})/)
-  if (!match) return true; // If no date pattern, publish by default
-  
-  const [, year, month, day] = match;
-  const postDate = new Date(`${year}-${month}-${day}T12:00:00`); // Set to noon
-  const now = new Date();
-  
-  // Post should be published if it's past noon on the post date
-  return now >= postDate;
-}
+export type Post = CollectionEntry<"posts">;
 
-/**
- * Represents an archive item with a title, slug, date, and optional tags.
- */
-export type PostWithReadingMetadata = CollectionEntry<"posts"> & {
-  readingMetadata: ReadingMetadata;
-};
-
-export interface Archive {
-  title: string;
-  id: string;
-  date: Date;
-  tags?: string[];
-  description?: string;
-  cover?: string;
-  readingMetadata?: ReadingMetadata;
-}
-
-/**
- * Represents a tag used to categorize content.
- */
-export interface Tag {
-  name: string;
-  slug: string;
-  posts: Archive[];
-}
-
-/**
- * Represents a category of content.
- */
-export interface Category {
-  name: string;
-  slug: string;
-  posts: Archive[];
-}
-
-/**
- * Retrieves and sorts blog posts by their published date.
- *
- * This function fetches all blog posts from the "posts" collection, filters out drafts if in production mode,
- * and sorts them in descending order by their published date. It also adds `nextSlug`, `nextTitle`, `prevSlug`,
- * and `prevTitle` properties to each post for navigation purposes.
- *
- * @param lang - Optional language filter. If not provided, defaults to "ja"
- * @returns A promise that resolves to an array of sorted blog posts with navigation properties.
- */
-export async function GetSortedPosts(
-  lang: "ja" | "en" = "ja"
-): Promise<PostWithReadingMetadata[]> {
-  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
-    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
-    const isLangFiltered = (data.lang || "ja") === lang;
-    const isPublishTimeReached = shouldPublishPost(id);
-    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
-  });
-  const sorted = allBlogPosts.sort((a, b) => {
-    const dateA = new Date(a.data.published);
-    const dateB = new Date(b.data.published);
-    return dateA > dateB ? -1 : 1;
-  });
-
-  for (let i = 1; i < sorted.length; i++) {
-    (sorted[i].data as any).nextSlug = (sorted[i - 1] as any).slug;
-    (sorted[i].data as any).nextTitle = sorted[i - 1].data.title;
-  }
-  for (let i = 0; i < sorted.length - 1; i++) {
-    (sorted[i].data as any).prevSlug = (sorted[i + 1] as any).slug;
-    (sorted[i].data as any).prevTitle = sorted[i + 1].data.title;
-  }
-
-  return sorted.map((entry) => {
-    const readingMetadata = calculateReadingTimeFromContent(entry.body);
-    return Object.assign(entry, { readingMetadata }) as PostWithReadingMetadata;
-  });
-}
-
-/**
- * Retrieves and organizes blog post archives.
- *
- * This function fetches all blog posts from the "posts" collection, filters them based on the environment
- * (excluding drafts in production), and organizes them into a map of archives grouped by year.
- * Each archive entry contains the post's title, slug, publication date, and tags.
- * The archives are sorted in descending order by year and by date within each year.
- *
- * @param lang - Optional language filter. If not provided, defaults to "ja"
- * @returns A promise that resolves to a map of archives grouped by year.
- */
-export async function GetArchives(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
-    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
-    const isLangFiltered = (data.lang || "ja") === lang;
-    const isPublishTimeReached = shouldPublishPost(id);
-    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
-  });
-
-  const archives = new Map<number, Archive[]>();
-
-  for (const post of allBlogPosts) {
-    const date = new Date(post.data.published);
-    const year = date.getFullYear();
-    if (!archives.has(year)) {
-      archives.set(year, []);
-    }
-
-    // 共通の読了時間計算ロジックを使用
-    const readingMetadata = calculateReadingTimeFromContent(post.body);
-
-    archives.get(year)!.push({
-      title: post.data.title,
-      id: `/posts/${IdToSlug(post.id)}`,
-      date: date,
-      tags: post.data.tags,
-      description: post.data.description,
-      cover: post.data.cover,
-      readingMetadata
-    });
-  }
-
-  const sortedArchives = new Map(
-    [...archives.entries()].sort((a, b) => b[0] - a[0]),
+/** All non-draft posts, newest first. */
+export async function getPublishedPosts(): Promise<Post[]> {
+  const posts = await getCollection("posts", ({ data }) => !data.draft);
+  return posts.sort(
+    (a, b) => b.data.published.getTime() - a.data.published.getTime(),
   );
-  sortedArchives.forEach((value) => {
-    value.sort((a, b) => (a.date > b.date ? -1 : 1));
-  });
-
-  return sortedArchives;
 }
 
-/**
- * Retrieves all tags from blog posts.
- *
- * This function fetches all blog posts from the "posts" collection and extracts tags from each post.
- * It then organizes the tags into a map where each tag is associated with its metadata and the posts that have that tag.
- *
- * @param lang - Optional language filter. If not provided, defaults to "ja"
- * @returns A promise that resolves to a map of tags. Each key is a tag slug, and the value is an object containing the tag's name, slug, and associated posts.
- */
-export async function GetTags(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
-    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
-    const isLangFiltered = (data.lang || "ja") === lang;
-    const isPublishTimeReached = shouldPublishPost(id);
-    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
-  });
-
-  const tags = new Map<string, Tag>();
-  allBlogPosts.forEach((post) => {
-    post.data.tags?.forEach((tag: string) => {
-      const tagSlug = IdToSlug(tag);
-      if (!tags.has(tagSlug)) {
-        tags.set(tagSlug, {
-          name: tag,
-          slug: `/tags/${tagSlug}`,
-          posts: [],
-        });
-      }
-
-      const readingMetadata = calculateReadingTimeFromContent(post.body);
-
-      tags.get(tagSlug)!.posts.push({
-        title: post.data.title,
-        id: `/posts/${IdToSlug(post.id)}`,
-        date: new Date(post.data.published),
-        tags: post.data.tags,
-        description: post.data.description,
-        cover: post.data.cover,
-        readingMetadata
-      });
-    });
-  });
-
-  return tags;
+/** Category name -> post count, ordered by count desc. */
+export function countCategories(posts: Post[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    if (!post.data.category) continue;
+    counts.set(post.data.category, (counts.get(post.data.category) ?? 0) + 1);
+  }
+  return new Map([...counts].sort((a, b) => b[1] - a[1]));
 }
 
-/**
- * Retrieves all tags as an array, sorted by post count.
- *
- * @param lang - Optional language filter. If not provided, defaults to "ja"
- * @returns A promise that resolves to an array of tags sorted by the number of posts that have each tag.
- */
-export async function GetAllTags(lang: "ja" | "en" = "ja") {
-  const tags = await GetTags(lang);
-  return Array.from(tags.values())
-    .sort((a, b) => b.posts.length - a.posts.length);
-}
-
-/**
- * Retrieves all blog post categories and their associated posts.
- *
- * This function fetches all blog posts from the "posts" collection and filters them based on the environment.
- * In production, it excludes drafts. It then organizes the posts into categories and returns a map of categories.
- *
- * @param lang - Optional language filter. If not provided, defaults to "ja"
- * @returns A promise that resolves to a map of categories, where each category contains its name, slug, and associated posts.
- */
-export async function GetCategories(lang: "ja" | "en" = "ja") {
-  const allBlogPosts = await getCollection("posts", ({ data, id }) => {
-    const isDraftFiltered = import.meta.env.PROD ? data.draft !== true : true;
-    const isLangFiltered = (data.lang || "ja") === lang;
-    const isPublishTimeReached = shouldPublishPost(id);
-    return isDraftFiltered && isLangFiltered && isPublishTimeReached;
-  });
-
-  const categories = new Map<string, Category>();
-
-  allBlogPosts.forEach((post) => {
-    if (!post.data.category) return;
-    const categorySlug = IdToSlug(post.data.category);
-
-    if (!categories.has(categorySlug)) {
-      categories.set(categorySlug, {
-        name: post.data.category,
-        slug: `/categories/${categorySlug}`,
-        posts: [],
-      });
+/** Tag name -> post count, ordered by count desc. */
+export function countTags(posts: Post[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const post of posts) {
+    for (const tag of post.data.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
     }
+  }
+  return new Map([...counts].sort((a, b) => b[1] - a[1]));
+}
 
-    // 共通の読了時間計算ロジックを使用
-    const readingMetadata = calculateReadingTimeFromContent(post.body);
-
-    categories.get(categorySlug)!.posts.push({
-      title: post.data.title,
-      id: `/posts/${IdToSlug(post.id)}`,
-      date: new Date(post.data.published),
-      tags: post.data.tags,
-      description: post.data.description,
-      cover: post.data.cover,
-      readingMetadata
-    });
-  });
-
-  return categories;
+/** Posts grouped by publication year, newest year first. */
+export function groupByYear(posts: Post[]): [number, Post[]][] {
+  const groups = new Map<number, Post[]>();
+  for (const post of posts) {
+    const year = post.data.published.getFullYear();
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year)!.push(post);
+  }
+  return [...groups.entries()].sort((a, b) => b[0] - a[0]);
 }
 
 /**
- * Retrieves all categories as an array, sorted by post count.
- *
- * @param lang - Optional language filter. If not provided, defaults to "ja"
- * @returns A promise that resolves to an array of categories sorted by the number of posts in each category.
+ * Related posts scored by shared category (+2) and shared tags (+1 each),
+ * falling back to recency among candidates with equal scores.
  */
-export async function GetAllCategories(lang: "ja" | "en" = "ja") {
-  const categories = await GetCategories(lang);
-  return Array.from(categories.values())
-    .sort((a, b) => b.posts.length - a.posts.length);
+export function getRelatedPosts(post: Post, all: Post[], count = 3): Post[] {
+  const tagSet = new Set(post.data.tags);
+  return all
+    .filter((p) => p.id !== post.id)
+    .map((p) => {
+      let score = 0;
+      if (post.data.category && p.data.category === post.data.category) {
+        score += 2;
+      }
+      for (const tag of p.data.tags) {
+        if (tagSet.has(tag)) score += 1;
+      }
+      return { post: p, score };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        b.post.data.published.getTime() - a.post.data.published.getTime(),
+    )
+    .slice(0, count)
+    .map((entry) => entry.post);
+}
+
+/** ISO-like date for the terminal aesthetic: 2026-06-10 */
+export function formatDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/** Short date without year: 06-10 (for year-grouped lists) */
+export function formatDateShort(date: Date): string {
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${m}-${d}`;
 }

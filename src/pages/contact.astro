@@ -1,34 +1,152 @@
 ---
-import MainLayout from '../layouts/MainLayout.astro';
-import ContactForm from '../components/ContactForm.svelte';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../components/PathBreadcrumb.astro";
+import PageHeader from "../components/PageHeader.astro";
+import Icon from "../components/Icon.astro";
+import { SITE } from "../site.config";
 ---
 
-<MainLayout 
-  title="お問い合わせ - セミラミスの庭" 
-  description="お問い合わせフォームです。ご意見・ご感想・ご質問などお気軽にどうぞ。"
->
-  <h1 class="text-3xl font-bold mb-8 text-center">お問い合わせ</h1>
-  
-  <div class="prose prose-lg dark:prose-invert mb-12 max-w-none">
-    <p class="text-center mb-8">
-      ブログに関するご意見・ご感想・ご質問など、お気軽にお問い合わせください。
+<BaseLayout title="Contact" description="お問い合わせフォーム">
+  <div class="container contact-page">
+    <PathBreadcrumb segments={[{ label: "contact" }]} />
+    <PageHeader kicker="Contact" title="お問い合わせ" />
+
+    <p id="sent-message" class="sent-message" hidden>
+      ✓ 送信しました。ありがとうございます！
     </p>
-    
-    <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg mb-8">
-      <h2 class="text-xl font-semibold mb-4">ご注意事項</h2>
-      <ul class="space-y-2">
-        <li>すべてのお問い合わせに返信できない場合があります。</li>
-        <li>返信には数日お時間をいただく場合があります。</li>
-        <li>営業・勧誘等のメールはご遠慮ください。</li>
-      </ul>
+
+    <form
+      name="contact"
+      method="POST"
+      action="/contact/?sent=1"
+      data-netlify="true"
+      netlify-honeypot="bot-field"
+      class="contact-form"
+    >
+      <input type="hidden" name="form-name" value="contact" />
+      <p class="hidden-field">
+        <label>Don't fill this out: <input name="bot-field" /></label>
+      </p>
+
+      <div class="field">
+        <label for="name" data-i18n="contact.name">お名前</label>
+        <input type="text" id="name" name="name" required autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label for="email" data-i18n="contact.email">メールアドレス</label>
+        <input type="email" id="email" name="email" required autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label for="subject" data-i18n="contact.subject">件名</label>
+        <input type="text" id="subject" name="subject" required />
+      </div>
+
+      <div class="field">
+        <label for="message" data-i18n="contact.message">メッセージ</label>
+        <textarea id="message" name="message" rows="8" required></textarea>
+      </div>
+
+      <button type="submit" class="submit-button">
+        <span data-i18n="contact.send">送信</span>
+      </button>
+    </form>
+
+    <div class="alt-contacts">
+      <span class="kicker">Or</span>
+      <a href={SITE.x} target="_blank" rel="noopener"><Icon name="x" size={16} /> @sekine_DS</a>
+      <a href={SITE.github} target="_blank" rel="noopener"><Icon name="github" size={16} /> GitHub</a>
     </div>
   </div>
-
-  <ContactForm client:load />
-</MainLayout>
+</BaseLayout>
 
 <style>
-  h1 {
-    @apply text-gray-900 dark:text-white;
+  .contact-page {
+    padding-block: 2rem 4rem;
+    max-width: 44rem;
+  }
+
+  .sent-message {
+    color: var(--accent);
+    font-weight: 700;
+    margin-block: 1.5rem 0;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 2rem;
+  }
+
+  .hidden-field {
+    display: none;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .field label {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+
+  .field input,
+  .field textarea {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.8rem;
+    color: var(--text-primary);
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 0;
+    border-color: transparent;
+  }
+
+  .submit-button {
+    align-self: flex-start;
+    background-color: var(--accent);
+    color: var(--accent-text-on);
+    font-weight: 700;
+    border-radius: var(--radius-pill);
+    padding: 0.55rem 1.8rem;
+  }
+
+  .submit-button:hover {
+    background-color: var(--accent-hover);
+  }
+
+  .alt-contacts {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    font-size: var(--text-sm);
+  }
+
+  .alt-contacts a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-secondary);
+  }
+
+  .alt-contacts a:hover {
+    color: var(--accent);
   }
 </style>
+
+<script>
+  if (new URLSearchParams(location.search).has("sent")) {
+    document.getElementById("sent-message")?.removeAttribute("hidden");
+  }
+</script>

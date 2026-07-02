@@ -4,30 +4,28 @@ import { defineCollection, z } from "astro:content";
 const posts = defineCollection({
   loader: glob({
     pattern: "**/*.md",
-    base: "src/contents/posts",
+    base: "src/content/posts",
   }),
   schema: z.object({
     title: z.string(),
     published: z.date(),
-    draft: z.boolean().optional(),
     description: z.string().optional(),
-    cover: z.string().optional(),
-    tags: z.array(z.string()).optional(),
+    tags: z.array(z.string()).default([]),
     category: z.string().optional(),
-    author: z.string().optional(),
-    sourceLink: z.string().optional(),
-    licenseName: z.string().optional(),
-    licenseUrl: z.string().optional(),
-    lang: z.enum(["ja", "en"]).optional().default("ja"),
-    translatedFrom: z.string().optional(),
-    translatedAt: z.date().optional(),
+    draft: z.boolean().default(false),
+    cover: z.string().optional(),
+    lang: z.enum(["ja", "en"]).default("ja"),
   }),
 });
 
 const specs = defineCollection({
   loader: glob({
     pattern: "**/*.md",
-    base: "src/contents/specs",
+    base: "src/content/specs",
+  }),
+  schema: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
   }),
 });
 

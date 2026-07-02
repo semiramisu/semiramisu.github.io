@@ -1,0 +1,79 @@
+---
+import { SITE } from "../site.config";
+
+interface Segment {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  segments: Segment[];
+}
+
+const { segments } = Astro.props;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: SITE.title,
+      item: new URL("/", Astro.site).toString(),
+    },
+    ...segments.map((seg, i) => ({
+      "@type": "ListItem",
+      position: i + 2,
+      name: seg.label,
+      ...(seg.href
+        ? { item: new URL(seg.href, Astro.site).toString() }
+        : {}),
+    })),
+  ],
+};
+---
+
+<nav class="breadcrumb" aria-label="パンくずリスト">
+  <a href="/" class="segment" data-i18n="breadcrumb.home">ホーム</a>{
+    segments.map((seg) => (
+      <>
+        <span class="separator">›</span>
+        {seg.href ? (
+          <a href={seg.href} class="segment">
+            {seg.label}
+          </a>
+        ) : (
+          <span class="segment current">{seg.label}</span>
+        )}
+      </>
+    ))
+  }
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+<style>
+  .breadcrumb {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .segment {
+    color: var(--text-muted);
+  }
+
+  a.segment:hover {
+    color: var(--accent);
+  }
+
+  .separator {
+    margin-inline: 0.4em;
+    color: var(--border-strong);
+  }
+
+  .current {
+    color: var(--text-secondary);
+  }
+</style>

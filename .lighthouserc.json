@@ -4,7 +4,7 @@
       "staticDistDir": "./dist",
       "url": [
         "http://localhost/",
-        "http://localhost/all-posts/",
+        "http://localhost/search/",
         "http://localhost/archive/"
       ],
       "numberOfRuns": 3,

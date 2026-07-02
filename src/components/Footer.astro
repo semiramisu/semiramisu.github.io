@@ -1,365 +1,148 @@
 ---
-import { Icon } from "astro-icon/components";
-import YukinaConfig from "../../yukina.config";
-import { i18n } from "../locales/translation";
-import I18nKeys from "../locales/keys";
-import { GetCategories, GetTags } from "../utils/content";
+import { SITE } from "../site.config";
 
-const categories = await GetCategories();
-const tags = await GetTags();
+const year = new Date().getFullYear();
 
-const categoryKeys = [...categories.keys()];
-const tagKeys = [...tags.keys()];
+const indexLinks = [
+  { href: "/archive/", label: "記事一覧" },
+  { href: "/categories/", label: "カテゴリ" },
+  { href: "/tags/", label: "タグ" },
+  { href: "/search/", label: "検索" },
+];
+
+const infoLinks = [
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
+  { href: "/privacy-policy/", label: "プライバシーポリシー" },
+  { href: "/rss.xml", label: "RSS" },
+];
 ---
 
-<div class="footer-stack">
-  <section class="mobile-support lg:hidden" aria-label="Footer support cards">
-    <article class="support-card profile-card">
-      <div class="profile-row">
-        <a href="/about" class="avatar-link" aria-label="About">
-          <img
-            class="lozad avatar"
-            data-src={YukinaConfig.avatarUrl}
-            alt={YukinaConfig.username}
-          />
-        </a>
-        <div class="profile-meta">
-          <a href="/about" class="profile-name">{YukinaConfig.username}</a>
-          <p class="profile-sign">{YukinaConfig.sign}</p>
-          <ul class="social-list">
-            {
-              YukinaConfig.socialLinks.map((item) => (
-                <li>
-                  <a href={item.link} class="social-link" aria-label={item.icon}>
-                    <Icon name={item.icon} size={18} />
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </div>
-    </article>
-
-    {categoryKeys.length > 0 && (
-      <article class="support-card">
-        <div class="support-title-row">
-          <span class="title-bar" aria-hidden="true"></span>
-          <h3>{i18n(I18nKeys.side_bar_categories)}</h3>
-        </div>
-        <div class="category-grid">
-          {
-            categoryKeys.slice(0, YukinaConfig.maxFooterCategoryChip).map((category) => (
-              <a href={`/categories/${category}`} class="category-link">
-                <span class="category-name">{categories.get(category)!.name}</span>
-                <span class="category-count">{categories.get(category)!.posts.length}</span>
-              </a>
-            ))
-          }
-        </div>
-        {categoryKeys.length > YukinaConfig.maxFooterCategoryChip && (
-          <a href="/categories/" class="view-more-link">
-            <span>{i18n(I18nKeys.side_bar_view_more)}</span>
-            <Icon name="mingcute:arrow-right-line" size={16} />
-          </a>
-        )}
-      </article>
-    )}
-
-    {tagKeys.length > 0 && (
-      <article class="support-card">
-        <div class="support-title-row">
-          <span class="title-bar" aria-hidden="true"></span>
-          <h3>{i18n(I18nKeys.side_bar_tags)}</h3>
-        </div>
-        <div class="tag-list">
-          {
-            tagKeys.slice(0, YukinaConfig.maxFooterTagChip + 1).map((tag) => (
-              <a href={`/tags/${tag}`} class="tag-chip">{tags.get(tag)!.name}</a>
-            ))
-          }
-        </div>
-        {tagKeys.length > YukinaConfig.maxFooterTagChip + 1 && (
-          <a href="/tags/" class="view-more-link">
-            <span>{i18n(I18nKeys.side_bar_view_more)}</span>
-            <Icon name="mingcute:arrow-right-line" size={16} />
-          </a>
-        )}
-      </article>
-    )}
-  </section>
-
-  <footer class="site-footer">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <p class="brand-label">{YukinaConfig.brandTitle}</p>
-        <p class="brand-copy">© {new Date().getFullYear()} {YukinaConfig.username}</p>
-      </div>
-
-      <div class="footer-links">
-        <a class="link" href="https://github.com/WhitePaper233/yukina">Yukina</a>
-        <a class="link" href="https://astro.build/">Astro</a>
-        <a class="link" href={new URL("sitemap-index.xml", YukinaConfig.site)}>SiteMap</a>
-        <a class="link" href="/rss.xml">RSS</a>
-      </div>
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="colophon">
+      <p class="footer-brand">
+        {SITE.title}<span class="brand-dot" aria-hidden="true"></span>
+      </p>
+      <p class="footer-description">{SITE.description}</p>
     </div>
-  </footer>
-</div>
+
+    <nav class="footer-links" aria-label="フッターナビゲーション">
+      <div class="link-group">
+        <p class="kicker link-heading">Index</p>
+        <ul>
+          {indexLinks.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+      <div class="link-group">
+        <p class="kicker link-heading">Info</p>
+        <ul>
+          {infoLinks.map((link) => (
+            <li><a href={link.href}>{link.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="container footer-bottom">
+    <p class="copyright">
+      © 2025-{year}
+      {SITE.author} ·
+      <a href={SITE.license.url} rel="license noopener" target="_blank">{SITE.license.name}</a>
+    </p>
+    <p class="kicker sign">{SITE.sign}</p>
+  </div>
+</footer>
 
 <style>
-  .footer-stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
+  .site-footer {
+    margin-top: 5rem;
+    border-top: 3px solid var(--rule-ink);
+    background-color: var(--bg-surface);
   }
 
-  .mobile-support {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-  }
-
-  .support-card {
-    border-radius: var(--radius-card);
-    border: 1px solid var(--border-color);
-    background: var(--card-color);
-    padding: var(--space-md);
-    box-shadow: var(--shadow-soft);
-  }
-
-  .profile-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-  }
-
-  .avatar-link {
-    display: inline-flex;
-    flex-shrink: 0;
-    border-radius: var(--radius-card);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-  }
-
-  .avatar {
-    height: 5.2rem;
-    width: 5.2rem;
-    object-fit: cover;
-  }
-
-  .profile-meta {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .profile-name {
-    font-family: var(--title-font);
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--text-color);
-  }
-
-  .profile-sign {
-    margin: 0;
-    color: var(--text-color-lighten);
-    font-size: 0.92rem;
-    line-height: 1.5;
-  }
-
-  .social-list {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .social-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 2rem;
-    width: 2rem;
-    border-radius: var(--radius-pill);
-    color: var(--primary-color);
-    background: var(--primary-color-hover);
-    transition: transform var(--transition-speed) var(--transition-timing),
-      filter var(--transition-speed) var(--transition-timing);
-  }
-
-  .social-link:hover {
-    transform: translateY(-1px);
-    filter: brightness(0.98);
-  }
-
-  .support-title-row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
-  }
-
-  .support-title-row h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-color);
-  }
-
-  .title-bar {
-    height: 1.2rem;
-    width: 0.3rem;
-    border-radius: var(--radius-pill);
-    background: var(--gradient-border);
-  }
-
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-xs);
-  }
-
-  .category-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-xs);
-    border-radius: 0.8rem;
-    border: 1px solid var(--border-color);
-    background: color-mix(in oklch, var(--card-color) 88%, var(--background-color));
-    padding: 0.45rem 0.65rem;
-    transition: background-color var(--transition-speed) var(--transition-timing),
-      border-color var(--transition-speed) var(--transition-timing);
-  }
-
-  .category-link:hover {
-    background: var(--primary-color-hover);
-    border-color: var(--primary-color-lighten);
-  }
-
-  .category-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: var(--text-color);
-    font-size: 0.9rem;
-  }
-
-  .category-count {
-    min-width: 1.65rem;
-    border-radius: var(--radius-pill);
-    background: var(--primary-color-lighten);
-    color: var(--primary-color-darken);
-    text-align: center;
-    font-size: 0.78rem;
-    font-weight: 700;
-    line-height: 1.6;
-  }
-
-  .tag-list {
+  .footer-inner {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-xs);
-  }
-
-  .tag-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-pill);
-    background: var(--primary-color-hover);
-    color: var(--primary-color);
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.36rem 0.72rem;
-    transition: filter var(--transition-speed) var(--transition-timing);
-  }
-
-  .tag-chip:hover {
-    filter: brightness(0.98);
-  }
-
-  .view-more-link {
-    margin-top: var(--space-sm);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-    color: var(--primary-color);
-    font-size: 0.88rem;
-    font-weight: 600;
-  }
-
-  .site-footer {
-    position: relative;
-    border-top: none;
-    padding-top: calc(var(--space-lg) + 2px);
-    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0px));
-  }
-
-  .site-footer::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--gradient-border);
-    border-radius: 1px;
-  }
-
-  .footer-grid {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    align-items: flex-start;
+    gap: 2.5rem 4rem;
     justify-content: space-between;
+    padding-block: 2.75rem 2.25rem;
   }
 
   .footer-brand {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--text-primary);
   }
 
-  .brand-label {
-    margin: 0;
-    font-family: var(--brand-font);
-    color: var(--text-color);
-    font-size: 1rem;
-    font-weight: 700;
+  .brand-dot {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.42em;
+    margin-left: 0.18em;
+    background-color: var(--accent);
   }
 
-  .brand-copy {
-    margin: 0;
-    color: var(--text-color-lighten);
-    font-size: 0.88rem;
+  .footer-description {
+    margin-top: 0.6rem;
+    max-width: 26em;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
   }
 
   .footer-links {
     display: flex;
+    gap: 3.5rem;
+  }
+
+  .link-heading {
+    color: var(--text-muted);
+  }
+
+  .link-group ul {
+    list-style: none;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .link-group a {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+  }
+
+  .link-group a:hover {
+    color: var(--accent);
+  }
+
+  .footer-bottom {
+    display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm);
+    gap: 0.5rem 2rem;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-block: 1.1rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
   }
 
-  .link {
-    color: var(--primary-color);
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: color 0.3s ease, transform 0.3s ease;
+  .copyright a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
-  .link:hover {
-    color: var(--accent-color);
-    transform: translateY(-1px);
+  .copyright a:hover {
+    color: var(--accent);
   }
 
-  @media (min-width: 768px) {
-    .footer-grid {
-      flex-direction: row;
-      align-items: center;
-    }
+  .sign {
+    color: var(--text-muted);
   }
 </style>
