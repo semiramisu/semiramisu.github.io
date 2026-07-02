@@ -1,6 +1,6 @@
 /**
  * UI label dictionary for the client-side ?lang=en switcher.
- * Most chrome (prompts like `$ ls ~/posts`, nav, dates) is language-neutral
+ * Most chrome (uppercase Latin kickers, nav, dates) is language-neutral
  * by design, so only human-language labels live here.
  * Build output is always Japanese; English is applied client-side.
  */
