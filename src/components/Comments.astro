@@ -26,7 +26,7 @@
   const container = document.querySelector(".giscus-container");
   if (container) {
     const theme =
-      document.documentElement.dataset.theme === "light" ? "light" : "dark";
+      document.documentElement.dataset.theme === "dark" ? "dark" : "light";
     const script = document.createElement("script");
     const config: Record<string, string> = {
       src: "https://giscus.app/client.js",
