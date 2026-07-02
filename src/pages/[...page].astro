@@ -1,7 +1,8 @@
 ---
 import type { GetStaticPaths } from "astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import PostList from "../components/PostList.astro";
+import PageHeader from "../components/PageHeader.astro";
+import PostCard from "../components/PostCard.astro";
 import Pagination from "../components/Pagination.astro";
 import PathBreadcrumb from "../components/PathBreadcrumb.astro";
 import { SITE } from "../site.config";
@@ -22,8 +23,13 @@ const { page } = Astro.props;
 <BaseLayout title={`記事一覧 (${page.currentPage}/${page.lastPage})`}>
   <div class="container list-page">
     <PathBreadcrumb segments={[{ label: "posts", href: "/archive/" }, { label: `page ${page.currentPage}` }]} />
-    <h1 class="prompt page-title">ls ~/posts --page {page.currentPage}</h1>
-    <PostList posts={page.data} variant="detail" />
+    <PageHeader
+      kicker={`Page ${page.currentPage} / ${page.lastPage}`}
+      title="記事一覧"
+    />
+    <div class="card-grid">
+      {page.data.map((post) => <PostCard post={post} variant="standard" />)}
+    </div>
     <Pagination
       currentPage={page.currentPage}
       lastPage={page.lastPage}
@@ -38,7 +44,21 @@ const { page } = Astro.props;
     padding-block: 2rem 4rem;
   }
 
-  .page-title {
-    margin-block: 1.5rem 1rem;
+  .card-grid {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .card-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 </style>

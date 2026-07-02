@@ -1,6 +1,7 @@
 ---
 import type { Post } from "../utils/content";
-import { formatDate } from "../utils/content";
+import PostCard from "./PostCard.astro";
+import SectionHeader from "./SectionHeader.astro";
 
 interface Props {
   posts: Post[];
@@ -12,17 +13,12 @@ const { posts } = Astro.props;
 {
   posts.length > 0 && (
     <section class="related" data-pagefind-ignore>
-      <h2 class="prompt">ls ./related</h2>
-      <ul class="related-list">
+      <SectionHeader kicker="Related" title="関連記事" titleI18n="related.title" />
+      <div class="related-list">
         {posts.map((post) => (
-          <li>
-            <a href={`/posts/${post.id}/`} class="related-link">
-              <time class="mono date">{formatDate(post.data.published)}</time>
-              <span class="title">{post.data.title}</span>
-            </a>
-          </li>
+          <PostCard post={post} variant="compact" />
         ))}
-      </ul>
+      </div>
     </section>
   )
 }
@@ -33,35 +29,6 @@ const { posts } = Astro.props;
   }
 
   .related-list {
-    list-style: none;
-    margin: 1rem 0 0;
-    padding: 0;
-  }
-
-  .related-link {
-    display: flex;
-    align-items: baseline;
-    gap: 0.9rem;
-    padding: 0.5rem 0.6rem;
-    border-radius: 6px;
-    color: inherit;
-  }
-
-  .related-link:hover {
-    background-color: var(--bg-elevated);
-  }
-
-  .related-link:hover .title {
-    color: var(--accent);
-  }
-
-  .date {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    flex-shrink: 0;
-  }
-
-  .title {
-    color: var(--text-primary);
+    margin-top: 0.75rem;
   }
 </style>

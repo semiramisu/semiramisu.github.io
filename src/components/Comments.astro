@@ -6,15 +6,20 @@
 ---
 
 <section class="comments" data-pagefind-ignore>
-  <h2 class="prompt" data-i18n="comments.title">コメント</h2>
+  <h2 class="comments-title" data-i18n="comments.title">コメント</h2>
   <div class="giscus-container"></div>
 </section>
 
 <style>
   .comments {
     margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+    border-top: 3px solid var(--rule-ink);
+  }
+
+  .comments-title {
+    font-size: var(--text-2xl);
+    font-weight: 800;
   }
 
   .giscus-container {

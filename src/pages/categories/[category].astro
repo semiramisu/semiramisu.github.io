@@ -1,8 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import PageHeader from "../../components/PageHeader.astro";
 import PostList from "../../components/PostList.astro";
 import { getPublishedPosts, countCategories } from "../../utils/content";
+import { getCategoryGroup } from "../../utils/categories";
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -22,8 +24,12 @@ const { posts } = Astro.props;
     <PathBreadcrumb
       segments={[{ label: "categories", href: "/categories/" }, { label: category! }]}
     />
-    <h1 class="prompt page-title">ls ~/categories/{category}</h1>
-    <p class="comment-line">// {posts.length} posts</p>
+    <PageHeader
+      kicker="Category"
+      title={category!}
+      count={posts.length}
+      catKey={getCategoryGroup(category)}
+    />
     <div class="timeline-wrap">
       <PostList posts={posts} variant="timeline" />
     </div>
@@ -35,11 +41,7 @@ const { posts } = Astro.props;
     padding-block: 2rem 4rem;
   }
 
-  .page-title {
-    margin-block: 1.5rem 0.4rem;
-  }
-
   .timeline-wrap {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
   }
 </style>

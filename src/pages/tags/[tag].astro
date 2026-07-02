@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import PageHeader from "../../components/PageHeader.astro";
 import PostList from "../../components/PostList.astro";
 import { getPublishedPosts, countTags } from "../../utils/content";
 
@@ -20,8 +21,7 @@ const { posts } = Astro.props;
 <BaseLayout title={`タグ: ${tag}`}>
   <div class="container list-page">
     <PathBreadcrumb segments={[{ label: "tags", href: "/tags/" }, { label: tag! }]} />
-    <h1 class="prompt page-title">grep -rl "#{tag}" ~/posts</h1>
-    <p class="comment-line">// {posts.length} posts</p>
+    <PageHeader kicker="Tag" title={tag!} count={posts.length} />
     <div class="timeline-wrap">
       <PostList posts={posts} variant="timeline" />
     </div>
@@ -33,11 +33,7 @@ const { posts } = Astro.props;
     padding-block: 2rem 4rem;
   }
 
-  .page-title {
-    margin-block: 1.5rem 0.4rem;
-  }
-
   .timeline-wrap {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
   }
 </style>

@@ -7,11 +7,11 @@ const hasAny = Boolean(paypayId || buyMeACoffeeUrl);
 {
   hasAny && (
     <aside class="donation" data-pagefind-ignore>
-      <p class="prompt">support --coffee</p>
+      <p class="kicker">Support</p>
       <p class="donation-text" data-i18n="donation.text">
         この記事が役に立ったら、コーヒーを1杯ごちそうしてください ☕
       </p>
-      <div class="donation-links mono">
+      <div class="donation-links">
         {buyMeACoffeeUrl && (
           <a href={buyMeACoffeeUrl} target="_blank" rel="noopener">
             Buy Me a Coffee →
@@ -27,9 +27,10 @@ const hasAny = Boolean(paypayId || buyMeACoffeeUrl);
   .donation {
     margin-top: 3rem;
     padding: 1.25rem 1.5rem;
-    background-color: var(--bg-surface);
+    background-color: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
+    border-top: 3px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
   }
 
   .donation-text {

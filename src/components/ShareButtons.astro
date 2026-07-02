@@ -9,7 +9,7 @@ const encodedUrl = encodeURIComponent(url.toString());
 const encodedTitle = encodeURIComponent(title);
 ---
 
-<div class="share mono" data-pagefind-ignore>
+<div class="share" data-pagefind-ignore>
   <span class="share-label" data-i18n="share.title">この記事をシェア</span>
   <a
     href={`https://x.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
@@ -28,7 +28,7 @@ const encodedTitle = encodeURIComponent(title);
     はてブ
   </a>
   <button type="button" class="share-link" id="copy-url" data-url={url.toString()}>
-    copy url
+    Copy URL
   </button>
 </div>
 
@@ -45,14 +45,16 @@ const encodedTitle = encodeURIComponent(title);
   .share-label {
     color: var(--text-muted);
     font-size: var(--text-xs);
+    font-weight: 700;
   }
 
   .share-link {
     color: var(--text-secondary);
     border: 1px solid var(--border-strong);
-    border-radius: 6px;
-    padding: 0.2rem 0.8rem;
+    border-radius: var(--radius-pill);
+    padding: 0.2rem 0.95rem;
     font-size: var(--text-sm);
+    font-weight: 600;
   }
 
   .share-link:hover {

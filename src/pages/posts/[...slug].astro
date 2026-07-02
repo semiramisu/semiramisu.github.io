@@ -17,6 +17,7 @@ import {
   formatDate,
   type Post,
 } from "../../utils/content";
+import { getCategoryGroup } from "../../utils/categories";
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
@@ -46,6 +47,12 @@ const allPosts = await getPublishedPosts();
 const related = getRelatedPosts(post, allPosts);
 const readingTime = remarkPluginFrontmatter.readingMetadata?.time ?? 1;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const cat = getCategoryGroup(post.data.category);
+// the deck (standfirst): description shown as the lead-in, unless it just repeats the title
+const deck =
+  post.data.description && post.data.description !== post.data.title
+    ? post.data.description
+    : undefined;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -89,26 +96,27 @@ const jsonLd = {
 
     <div class="post-grid">
       <div class="article-col">
-        <article data-pagefind-body>
+        <article data-pagefind-body data-cat={cat}>
           <header class="post-header">
+            {
+              post.data.category && (
+                <a
+                  href={`/categories/${post.data.category}/`}
+                  class="category-kicker"
+                  data-pagefind-ignore
+                >
+                  {post.data.category}
+                </a>
+              )
+            }
             <h1 class="post-title">{post.data.title}</h1>
-            <p class="comment-line" data-pagefind-ignore>
-              // <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
-              · {readingTime} min
-              {
-                post.data.category && (
-                  <>
-                    ·
-                    <a
-                      href={`/categories/${post.data.category}/`}
-                      class="category-link"
-                    >
-                      {post.data.category}
-                    </a>
-                  </>
-                )
-              }
+            {deck && <p class="post-deck">{deck}</p>}
+            <p class="meta-line" data-pagefind-ignore>
+              <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+              <span class="meta-sep" aria-hidden="true">·</span>
+              {readingTime} min
             </p>
+            <hr class="rule-heavy post-rule" />
           </header>
 
           <TableOfContents headings={headings} mode="mobile" />
@@ -122,7 +130,7 @@ const jsonLd = {
           post.data.tags.length > 0 && (
             <div class="post-tags" data-pagefind-ignore>
               {post.data.tags.map((tag) => (
-                <a href={`/tags/${tag}/`} class="tag-chip">
+                <a href={`/tags/${tag}/`} class="chip">
                   {tag}
                 </a>
               ))}
@@ -136,7 +144,7 @@ const jsonLd = {
         <NewsletterForm />
         <Comments />
 
-        <nav class="post-nav mono" aria-label="前後の記事" data-pagefind-ignore>
+        <nav class="post-nav" aria-label="前後の記事" data-pagefind-ignore>
           {
             prevPost ? (
               <a href={`/posts/${prevPost.id}/`} class="nav-prev" rel="prev">
@@ -200,24 +208,46 @@ const jsonLd = {
     }
   }
 
-  .post-title {
-    font-size: clamp(1.75rem, 1.3rem + 2vw, 2.25rem);
-    line-height: 1.4;
-    font-weight: 700;
+  .category-kicker {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--cat, var(--accent));
   }
 
-  .post-header .comment-line {
-    margin-top: 0.8rem;
-  }
-
-  .category-link {
-    color: var(--text-secondary);
+  .category-kicker:hover {
+    color: var(--cat, var(--accent));
     text-decoration: underline;
-    text-underline-offset: 0.2em;
+    text-underline-offset: 0.25em;
   }
 
-  .category-link:hover {
-    color: var(--accent);
+  .post-title {
+    margin-top: 0.5rem;
+    font-size: var(--display-page);
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  /* the deck: the standfirst under the headline, in quiet gray */
+  .post-deck {
+    margin-top: 1rem;
+    font-size: var(--text-lg);
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  .post-header .meta-line {
+    margin-top: 1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .meta-sep {
+    margin-inline: 0.15em;
+  }
+
+  .post-rule {
+    margin-top: 1.5rem;
   }
 
   .post-header {
@@ -234,18 +264,22 @@ const jsonLd = {
   .post-nav {
     display: flex;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-subtle);
     font-size: var(--text-sm);
   }
 
   .post-nav a {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    max-width: 45%;
+    gap: 0.35rem;
+    flex: 1;
+    max-width: 48%;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-top: 2px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-elevated);
     color: var(--text-secondary);
   }
 
@@ -256,11 +290,19 @@ const jsonLd = {
 
   .nav-label {
     font-size: var(--text-xs);
+    font-weight: 700;
     color: var(--text-muted);
   }
 
+  .nav-title {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
   .post-nav a:hover .nav-title {
-    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--accent);
   }
 </style>
 
@@ -268,7 +310,7 @@ const jsonLd = {
   // copy button for code blocks
   document.querySelectorAll<HTMLPreElement>("pre.astro-code").forEach((pre) => {
     const button = document.createElement("button");
-    button.className = "code-copy-button mono";
+    button.className = "code-copy-button";
     button.type = "button";
     button.textContent = "copy";
     button.addEventListener("click", async () => {

@@ -17,7 +17,7 @@ const items = headings
 {
   items.length > 0 && mode === "mobile" && (
     <details class="toc-mobile">
-      <summary class="mono" data-i18n="toc.title">
+      <summary data-i18n="toc.title">
         目次
       </summary>
       <ul>
@@ -33,7 +33,7 @@ const items = headings
 {
   items.length > 0 && mode === "desktop" && (
     <nav class="toc-desktop" aria-label="目次">
-      <p class="mono toc-title" data-i18n="toc.title">
+      <p class="toc-title" data-i18n="toc.title">
         目次
       </p>
       <ul>
@@ -81,7 +81,7 @@ const items = headings
   /* ---------- mobile ---------- */
   .toc-mobile {
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background-color: var(--bg-surface);
     padding: 0.6rem 1rem;
     margin-bottom: 2rem;
@@ -90,6 +90,7 @@ const items = headings
   .toc-mobile summary {
     cursor: pointer;
     font-size: var(--text-sm);
+    font-weight: 700;
     color: var(--text-secondary);
   }
 
@@ -113,8 +114,8 @@ const items = headings
 
     .toc-title {
       font-size: var(--text-xs);
+      font-weight: 700;
       color: var(--text-muted);
-      text-transform: uppercase;
       letter-spacing: 0.08em;
       margin-bottom: 0.5rem;
       padding-left: 0.75rem;
