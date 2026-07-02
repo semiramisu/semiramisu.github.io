@@ -118,6 +118,76 @@ main {
   left: 0;
 }
 
+/* ---------- magazine utilities ---------- */
+
+/* uppercase editorial label above headings: FEATURE / LATEST / CATEGORY … */
+.kicker {
+  font-family: var(--font-display);
+  font-size: var(--kicker-size);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* small secondary metadata line (date · reading time · category) */
+.meta-line {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* heavy editorial ink rule that tops sections */
+.rule-heavy {
+  border: none;
+  border-top: 3px solid var(--rule-ink);
+  margin: 0;
+}
+
+/* Latin display face for masthead words, big dates, year numerals */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+/* pill chip for tags and categories */
+.chip {
+  display: inline-block;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  padding: 0.15em 0.85em;
+  text-decoration: none;
+}
+
+.chip:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* chip tinted by category color (requires data-cat on self or ancestor) */
+.chip--cat {
+  color: var(--cat, var(--accent));
+  border-color: color-mix(in oklab, var(--cat, var(--accent)) 45%, transparent);
+  background-color: color-mix(in oklab, var(--cat, var(--accent)) 8%, transparent);
+}
+
+.chip--cat:hover {
+  color: var(--cat, var(--accent));
+  border-color: var(--cat, var(--accent));
+}
+
+/* category color wiring: put data-cat="…" on an element and use var(--cat) */
+[data-cat="work"] { --cat: var(--cat-work); }
+[data-cat="chat"] { --cat: var(--cat-chat); }
+[data-cat="book"] { --cat: var(--cat-book); }
+[data-cat="holiday"] { --cat: var(--cat-holiday); }
+[data-cat="career"] { --cat: var(--cat-career); }
+[data-cat="money"] { --cat: var(--cat-money); }
+[data-cat="tech"] { --cat: var(--cat-tech); }
+[data-cat="health"] { --cat: var(--cat-health); }
+[data-cat="misc"] { --cat: var(--cat-misc); }
+
 /* ---------- terminal motifs ---------- */
 .mono {
   font-family: var(--font-mono);

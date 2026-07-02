@@ -18,16 +18,27 @@
 .prose h3,
 .prose h4 {
   color: var(--text-primary);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.5;
   scroll-margin-top: calc(var(--header-height) + 1.5rem);
 }
 
+/* h2 carries a short ink rule below — the editorial section mark */
 .prose h2 {
   font-size: var(--text-2xl);
   margin-top: 2.5em;
-  padding-bottom: 0.4em;
-  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.45em;
+  position: relative;
+}
+
+.prose h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 2.5rem;
+  height: 3px;
+  background-color: var(--rule-ink);
 }
 
 .prose h3 {
@@ -40,25 +51,8 @@
   margin-top: 2em;
 }
 
-/* markdown-style heading markers — muted, not accent (keep prose calm) */
-.prose h2::before,
-.prose h3::before {
-  font-family: var(--font-mono);
-  color: var(--text-muted);
-  user-select: none;
-}
-
-.prose h2::before {
-  content: "## ";
-}
-
-.prose h3::before {
-  content: "### ";
-}
-
 /* anchor links appended by rehype-autolink-headings */
 .prose .heading-anchor {
-  font-family: var(--font-mono);
   font-weight: 400;
   color: var(--text-muted);
   margin-left: 0.4em;
@@ -131,7 +125,7 @@
 
 /* ---------- images ---------- */
 .prose img {
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   margin-inline: auto;
 }
@@ -150,7 +144,7 @@
   position: relative;
   background-color: var(--code-bg) !important;
   border: 1px solid var(--code-border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 2.4rem 1.1rem 1.1rem;
   overflow-x: auto;
   font-size: var(--text-sm);
@@ -163,11 +157,11 @@
 
 /* Shiki dual themes (defaultColor: false): pick per [data-theme] */
 .astro-code span {
-  color: var(--shiki-dark);
+  color: var(--shiki-light);
 }
 
-html[data-theme="light"] .astro-code span {
-  color: var(--shiki-light);
+html[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark);
 }
 
 /* language label, from the data-language attribute Astro emits */
