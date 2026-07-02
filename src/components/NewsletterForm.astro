@@ -6,7 +6,7 @@
 ---
 
 <aside class="newsletter" data-pagefind-ignore>
-  <p class="prompt">subscribe</p>
+  <p class="kicker">Newsletter</p>
   <p class="newsletter-text" data-i18n="newsletter.text">新着記事の通知を受け取る</p>
   <form
     name="newsletter"
@@ -25,16 +25,16 @@
       name="email"
       required
       placeholder="email@example.com"
-      class="mono email-input"
+      class="email-input"
       aria-label="メールアドレス"
       data-i18n-aria="contact.email"
     />
-    <button type="submit" class="mono submit-button" data-i18n="newsletter.submit">
+    <button type="submit" class="submit-button" data-i18n="newsletter.submit">
       登録
     </button>
   </form>
-  <p class="rss-alt mono">
-    or <a href="/rss.xml">rss.xml →</a>
+  <p class="rss-alt">
+    or <a href="/rss.xml">RSS →</a>
   </p>
 </aside>
 
@@ -42,9 +42,10 @@
   .newsletter {
     margin-top: 2rem;
     padding: 1.25rem 1.5rem;
-    background-color: var(--bg-surface);
+    background-color: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
+    border-top: 3px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
   }
 
   .newsletter-text {
@@ -69,7 +70,7 @@
     min-width: 12rem;
     background-color: var(--bg-base);
     border: 1px solid var(--border-strong);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     padding: 0.4rem 0.8rem;
     font-size: var(--text-sm);
     color: var(--text-primary);
@@ -86,8 +87,8 @@
     color: var(--accent-text-on);
     font-weight: 700;
     font-size: var(--text-sm);
-    border-radius: 6px;
-    padding: 0.4rem 1.1rem;
+    border-radius: var(--radius-pill);
+    padding: 0.4rem 1.2rem;
   }
 
   .submit-button:hover {

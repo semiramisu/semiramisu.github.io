@@ -12,9 +12,11 @@ interface Props {
   hrefLabel?: string;
   /** colors the heavy rule, kicker and count with the category color */
   catKey?: CatKey;
+  /** i18n dictionary key applied to the title for the ?lang=en switcher */
+  titleI18n?: string;
 }
 
-const { kicker, title, count, href, hrefLabel, catKey } = Astro.props;
+const { kicker, title, count, href, hrefLabel, catKey, titleI18n } = Astro.props;
 ---
 
 <header class="section-header" data-cat={catKey}>
@@ -22,7 +24,7 @@ const { kicker, title, count, href, hrefLabel, catKey } = Astro.props;
     <div class="heading">
       {kicker && <span class="kicker section-kicker">{kicker}</span>}
       <h2 class="section-title">
-        {title}
+        <span data-i18n={titleI18n}>{title}</span>
         {count !== undefined && <span class="count">{count}</span>}
       </h2>
     </div>
