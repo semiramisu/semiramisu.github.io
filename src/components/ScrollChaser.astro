@@ -1,0 +1,162 @@
+<div class="scroll-chaser" data-scroll-chaser aria-hidden="true">
+  <span class="scroll-track"></span>
+  <span class="scroll-pet">
+    <span class="scroll-pet-sprite"></span>
+  </span>
+  <span class="scroll-thumb"></span>
+</div>
+
+<style>
+  .scroll-chaser {
+    --thumb-y: 0px;
+    --pet-y: 0px;
+    position: fixed;
+    z-index: 30;
+    top: calc(var(--header-height) + 1rem);
+    right: 0.65rem;
+    bottom: 1rem;
+    width: 3.6rem;
+    pointer-events: none;
+  }
+
+  .scroll-track {
+    position: absolute;
+    top: 0;
+    right: 0.2rem;
+    bottom: 0;
+    width: 0.4rem;
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-pill);
+    background: var(--bg-elevated);
+  }
+
+  .scroll-thumb {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    width: 0.8rem;
+    height: 3.5rem;
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    box-shadow: 2px 2px 0 var(--rule-ink);
+    transform: translateY(var(--thumb-y));
+  }
+
+  .scroll-pet {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    opacity: 1;
+    transform: translateY(var(--pet-y));
+    transition: opacity 120ms ease;
+  }
+
+  .scroll-pet-sprite {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: url("/images/kairo-run-strip.webp") 0 0 / 800% 100% no-repeat;
+    filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.2));
+    animation: scroll-pet-run 0.55s steps(7) infinite;
+  }
+
+  .scroll-chaser.is-up .scroll-pet-sprite {
+    transform: scaleX(-1);
+  }
+
+  .scroll-chaser.is-caught .scroll-pet {
+    opacity: 0;
+  }
+
+  .scroll-chaser.is-static {
+    display: none;
+  }
+
+  @keyframes scroll-pet-run {
+    to {
+      background-position: 100% 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .scroll-chaser {
+      right: 0.2rem;
+      width: 3rem;
+    }
+
+    .scroll-pet {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .scroll-thumb {
+      height: 3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-chaser {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const chaser = document.querySelector<HTMLElement>("[data-scroll-chaser]");
+  const thumb = chaser?.querySelector<HTMLElement>(".scroll-thumb");
+
+  if (
+    chaser &&
+    thumb &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    let target = 0;
+    let pet = 0;
+    let running = false;
+
+    const chase = () => {
+      const distance = target - pet;
+      pet += distance * 0.09;
+      chaser.style.setProperty("--pet-y", `${pet}px`);
+      chaser.classList.toggle("is-caught", Math.abs(distance) < 1);
+
+      if (Math.abs(distance) >= 0.1) {
+        requestAnimationFrame(chase);
+      } else {
+        pet = target;
+        chaser.style.setProperty("--pet-y", `${pet}px`);
+        chaser.classList.add("is-caught");
+        running = false;
+      }
+    };
+
+    const update = () => {
+      const maxScroll = document.documentElement.scrollHeight - innerHeight;
+      chaser.classList.toggle("is-static", maxScroll <= 0);
+      if (maxScroll <= 0) return;
+
+      const travel = chaser.clientHeight - thumb.offsetHeight;
+      const next = Math.max(
+        0,
+        Math.min(travel, (scrollY / maxScroll) * travel),
+      );
+      chaser.classList.toggle("is-up", next < target);
+      target = next;
+      chaser.style.setProperty("--thumb-y", `${target}px`);
+
+      if (!running) {
+        running = true;
+        requestAnimationFrame(chase);
+      }
+    };
+
+    update();
+    addEventListener("scroll", update, { passive: true });
+    addEventListener("resize", update);
+  }
+</script>
