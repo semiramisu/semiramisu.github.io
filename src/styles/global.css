@@ -19,6 +19,11 @@ html {
 
 body {
   background-color: var(--bg-base);
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--text-primary) 8%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 18px 18px;
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -127,7 +132,13 @@ main {
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #151515;
+  width: fit-content;
+  padding: 0.08em 0.45em;
+  background: var(--accent-sun);
+  border: 1.5px solid var(--rule-ink);
+  border-radius: 3px;
+  box-shadow: 2px 2px 0 var(--rule-ink);
 }
 
 /* small secondary metadata line (date · reading time · category) */
@@ -139,7 +150,7 @@ main {
 /* heavy editorial ink rule that tops sections */
 .rule-heavy {
   border: none;
-  border-top: 3px solid var(--rule-ink);
+  border-top: 4px solid var(--rule-ink);
   margin: 0;
 }
 
@@ -154,22 +165,31 @@ main {
   display: inline-block;
   font-size: var(--text-sm);
   color: var(--text-secondary);
-  border: 1px solid var(--border-strong);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius-pill);
   padding: 0.15em 0.85em;
   text-decoration: none;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
 }
 
 .chip:hover {
   color: var(--accent);
   border-color: var(--accent);
+  transform: translate(-1px, -1px);
 }
 
 /* chip tinted by category color (requires data-cat on self or ancestor) */
 .chip--cat {
   color: var(--cat, var(--accent));
   border-color: color-mix(in oklab, var(--cat, var(--accent)) 45%, transparent);
-  background-color: color-mix(in oklab, var(--cat, var(--accent)) 8%, transparent);
+  background-color: color-mix(
+    in oklab,
+    var(--cat, var(--accent)) 8%,
+    transparent
+  );
 }
 
 .chip--cat:hover {
@@ -178,15 +198,67 @@ main {
 }
 
 /* category color wiring: put data-cat="…" on an element and use var(--cat) */
-[data-cat="work"] { --cat: var(--cat-work); }
-[data-cat="chat"] { --cat: var(--cat-chat); }
-[data-cat="book"] { --cat: var(--cat-book); }
-[data-cat="holiday"] { --cat: var(--cat-holiday); }
-[data-cat="career"] { --cat: var(--cat-career); }
-[data-cat="money"] { --cat: var(--cat-money); }
-[data-cat="tech"] { --cat: var(--cat-tech); }
-[data-cat="health"] { --cat: var(--cat-health); }
-[data-cat="misc"] { --cat: var(--cat-misc); }
+[data-cat="work"] {
+  --cat: var(--cat-work);
+}
+[data-cat="chat"] {
+  --cat: var(--cat-chat);
+}
+[data-cat="book"] {
+  --cat: var(--cat-book);
+}
+[data-cat="holiday"] {
+  --cat: var(--cat-holiday);
+}
+[data-cat="career"] {
+  --cat: var(--cat-career);
+}
+[data-cat="money"] {
+  --cat: var(--cat-money);
+}
+[data-cat="tech"] {
+  --cat: var(--cat-tech);
+}
+[data-cat="health"] {
+  --cat: var(--cat-health);
+}
+[data-cat="misc"] {
+  --cat: var(--cat-misc);
+}
+
+/* ---------- scroll-driven entrances ---------- */
+@keyframes content-reveal {
+  from {
+    translate: 0 1.25rem;
+    rotate: 0.4deg;
+    scale: 0.985;
+  }
+  to {
+    translate: none;
+    rotate: none;
+    scale: 1;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  :where(
+    .post-card,
+    .post-item,
+    .page-header,
+    .post-header,
+    .newsletter,
+    .cat-section,
+    .contact-form,
+    .notfound
+  ) {
+    animation-name: content-reveal;
+    animation-duration: 1ms;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation-timeline: view();
+    animation-range: entry 5% cover 28%;
+  }
+}
 
 /* ---------- page transitions (native cross-document) ---------- */
 @view-transition {
@@ -203,8 +275,7 @@ main {
   *,
   ::before,
   ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 0.01ms !important;
   }
 

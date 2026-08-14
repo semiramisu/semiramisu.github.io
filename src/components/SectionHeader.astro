@@ -16,7 +16,8 @@ interface Props {
   titleI18n?: string;
 }
 
-const { kicker, title, count, href, hrefLabel, catKey, titleI18n } = Astro.props;
+const { kicker, title, count, href, hrefLabel, catKey, titleI18n } =
+  Astro.props;
 ---
 
 <header class="section-header" data-cat={catKey}>
@@ -41,8 +42,8 @@ const { kicker, title, count, href, hrefLabel, catKey, titleI18n } = Astro.props
 
 <style>
   .section-header {
-    border-top: 3px solid var(--cat, var(--rule-ink));
-    padding-top: 0.8rem;
+    border-top: 4px solid var(--cat, var(--rule-ink));
+    padding-top: 0.9rem;
   }
 
   .row {
@@ -54,7 +55,7 @@ const { kicker, title, count, href, hrefLabel, catKey, titleI18n } = Astro.props
 
   .section-kicker {
     display: block;
-    color: var(--cat, var(--accent));
+    color: var(--text-primary);
   }
 
   .section-title {
@@ -77,8 +78,12 @@ const { kicker, title, count, href, hrefLabel, catKey, titleI18n } = Astro.props
     flex-shrink: 0;
     font-size: var(--text-sm);
     font-weight: 700;
-    color: var(--text-secondary);
-    padding-bottom: 0.2rem;
+    color: var(--text-primary);
+    padding: 0.25rem 0.65rem;
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
+    background: var(--accent-alt);
+    box-shadow: 2px 2px 0 var(--rule-ink);
   }
 
   .view-all:hover {

@@ -76,7 +76,12 @@ const jsonLd = {
   ogType="article"
   publishedTime={post.data.published.toISOString()}
 >
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+    is:inline
+  />
 
   <div class="container post-page">
     <PathBreadcrumb
@@ -112,7 +117,9 @@ const jsonLd = {
             <h1 class="post-title">{post.data.title}</h1>
             {deck && <p class="post-deck">{deck}</p>}
             <p class="meta-line" data-pagefind-ignore>
-              <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+              <time datetime={post.data.published.toISOString()}
+                >{formatDate(post.data.published)}</time
+              >
               <span class="meta-sep" aria-hidden="true">·</span>
               {readingTime} min
             </p>
@@ -252,6 +259,11 @@ const jsonLd = {
 
   .post-header {
     margin-bottom: 2.5rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
+    background: var(--bg-elevated);
+    border: 3px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
   }
 
   .post-tags {
@@ -276,9 +288,9 @@ const jsonLd = {
     flex: 1;
     max-width: 48%;
     padding: 0.9rem 1rem;
-    border: 1px solid var(--border-subtle);
-    border-top: 2px solid var(--rule-ink);
-    border-radius: var(--radius-sm);
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: 2px 2px 0 var(--rule-ink);
     background-color: var(--bg-elevated);
     color: var(--text-secondary);
   }

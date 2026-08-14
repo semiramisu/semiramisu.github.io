@@ -23,17 +23,21 @@ const { kicker, title, count, catKey, titleI18n } = Astro.props;
 
 <style>
   .page-header {
-    border-top: 3px solid var(--cat, var(--rule-ink));
-    padding-top: 0.9rem;
+    position: relative;
+    padding: 1.25rem 1.4rem;
     margin-top: 1.5rem;
+    background: var(--bg-elevated);
+    border: 3px solid var(--cat, var(--rule-ink));
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
   }
 
   .page-kicker {
-    color: var(--cat, var(--accent));
+    color: var(--text-primary);
   }
 
   .page-title {
-    margin-top: 0.2rem;
+    margin-top: 0.7rem;
     font-size: var(--display-page);
     font-weight: 800;
     line-height: 1.3;

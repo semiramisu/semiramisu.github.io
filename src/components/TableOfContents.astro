@@ -17,9 +17,7 @@ const items = headings
 {
   items.length > 0 && mode === "mobile" && (
     <details class="toc-mobile">
-      <summary data-i18n="toc.title">
-        目次
-      </summary>
+      <summary data-i18n="toc.title">目次</summary>
       <ul>
         {items.map((h) => (
           <li class:list={["toc-item", `depth-${h.depth}`]}>
@@ -80,8 +78,8 @@ const items = headings
 
   /* ---------- mobile ---------- */
   .toc-mobile {
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
     background-color: var(--bg-surface);
     padding: 0.6rem 1rem;
     margin-bottom: 2rem;

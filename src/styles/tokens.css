@@ -1,35 +1,32 @@
-/*
- * Magazine Grid — design tokens.
- * Light (paper) is the default theme; dark overrides via html[data-theme="dark"].
- * All text/background pairs verified WCAG AA or better.
- */
+/* Comic editorial design tokens. */
 :root {
-  /* surfaces: paper (3 layers) */
-  --bg-base: #faf9f6;
-  --bg-surface: #f1efe9;
-  --bg-elevated: #ffffff;
+  --bg-base: #fbf5e9;
+  --bg-surface: #f2e8d7;
+  --bg-elevated: #fffdf7;
 
-  /* ink (3 layers) */
-  --text-primary: #17191d;
-  --text-secondary: #4c525b;
-  --text-muted: #6b7280;
+  --text-primary: #151515;
+  --text-secondary: #48453f;
+  --text-muted: #706b62;
 
   /* rules: hairline / medium / heavy editorial ink rule */
-  --border-subtle: #e6e3db;
-  --border-strong: #c9c5bb;
+  --border-subtle: #d7cdbd;
+  --border-strong: #151515;
   --rule-ink: var(--text-primary);
 
-  /* accent: vermilion — the editorial red of the new masthead */
-  --accent: #c2410c;
-  --accent-hover: #9a3412;
-  --accent-muted: color-mix(in oklab, #c2410c 10%, transparent);
-  --accent-text-on: #ffffff;
+  --accent: #ef722a;
+  --accent-hover: #d95717;
+  --accent-alt: #63c8c1;
+  --accent-sun: #ebc04b;
+  --accent-muted: color-mix(in oklab, #ef722a 14%, transparent);
+  --accent-text-on: #151515;
+  --header-bg: #151515;
+  --header-text: #fffdf7;
 
   /* category palette (display layer only — URLs and labels stay raw) */
-  --cat-work: #1d4ed8;
-  --cat-chat: #b45309;
-  --cat-book: #15803d;
-  --cat-holiday: #0e7490;
+  --cat-work: #4471d0;
+  --cat-chat: #d95717;
+  --cat-book: #478d55;
+  --cat-holiday: #267b7a;
   --cat-career: #7e22ce;
   --cat-money: #a16207;
   --cat-tech: #4338ca;
@@ -37,14 +34,14 @@
   --cat-misc: #52525b;
 
   /* code */
-  --code-bg: #f4f2ec;
-  --code-border: #e6e3db;
-  --code-inline-bg: #edeae2;
+  --code-bg: #f5ecdc;
+  --code-border: #151515;
+  --code-inline-bg: #efe2ce;
 
   /* semantic */
   --link: var(--accent);
   --link-hover: var(--accent-hover);
-  --selection: color-mix(in oklab, #c2410c 18%, transparent);
+  --selection: color-mix(in oklab, var(--accent-alt) 42%, transparent);
   --focus-ring: var(--accent);
   --danger: #b91c1c;
 
@@ -53,11 +50,11 @@
     "Helvetica Neue", Arial, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
     "BIZ UDPGothic", "Yu Gothic Medium", "Yu Gothic", Meiryo, sans-serif;
   --font-display:
-    "Archivo Black", "Helvetica Neue", Arial, "Hiragino Sans",
-    "Yu Gothic", Meiryo, sans-serif;
+    "Archivo Black", "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic",
+    Meiryo, sans-serif;
   --font-mono:
-    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas,
-    "Hiragino Sans", monospace;
+    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Hiragino Sans",
+    monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -76,11 +73,11 @@
   --display-page: clamp(1.7rem, 1.25rem + 2vw, 2.5rem);
   --kicker-size: 0.72rem;
 
-  /* elevation: flat by default, lift on hover only */
-  --shadow-card: 0 1px 2px rgb(23 25 29 / 0.06);
-  --shadow-lift: 0 10px 28px rgb(23 25 29 / 0.1);
+  --shadow-card: 4px 4px 0 var(--rule-ink);
+  --shadow-lift: 7px 7px 0 var(--rule-ink);
 
-  --radius-sm: 2px;
+  --radius-sm: 5px;
+  --radius-panel: 12px;
   --radius-pill: 999px;
 
   /* prose line length: ~38 full-width chars, the sweet spot for Japanese */
@@ -94,20 +91,22 @@
 }
 
 html[data-theme="dark"] {
-  --bg-base: #14161a;
-  --bg-surface: #1a1d22;
-  --bg-elevated: #1f2329;
+  --bg-base: #151515;
+  --bg-surface: #201f1d;
+  --bg-elevated: #292724;
 
   --text-primary: #ecedee;
   --text-secondary: #a3a9b3;
   --text-muted: #82878f;
 
-  --border-subtle: #2a2e35;
-  --border-strong: #3c4149;
+  --border-subtle: #45413b;
+  --border-strong: #ecedee;
   --rule-ink: #ecedee;
 
   --accent: #fb923c;
   --accent-hover: #fdba74;
+  --accent-alt: #63c8c1;
+  --accent-sun: #f5d36f;
   --accent-muted: color-mix(in oklab, #fb923c 14%, transparent);
   --accent-text-on: #201207;
 
@@ -128,8 +127,8 @@ html[data-theme="dark"] {
   --selection: color-mix(in oklab, #fb923c 30%, transparent);
   --danger: #f87171;
 
-  --shadow-card: none;
-  --shadow-lift: 0 10px 28px rgb(0 0 0 / 0.5);
+  --shadow-card: 4px 4px 0 #000;
+  --shadow-lift: 7px 7px 0 #000;
 
   color-scheme: dark;
 }
