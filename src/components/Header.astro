@@ -10,6 +10,7 @@ const isCurrent = (href: string) =>
 <header class="site-header">
   <div class="container header-inner">
     <a href="/" class="brand" aria-label={SITE.title}>
+      <span class="brand-mascot" aria-hidden="true"></span>
       {SITE.title}<span class="brand-dot" aria-hidden="true"></span>
     </a>
 
@@ -28,7 +29,12 @@ const isCurrent = (href: string) =>
     </nav>
 
     <div class="header-actions">
-      <a href="/search/" class="icon-button" aria-label="検索" data-i18n-aria="action.search">
+      <a
+        href="/search/"
+        class="icon-button"
+        aria-label="検索"
+        data-i18n-aria="action.search"
+      >
         <Icon name="search" size={18} />
       </a>
       <button
@@ -37,16 +43,36 @@ const isCurrent = (href: string) =>
         aria-label="テーマ切り替え"
         data-i18n-aria="action.theme"
       >
-        <span class="theme-icon theme-icon-moon"><Icon name="moon" size={17} /></span>
-        <span class="theme-icon theme-icon-sun"><Icon name="sun" size={17} /></span>
+        <span class="theme-icon theme-icon-moon"
+          ><Icon name="moon" size={17} /></span
+        >
+        <span class="theme-icon theme-icon-sun"
+          ><Icon name="sun" size={17} /></span
+        >
       </button>
-      <button id="lang-toggle" class="icon-button lang-button" aria-label="Switch language">
+      <button
+        id="lang-toggle"
+        class="icon-button lang-button"
+        aria-label="Switch language"
+      >
         ja
       </button>
-      <a href={SITE.github} class="icon-button external" rel="me noopener" target="_blank" aria-label="GitHub">
+      <a
+        href={SITE.github}
+        class="icon-button external"
+        rel="me noopener"
+        target="_blank"
+        aria-label="GitHub"
+      >
         <Icon name="github" size={18} />
       </a>
-      <a href={SITE.x} class="icon-button external" rel="me noopener" target="_blank" aria-label="X (Twitter)">
+      <a
+        href={SITE.x}
+        class="icon-button external"
+        rel="me noopener"
+        target="_blank"
+        aria-label="X (Twitter)"
+      >
         <Icon name="x" size={16} />
       </a>
       <button
@@ -64,13 +90,18 @@ const isCurrent = (href: string) =>
 
 <div id="mobile-menu" class="mobile-menu" hidden>
   <div class="mobile-menu-header container">
-    <a href="/" class="brand">{SITE.title}<span class="brand-dot" aria-hidden="true"></span></a>
+    <a href="/" class="brand">
+      <span class="brand-mascot" aria-hidden="true"></span>
+      {SITE.title}<span class="brand-dot" aria-hidden="true"></span>
+    </a>
     <button id="menu-close" class="icon-button" aria-label="メニューを閉じる">
       <Icon name="close" size={20} />
     </button>
   </div>
   <nav class="mobile-nav container" aria-label="モバイルナビゲーション">
-    <a href="/" class:list={["mobile-link", { current: pathname === "/" }]}>Home</a>
+    <a href="/" class:list={["mobile-link", { current: pathname === "/" }]}
+      >Home</a
+    >
     {
       NAV_ITEMS.map((item) => (
         <a
@@ -83,21 +114,31 @@ const isCurrent = (href: string) =>
     }
     <a href="/search/" class="mobile-link">Search</a>
     <div class="mobile-social">
-      <a href={SITE.github} rel="me noopener" target="_blank" aria-label="GitHub"><Icon name="github" /></a>
-      <a href={SITE.x} rel="me noopener" target="_blank" aria-label="X (Twitter)"><Icon name="x" size={18} /></a>
+      <a
+        href={SITE.github}
+        rel="me noopener"
+        target="_blank"
+        aria-label="GitHub"><Icon name="github" /></a
+      >
+      <a
+        href={SITE.x}
+        rel="me noopener"
+        target="_blank"
+        aria-label="X (Twitter)"><Icon name="x" size={18} /></a
+      >
     </div>
   </nav>
 </div>
 
 <style>
-  /* opaque masthead topped onto a double rule: hairline over heavy ink */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 50;
     height: var(--header-height);
-    background-color: var(--bg-base);
-    border-bottom: 3px solid var(--rule-ink);
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    border-bottom: 3px solid var(--accent);
   }
 
   .header-inner {
@@ -105,15 +146,42 @@ const isCurrent = (href: string) =>
     align-items: center;
     gap: 1.5rem;
     height: 100%;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid rgb(255 255 255 / 0.2);
   }
 
   .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: 800;
-    color: var(--text-primary);
+    color: var(--header-text);
     flex-shrink: 0;
     letter-spacing: 0.02em;
+  }
+
+  .brand-mascot {
+    width: 2rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    background-image: url("/images/kairo-idle-strip.webp");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 700% 100%;
+    image-rendering: pixelated;
+    align-self: flex-end;
+    animation: kairo-idle 2.8s steps(6) infinite;
+  }
+
+  @keyframes kairo-idle {
+    0%,
+    58% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100% 0;
+    }
   }
 
   /* the vermilion full stop — the site's new signature mark */
@@ -122,12 +190,13 @@ const isCurrent = (href: string) =>
     width: 0.42em;
     height: 0.42em;
     margin-left: 0.18em;
-    background-color: var(--accent);
+    background-color: var(--accent-alt);
+    border-radius: 50%;
   }
 
   .brand:hover {
-    color: var(--text-primary);
-    opacity: 0.75;
+    color: var(--header-text);
+    opacity: 0.85;
   }
 
   .desktop-nav {
@@ -141,16 +210,16 @@ const isCurrent = (href: string) =>
     font-size: var(--kicker-size);
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: rgb(255 255 255 / 0.72);
     padding-block: 0.3rem;
   }
 
   .nav-link:hover {
-    color: var(--text-primary);
+    color: var(--header-text);
   }
 
   .nav-link.current {
-    color: var(--text-primary);
+    color: var(--header-text);
     border-bottom: 2px solid var(--accent);
   }
 
@@ -183,12 +252,30 @@ const isCurrent = (href: string) =>
     width: 2.1rem;
     height: 2.1rem;
     border-radius: var(--radius-sm);
-    color: var(--text-secondary);
+    color: rgb(255 255 255 / 0.78);
+    border: 1px solid transparent;
   }
 
   .icon-button:hover {
-    color: var(--text-primary);
-    background-color: var(--bg-surface);
+    color: var(--header-text);
+    background-color: rgb(255 255 255 / 0.12);
+    border-color: rgb(255 255 255 / 0.32);
+  }
+
+  .icon-button :global(svg) {
+    transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .icon-button:hover :global(svg) {
+    transform: translateY(-2px) rotate(-8deg) scale(1.12);
+  }
+
+  .icon-button:active {
+    transform: translateY(2px) scale(0.92);
+  }
+
+  #theme-toggle:hover :global(svg) {
+    transform: rotate(28deg) scale(1.15);
   }
 
   /* show the theme you would switch to */
@@ -224,6 +311,7 @@ const isCurrent = (href: string) =>
     inset: 0;
     z-index: 60;
     background-color: var(--bg-base);
+    color: var(--text-primary);
     overflow-y: auto;
   }
 
@@ -232,7 +320,8 @@ const isCurrent = (href: string) =>
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    border-bottom: 3px solid var(--rule-ink);
+    background-color: var(--header-bg);
+    border-bottom: 3px solid var(--accent);
   }
 
   .mobile-nav {
@@ -287,7 +376,9 @@ const isCurrent = (href: string) =>
     setTimeout(() => root.classList.remove("theme-transition"), 250);
 
     // keep giscus in sync
-    const frame = document.querySelector<HTMLIFrameElement>("iframe.giscus-frame");
+    const frame = document.querySelector<HTMLIFrameElement>(
+      "iframe.giscus-frame",
+    );
     frame?.contentWindow?.postMessage(
       { giscus: { setConfig: { theme: next } } },
       "https://giscus.app",

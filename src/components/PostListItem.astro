@@ -64,7 +64,7 @@ const description =
 <style>
   .post-item {
     list-style: none;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 2px solid var(--rule-ink);
   }
 
   .post-link {
@@ -74,7 +74,11 @@ const description =
   }
 
   .post-link:hover {
-    background-color: var(--bg-elevated);
+    background-color: color-mix(
+      in oklab,
+      var(--accent-alt) 18%,
+      var(--bg-elevated)
+    );
     color: inherit;
   }
 

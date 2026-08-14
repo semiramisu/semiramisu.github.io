@@ -7,7 +7,9 @@
 
 <aside class="newsletter" data-pagefind-ignore>
   <p class="kicker">Newsletter</p>
-  <p class="newsletter-text" data-i18n="newsletter.text">新着記事の通知を受け取る</p>
+  <p class="newsletter-text" data-i18n="newsletter.text">
+    新着記事の通知を受け取る
+  </p>
   <form
     name="newsletter"
     method="POST"
@@ -42,10 +44,14 @@
   .newsletter {
     margin-top: 2rem;
     padding: 1.25rem 1.5rem;
-    background-color: var(--bg-elevated);
-    border: 1px solid var(--border-subtle);
-    border-top: 3px solid var(--rule-ink);
-    border-radius: var(--radius-sm);
+    background-color: color-mix(
+      in oklab,
+      var(--accent-sun) 42%,
+      var(--bg-elevated)
+    );
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
   }
 
   .newsletter-text {
@@ -69,7 +75,7 @@
     flex: 1;
     min-width: 12rem;
     background-color: var(--bg-base);
-    border: 1px solid var(--border-strong);
+    border: 2px solid var(--border-strong);
     border-radius: var(--radius-sm);
     padding: 0.4rem 0.8rem;
     font-size: var(--text-sm);
@@ -87,7 +93,9 @@
     color: var(--accent-text-on);
     font-weight: 700;
     font-size: var(--text-sm);
-    border-radius: var(--radius-pill);
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
+    box-shadow: 2px 2px 0 var(--rule-ink);
     padding: 0.4rem 1.2rem;
   }
 

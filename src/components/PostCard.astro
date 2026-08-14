@@ -25,7 +25,20 @@ const description =
 
 // 85% of posts have no image, so the visual is a typographic plate:
 // the day as a huge numeral, month/year as a kicker, category as the imprint.
-const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+const MONTHS = [
+  "JAN",
+  "FEB",
+  "MAR",
+  "APR",
+  "MAY",
+  "JUN",
+  "JUL",
+  "AUG",
+  "SEP",
+  "OCT",
+  "NOV",
+  "DEC",
+];
 const published = post.data.published;
 const day = String(published.getDate()).padStart(2, "0");
 const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
@@ -38,7 +51,9 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
         <div class="plate" aria-hidden="true">
           <span class="plate-month display">{monthYear}</span>
           <span class="plate-day display">{day}</span>
-          {post.data.category && <span class="plate-cat">{post.data.category}</span>}
+          {post.data.category && (
+            <span class="plate-cat">{post.data.category}</span>
+          )}
         </div>
       )
     }
@@ -57,8 +72,12 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
             <h3 class="title">{post.data.title}</h3>
             {description && <p class="lead">{description}</p>}
             <p class="meta-line">
-              <time datetime={published.toISOString()}>{formatDate(published)}</time>
-              {post.data.category && <span class="meta-cat">{post.data.category}</span>}
+              <time datetime={published.toISOString()}>
+                {formatDate(published)}
+              </time>
+              {post.data.category && (
+                <span class="meta-cat">{post.data.category}</span>
+              )}
             </p>
           </>
         )
@@ -78,6 +97,16 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
     color: inherit;
   }
 
+  .hero .card-link,
+  .featured .card-link,
+  .standard .card-link {
+    overflow: hidden;
+    background: var(--bg-elevated);
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
+  }
+
   .card-link:hover {
     color: inherit;
   }
@@ -90,8 +119,12 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
     justify-content: center;
     align-items: center;
     aspect-ratio: 16 / 9;
-    background-color: color-mix(in oklab, var(--cat, var(--accent)) 12%, var(--bg-elevated));
-    border-radius: var(--radius-sm);
+    background-color: color-mix(
+      in oklab,
+      var(--cat, var(--accent)) 12%,
+      var(--bg-elevated)
+    );
+    border-bottom: 2px solid var(--rule-ink);
     overflow: hidden;
   }
 
@@ -105,6 +138,7 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
     font-size: clamp(2.6rem, 2rem + 2vw, 3.6rem);
     line-height: 1.1;
     color: color-mix(in oklab, var(--cat, var(--accent)) 38%, transparent);
+    transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1.2);
   }
 
   .plate-cat {
@@ -118,7 +152,7 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
 
   /* ---------- body ---------- */
   .card-body {
-    padding: 0.9rem 0.15rem 0;
+    padding: 1rem;
   }
 
   .title {
@@ -138,6 +172,10 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
     text-underline-offset: 0.22em;
     text-decoration-thickness: 2px;
     text-decoration-color: var(--cat, var(--accent));
+  }
+
+  .card-link:hover .plate-day {
+    transform: rotate(-5deg) scale(1.12);
   }
 
   .lead {
@@ -172,12 +210,13 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
 
   .standard .card-link:hover,
   .featured .card-link:hover {
-    transform: translateY(-2px);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-lift);
   }
 
   .standard .card-link:hover .plate,
   .featured .card-link:hover .plate {
-    box-shadow: var(--shadow-lift);
+    box-shadow: none;
   }
 
   /* ---------- hero ---------- */
@@ -212,7 +251,13 @@ const monthYear = `${MONTHS[published.getMonth()]} ${published.getFullYear()}`;
     }
 
     .hero .card-body {
-      padding: 0;
+      padding: 1.5rem;
+    }
+
+    .hero .plate {
+      height: 100%;
+      border-right: 2px solid var(--rule-ink);
+      border-bottom: 0;
     }
   }
 

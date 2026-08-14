@@ -4,6 +4,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 <BaseLayout title="404 Not Found">
   <div class="container notfound">
+    <img
+      src="/images/kairo-sad.webp"
+      alt=""
+      width="122"
+      height="149"
+      class="sad-kairo"
+    />
     <p class="kicker">Missing Issue</p>
     <p class="big display" aria-hidden="true">
       <span>4</span><span>0</span><span>4</span>
@@ -16,7 +23,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     <div class="actions">
       <a href="/" class="action" data-i18n="notfound.home">ホームへ戻る</a>
-      <a href="/archive/" class="action" data-i18n="notfound.archive">記事一覧を見る</a>
+      <a href="/archive/" class="action" data-i18n="notfound.archive"
+        >記事一覧を見る</a
+      >
       <a href="/search/" class="action" data-i18n="action.search">検索</a>
     </div>
   </div>
@@ -26,6 +35,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .notfound {
     padding-block: 5rem 6rem;
     text-align: center;
+  }
+
+  .sad-kairo {
+    width: 7.6rem;
+    height: auto;
+    margin: 0 auto -1rem;
+    image-rendering: pixelated;
+    transform-origin: 50% 100%;
+    animation: sad-wobble 2.8s ease-in-out infinite;
+  }
+
+  @keyframes sad-wobble {
+    0%,
+    100% {
+      transform: rotate(-2deg) translateY(0);
+    }
+    50% {
+      transform: rotate(2deg) translateY(-0.35rem);
+    }
   }
 
   /* the missing issue number, stamped in category inks */
@@ -76,8 +104,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   .action {
     padding: 0.5rem 1.4rem;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-pill);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    box-shadow: 2px 2px 0 var(--rule-ink);
     font-size: var(--text-sm);
     font-weight: 700;
     color: var(--text-secondary);
