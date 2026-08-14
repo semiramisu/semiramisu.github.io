@@ -8,6 +8,7 @@ import "../styles/prose.css";
 import { SITE } from "../site.config";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import ScrollChaser from "../components/ScrollChaser.astro";
 
 interface Props {
   title?: string;
@@ -118,6 +119,7 @@ const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
       <slot />
     </main>
     <Footer />
+    <ScrollChaser />
     <script>
       import "../scripts/i18n-client";
     </script>
