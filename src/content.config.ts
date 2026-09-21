@@ -12,6 +12,7 @@ const posts = defineCollection({
     description: z.string().optional(),
     tags: z.array(z.string()).default([]),
     category: z.string().optional(),
+    tech: z.boolean().default(false),
     draft: z.boolean().default(false),
     cover: z.string().optional(),
     lang: z.enum(["ja", "en"]).default("ja"),

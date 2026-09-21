@@ -1,0 +1,638 @@
+/* A deliberately separate visual language for the technical profile. */
+:root {
+  color-scheme: dark;
+}
+
+html:has(body.tech-site),
+body.tech-site {
+  background: #050505;
+  color: #f5f5f5;
+}
+
+body.tech-site {
+  min-width: 320px;
+  min-height: 100dvh;
+  margin: 0;
+  background-image: radial-gradient(
+    circle at top,
+    rgb(21 39 48 / 0.26),
+    transparent 34rem
+  );
+  font-family:
+    "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  line-height: 1.7;
+}
+
+body.tech-site *,
+body.tech-site *::before,
+body.tech-site *::after {
+  box-sizing: border-box;
+}
+
+body.tech-site a {
+  color: inherit;
+  text-decoration: none;
+}
+
+body.tech-site a:focus-visible,
+body.tech-site button:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 4px;
+}
+
+.tech-shell {
+  width: min(100% - 3rem, 72rem);
+  margin-inline: auto;
+}
+
+.tech-header {
+  border-bottom: 1px solid #242424;
+  background: rgb(5 5 5 / 0.92);
+}
+
+.tech-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  min-height: 4.25rem;
+}
+
+.tech-brand {
+  color: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.tech-brand::before {
+  content: "~/";
+  margin-right: 0.35rem;
+  color: #22d3ee;
+}
+
+.tech-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.875rem;
+}
+
+.tech-nav a {
+  color: #8a8a8a;
+  transition: color 160ms ease;
+}
+
+.tech-nav a:hover,
+.tech-nav a[aria-current="page"] {
+  color: #fff;
+}
+
+.tech-nav .tech-personal-link {
+  margin-left: 0.25rem;
+  padding-left: 1.25rem;
+  border-left: 1px solid #303030;
+  color: #666;
+}
+
+.tech-nav .tech-personal-link:hover {
+  color: #22d3ee;
+}
+
+.tech-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 20;
+  padding: 0.5rem 0.75rem;
+  background: #111;
+  color: #fff;
+}
+
+.tech-skip:focus {
+  left: 1rem;
+}
+
+.tech-page {
+  padding-block: 4.5rem 6rem;
+}
+
+.tech-hero {
+  max-width: 50rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.tech-avatar {
+  width: 9rem;
+  height: 9rem;
+  margin-inline: auto;
+  border: 2px solid #353535;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.tech-eyebrow,
+.tech-section-kicker {
+  margin: 0;
+  color: #22d3ee;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tech-eyebrow {
+  margin-top: 1.75rem;
+}
+
+.tech-hero h1 {
+  margin: 0.55rem 0 0;
+  color: #fff;
+  font-size: clamp(2rem, 1.35rem + 2.5vw, 3.25rem);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.tech-role {
+  margin-top: 0.75rem;
+  color: #a4a4a4;
+  font-size: 1rem;
+}
+
+.tech-headline {
+  margin-top: 0.7rem;
+  color: #e8e8e8;
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+
+.tech-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  color: #808080;
+  font-size: 0.9rem;
+}
+
+.tech-socials a:hover {
+  color: #22d3ee;
+}
+
+.tech-bio {
+  margin: 2.25rem auto 0;
+  color: #c4c4c4;
+  line-height: 1.95;
+  text-align: left;
+}
+
+.tech-section {
+  margin-top: 6rem;
+}
+
+.tech-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.tech-section-heading h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.65rem;
+  letter-spacing: -0.02em;
+}
+
+.tech-section-heading::before {
+  width: 0.35rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: #22d3ee;
+  content: "";
+}
+
+.tech-skill-grid,
+.tech-resource-grid,
+.tech-post-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.tech-skill-card,
+.tech-resource-card,
+.tech-post-card,
+.tech-career-item,
+.tech-cta {
+  border: 1px solid #252525;
+  border-radius: 0.8rem;
+  background: rgb(20 20 20 / 0.76);
+}
+
+.tech-skill-card {
+  padding: 1.25rem;
+}
+
+.tech-skill-card h3 {
+  margin: 0 0 0.9rem;
+  color: #f5f5f5;
+  font-size: 1rem;
+}
+
+.tech-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tech-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.9rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid #343434;
+  border-radius: 999px;
+  background: #1d1d1d;
+  color: #bcbcbc;
+  font-size: 0.82rem;
+}
+
+.tech-resource-card,
+.tech-post-card,
+.tech-cta {
+  display: block;
+  padding: 1.35rem;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.tech-resource-card:hover,
+.tech-post-card:hover,
+.tech-cta:hover {
+  border-color: #3b3b3b;
+  background: #171717;
+  transform: translateY(-2px);
+}
+
+.tech-card-kind,
+.tech-post-meta {
+  color: #737373;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tech-resource-card h3,
+.tech-post-card h3,
+.tech-cta h3 {
+  margin: 0.65rem 0 0;
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1.45;
+}
+
+.tech-resource-card h4 {
+  margin: 0.65rem 0 0;
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+.tech-resource-card:hover h3,
+.tech-post-card:hover h3,
+.tech-cta:hover h3 {
+  color: #22d3ee;
+}
+
+.tech-resource-card:hover h4 {
+  color: #22d3ee;
+}
+
+.tech-resource-card p,
+.tech-post-card p,
+.tech-cta p {
+  margin: 0.55rem 0 0;
+  color: #8c8c8c;
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.tech-research-intro {
+  max-width: 48rem;
+  margin: -0.5rem 0 2rem;
+  color: #bdbdbd;
+  line-height: 1.9;
+}
+
+.tech-research-groups {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.tech-research-group-title {
+  margin: 0 0 0.9rem;
+  color: #e8e8e8;
+  font-size: 1.05rem;
+}
+
+.tech-career-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.tech-career-item {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.tech-career-period {
+  color: #22d3ee;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+}
+
+.tech-career-item h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.tech-career-item p {
+  margin: 0.35rem 0 0;
+  color: #8c8c8c;
+  font-size: 0.9rem;
+}
+
+.tech-cta-wrap {
+  display: grid;
+  gap: 1rem;
+}
+
+.tech-cta {
+  border-color: #1e6875;
+  background: linear-gradient(120deg, rgb(12 43 50 / 0.65), rgb(20 20 20 / 0.8));
+}
+
+.tech-cta-arrow {
+  color: #22d3ee;
+}
+
+.tech-list-page {
+  max-width: 54rem;
+  margin-inline: auto;
+  padding-block: 4rem 6rem;
+}
+
+.tech-list-header {
+  margin-bottom: 2.5rem;
+}
+
+.tech-list-header h1 {
+  margin: 0.5rem 0 0;
+  color: #fff;
+  font-size: clamp(2rem, 1.3rem + 2vw, 2.8rem);
+  line-height: 1.2;
+}
+
+.tech-list-header p {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  color: #8c8c8c;
+}
+
+.tech-post-grid {
+  gap: 0.75rem;
+}
+
+.tech-post-card {
+  padding: 1.5rem;
+}
+
+.tech-post-card h2 {
+  margin: 0.65rem 0 0;
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+
+.tech-post-card:hover h2 {
+  color: #22d3ee;
+}
+
+.tech-post-description {
+  max-width: 45rem;
+}
+
+.tech-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.tech-tag {
+  color: #747474;
+  font-size: 0.75rem;
+}
+
+.tech-tag::before {
+  content: "#";
+  color: #3e8c99;
+}
+
+.tech-empty {
+  padding: 2rem;
+  border: 1px dashed #343434;
+  border-radius: 0.8rem;
+  color: #8c8c8c;
+  text-align: center;
+}
+
+.tech-article-page {
+  max-width: 48rem;
+  margin-inline: auto;
+  padding-block: 4rem 6rem;
+}
+
+.tech-article-header {
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #2b2b2b;
+}
+
+.tech-article-header h1 {
+  margin: 0.7rem 0 0;
+  color: #fff;
+  font-size: clamp(2rem, 1.2rem + 2.5vw, 3rem);
+  line-height: 1.3;
+}
+
+.tech-article-deck {
+  margin: 1.25rem 0 0;
+  color: #9a9a9a;
+  font-size: 1.05rem;
+}
+
+.tech-prose {
+  margin-top: 2.5rem;
+  color: #d0d0d0;
+  font-size: 1.02rem;
+  line-height: 2;
+}
+
+.tech-prose :where(h2, h3, h4) {
+  margin: 2.5rem 0 0.9rem;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.tech-prose :where(h2) {
+  padding-left: 0.75rem;
+  border-left: 3px solid #22d3ee;
+}
+
+.tech-prose :where(p, ul, ol, blockquote, pre) {
+  margin: 1.1rem 0;
+}
+
+.tech-prose :where(ul, ol) {
+  padding-left: 1.5rem;
+}
+
+.tech-prose :where(a) {
+  color: #22d3ee;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.tech-prose :where(code) {
+  padding: 0.15em 0.35em;
+  border-radius: 0.25rem;
+  background: #1b1b1b;
+  color: #8de8f5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.tech-prose :where(pre) {
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid #2b2b2b;
+  border-radius: 0.5rem;
+  background: #101010;
+}
+
+.tech-prose :where(pre code) {
+  padding: 0;
+  background: transparent;
+}
+
+.tech-prose :where(blockquote) {
+  padding-left: 1rem;
+  border-left: 3px solid #3b6970;
+  color: #9e9e9e;
+}
+
+.tech-article-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #2b2b2b;
+}
+
+.tech-back-link {
+  color: #22d3ee;
+  font-size: 0.9rem;
+}
+
+.tech-footer {
+  border-top: 1px solid #242424;
+  color: #666;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.tech-footer-inner {
+  padding-block: 2rem;
+}
+
+@media (min-width: 640px) {
+  .tech-skill-grid,
+  .tech-resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tech-resource-grid > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 840px) {
+  .tech-skill-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tech-resource-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tech-resource-grid > :last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .tech-shell {
+    width: min(100% - 2rem, 72rem);
+  }
+
+  .tech-header-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-block: 1rem;
+  }
+
+  .tech-nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .tech-nav .tech-personal-link {
+    padding-left: 0.75rem;
+  }
+
+  .tech-page,
+  .tech-list-page,
+  .tech-article-page {
+    padding-block: 3rem 4rem;
+  }
+
+  .tech-section {
+    margin-top: 4rem;
+  }
+
+  .tech-career-item {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.tech-site *,
+  body.tech-site *::before,
+  body.tech-site *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,75 @@
+---
+import { render } from "astro:content";
+import TechLayout from "../../../layouts/TechLayout.astro";
+import { getTechPosts, formatDate, type Post } from "../../../utils/content";
+import { SITE, TECH_PROFILE } from "../../../site.config";
+
+export async function getStaticPaths() {
+  const posts = await getTechPosts();
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const description = post.data.description ?? TECH_PROFILE.bio;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description,
+  datePublished: post.data.published.toISOString(),
+  inLanguage: "ja",
+  url: canonical.toString(),
+  author: { "@type": "Person", name: SITE.author },
+};
+---
+
+<TechLayout
+  title={post.data.title}
+  description={description}
+  ogType="article"
+  publishedTime={post.data.published.toISOString()}
+>
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+    is:inline
+  />
+
+  <div class="tech-shell tech-article-page">
+    <article>
+      <header class="tech-article-header">
+        <div class="tech-post-meta">
+          <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+          <span aria-hidden="true"> · </span>
+          Technical Article
+        </div>
+        <h1>{post.data.title}</h1>
+        {description && <p class="tech-article-deck">{description}</p>}
+        {
+          post.data.tags.length > 0 && (
+            <div class="tech-tag-list" aria-label="タグ">
+              {post.data.tags.map((tag) => <span class="tech-tag">{tag}</span>)}
+            </div>
+          )
+        }
+      </header>
+      <div class="tech-prose">
+        <Content />
+      </div>
+      <footer class="tech-article-footer">
+        <a class="tech-back-link" href="/tech/blog/">← Tech Blog に戻る</a>
+      </footer>
+    </article>
+  </div>
+</TechLayout>

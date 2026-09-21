@@ -1,0 +1,161 @@
+---
+import TechLayout from "../../layouts/TechLayout.astro";
+import TechArticleCard from "../../components/TechArticleCard.astro";
+import { SITE, TECH_PROFILE } from "../../site.config";
+import { getTechPosts } from "../../utils/content";
+
+const techPosts = await getTechPosts();
+const latestPosts = techPosts.slice(0, 3);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  name: TECH_PROFILE.title,
+  description: TECH_PROFILE.bio,
+  url: new URL("/tech/", Astro.site).toString(),
+  mainEntity: {
+    "@type": "Person",
+    name: SITE.author,
+    jobTitle: TECH_PROFILE.role,
+    sameAs: TECH_PROFILE.socialLinks.map((link) => link.href),
+  },
+};
+---
+
+<TechLayout description={TECH_PROFILE.bio}>
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+    is:inline
+  />
+
+  <div class="tech-shell tech-page">
+    <section class="tech-hero" aria-labelledby="tech-profile-name">
+      <img
+        class="tech-avatar"
+        src={TECH_PROFILE.avatar}
+        alt={`${SITE.author}のプロフィール画像`}
+        width="144"
+        height="144"
+      />
+      <p class="tech-eyebrow">Technical Profile</p>
+      <h1 id="tech-profile-name">{SITE.author}</h1>
+      <p class="tech-role">{TECH_PROFILE.role}</p>
+      <p class="tech-headline">{TECH_PROFILE.headline}</p>
+      <div class="tech-socials" aria-label="ソーシャルリンク">
+        {
+          TECH_PROFILE.socialLinks.map((link) => (
+            <a href={link.href} target="_blank" rel="noopener noreferrer">
+              {link.label} ↗
+            </a>
+          ))
+        }
+      </div>
+      <p class="tech-bio">{TECH_PROFILE.bio}</p>
+    </section>
+
+    <section class="tech-section" id="skills" aria-labelledby="skills-title">
+      <div class="tech-section-heading">
+        <div>
+          <p class="tech-section-kicker">Capabilities</p>
+          <h2 id="skills-title">Skills</h2>
+        </div>
+      </div>
+      <div class="tech-skill-grid">
+        {
+          TECH_PROFILE.skills.map((group) => (
+            <article class="tech-skill-card">
+              <h3>{group.title}</h3>
+              <ul class="tech-pill-list">
+                {group.items.map((item) => <li class="tech-pill">{item}</li>)}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tech-section" id="writing" aria-labelledby="writing-title">
+      <div class="tech-section-heading">
+        <div>
+          <p class="tech-section-kicker">Selected Work</p>
+          <h2 id="writing-title">Writing / Research</h2>
+        </div>
+      </div>
+      <p class="tech-research-intro">{TECH_PROFILE.researchIntro}</p>
+      <div class="tech-research-groups">
+        {
+          TECH_PROFILE.researchGroups.map((group) => (
+            <div class="tech-research-group">
+              <h3 class="tech-research-group-title">{group.title}</h3>
+              <div class="tech-resource-grid">
+                {group.items.map((item) => (
+                  <a
+                    class="tech-resource-card"
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <span class="tech-card-kind">{group.kind}</span>
+                    <h4>{item.title} ↗</h4>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tech-section" id="career" aria-labelledby="career-title">
+      <div class="tech-section-heading">
+        <div>
+          <p class="tech-section-kicker">Experience</p>
+          <h2 id="career-title">Career</h2>
+        </div>
+      </div>
+      <div class="tech-career-list">
+        {
+          TECH_PROFILE.career.map((item) => (
+            <article class="tech-career-item">
+              <div class="tech-career-period">{item.period}</div>
+              <div>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tech-section" id="tech-blog" aria-labelledby="tech-blog-title">
+      <div class="tech-section-heading">
+        <div>
+          <p class="tech-section-kicker">Notes and Practice</p>
+          <h2 id="tech-blog-title">Tech Blog</h2>
+        </div>
+      </div>
+      {
+        latestPosts.length > 0 ? (
+          <div class="tech-cta-wrap">
+            <div class="tech-post-grid">
+              {latestPosts.map((post) => <TechArticleCard post={post} />)}
+            </div>
+            <a class="tech-cta" href="/tech/blog/">
+              <span class="tech-card-kind">All articles</span>
+              <h3>技術記事を一覧で読む <span class="tech-cta-arrow">→</span></h3>
+              <p>実務・研究・個人開発で得た知見をまとめています。</p>
+            </a>
+          </div>
+        ) : (
+          <div class="tech-empty">
+            <p>技術記事を準備中です。</p>
+            <a class="tech-back-link" href="/tech/blog/">Tech Blog を開く →</a>
+          </div>
+        )
+      }
+    </section>
+  </div>
+</TechLayout>

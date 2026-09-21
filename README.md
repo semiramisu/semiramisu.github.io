@@ -28,6 +28,7 @@ published: 2026-06-12
 description: 一覧やOGPに使われる説明文
 tags: [タグ1, タグ2]
 category: カテゴリ名
+tech: false
 draft: false
 ---
 
@@ -36,6 +37,12 @@ draft: false
 
 ファイル名がそのままURLスラグになる(`/posts/YYYY_MM_DD/`)。
 画像は `src/content/posts/media/` に置き `./media/ファイル名` で相対参照。
+
+## テックブログ
+
+個人ブログとは別デザインのテックプロフィールと技術記事一覧を `/tech/` に用意しています。
+既存記事をテックブログにも掲載する場合は、frontmatter に `tech: true` を追加してください。
+プロフィール、スキル、職歴、論文・外部リンクは `src/site.config.ts` の `TECH_PROFILE` を編集します。
 
 ## 構成
 

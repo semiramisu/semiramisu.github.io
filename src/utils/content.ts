@@ -10,6 +10,17 @@ export async function getPublishedPosts(): Promise<Post[]> {
   );
 }
 
+/** Posts explicitly selected for the separate technical blog. */
+export async function getTechPosts(): Promise<Post[]> {
+  const posts = await getCollection(
+    "posts",
+    ({ data }) => !data.draft && data.tech,
+  );
+  return posts.sort(
+    (a, b) => b.data.published.getTime() - a.data.published.getTime(),
+  );
+}
+
 /** Category name -> post count, ordered by count desc. */
 export function countCategories(posts: Post[]): Map<string, number> {
   const counts = new Map<string, number>();

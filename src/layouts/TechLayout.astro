@@ -1,0 +1,70 @@
+---
+import "../styles/tech.css";
+import TechHeader from "../components/TechHeader.astro";
+import { SITE, TECH_PROFILE } from "../site.config";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: "website" | "article";
+  publishedTime?: string;
+}
+
+const {
+  title,
+  description = TECH_PROFILE.bio,
+  ogType = "website",
+  publishedTime,
+} = Astro.props;
+
+const pageTitle = title
+  ? `${title} | ${TECH_PROFILE.title}`
+  : `${TECH_PROFILE.title} — ${TECH_PROFILE.role}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL("/icon.jpg", Astro.site);
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+    <meta name="theme-color" content="#050505" />
+
+    <meta property="og:title" content={title ?? TECH_PROFILE.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={TECH_PROFILE.title} />
+    <meta property="og:locale" content="ja_JP" />
+    {
+      publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )
+    }
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title ?? TECH_PROFILE.title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <slot name="head" />
+  </head>
+  <body class="tech-site">
+    <a href="#tech-main" class="tech-skip">本文へスキップ</a>
+    <TechHeader />
+    <main id="tech-main">
+      <slot />
+    </main>
+    <footer class="tech-footer">
+      <div class="tech-shell tech-footer-inner">
+        © {new Date().getFullYear()} {SITE.author} ·
+        <a href="/">Personal Blog</a>
+      </div>
+    </footer>
+  </body>
+</html>

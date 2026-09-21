@@ -1,0 +1,20 @@
+---
+import { TECH_PROFILE } from "../site.config";
+
+const pathname = Astro.url.pathname;
+const isTechHome = pathname === "/tech/";
+const isTechBlog = pathname.startsWith("/tech/blog");
+---
+
+<header class="tech-header">
+  <div class="tech-shell tech-header-inner">
+    <a href="/tech/" class="tech-brand" aria-label={`${TECH_PROFILE.title} home`}>
+      {TECH_PROFILE.shortName}
+    </a>
+    <nav class="tech-nav" aria-label="テックブログナビゲーション">
+      <a href="/tech/" aria-current={isTechHome ? "page" : undefined}>Home</a>
+      <a href="/tech/blog/" aria-current={isTechBlog ? "page" : undefined}>Blog</a>
+      <a href="/" class="tech-personal-link">Personal Blog ↗</a>
+    </nav>
+  </div>
+</header>
