@@ -15,6 +15,7 @@ export const SITE = {
 
   github: "https://github.com/semiramisu",
   x: "https://x.com/sekine_DS",
+  note: "https://note.com/sekine_ds",
 
   license: {
     name: "CC BY-NC-SA 4.0",
@@ -47,6 +48,7 @@ export const TECH_PROFILE = {
   socialLinks: [
     { label: "GitHub", href: SITE.github },
     { label: "X", href: SITE.x },
+    { label: "note", href: SITE.note },
   ],
   skills: [
     {

@@ -199,6 +199,20 @@ body.tech-site button:focus-visible {
   margin-bottom: 1.5rem;
 }
 
+.tech-section-link {
+  margin-left: auto;
+  color: #8a8a8a;
+  font-size: 0.85rem;
+}
+
+.tech-section-link:hover {
+  color: #22d3ee;
+}
+
+.tech-blog-priority {
+  margin-top: 4rem;
+}
+
 .tech-section-heading h2 {
   margin: 0;
   color: #fff;
@@ -641,6 +655,10 @@ body.tech-site button:focus-visible {
 
   .tech-section {
     margin-top: 4rem;
+  }
+
+  .tech-blog-priority {
+    margin-top: 3rem;
   }
 
   .tech-career-item {

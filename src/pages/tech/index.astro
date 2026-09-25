@@ -55,6 +55,35 @@ const jsonLd = {
       <p class="tech-bio">{TECH_PROFILE.bio}</p>
     </section>
 
+    <section class="tech-section tech-blog-priority" id="tech-blog" aria-labelledby="tech-blog-title">
+      <div class="tech-section-heading">
+        <div>
+          <p class="tech-section-kicker">Notes and Practice</p>
+          <h2 id="tech-blog-title">Tech Blog</h2>
+        </div>
+        <a class="tech-section-link" href="/tech/blog/">すべて見る →</a>
+      </div>
+      {
+        latestPosts.length > 0 ? (
+          <div class="tech-cta-wrap">
+            <div class="tech-post-grid">
+              {latestPosts.map((post) => <TechArticleCard post={post} />)}
+            </div>
+            <a class="tech-cta" href="/tech/blog/">
+              <span class="tech-card-kind">All articles</span>
+              <h3>技術記事を一覧で読む <span class="tech-cta-arrow">→</span></h3>
+              <p>実務・研究・個人開発で得た知見をまとめています。</p>
+            </a>
+          </div>
+        ) : (
+          <div class="tech-empty">
+            <p>技術記事を準備中です。</p>
+            <a class="tech-back-link" href="/tech/blog/">Tech Blog を開く →</a>
+          </div>
+        )
+      }
+    </section>
+
     <section class="tech-section" id="skills" aria-labelledby="skills-title">
       <div class="tech-section-heading">
         <div>
@@ -130,32 +159,5 @@ const jsonLd = {
       </div>
     </section>
 
-    <section class="tech-section" id="tech-blog" aria-labelledby="tech-blog-title">
-      <div class="tech-section-heading">
-        <div>
-          <p class="tech-section-kicker">Notes and Practice</p>
-          <h2 id="tech-blog-title">Tech Blog</h2>
-        </div>
-      </div>
-      {
-        latestPosts.length > 0 ? (
-          <div class="tech-cta-wrap">
-            <div class="tech-post-grid">
-              {latestPosts.map((post) => <TechArticleCard post={post} />)}
-            </div>
-            <a class="tech-cta" href="/tech/blog/">
-              <span class="tech-card-kind">All articles</span>
-              <h3>技術記事を一覧で読む <span class="tech-cta-arrow">→</span></h3>
-              <p>実務・研究・個人開発で得た知見をまとめています。</p>
-            </a>
-          </div>
-        ) : (
-          <div class="tech-empty">
-            <p>技術記事を準備中です。</p>
-            <a class="tech-back-link" href="/tech/blog/">Tech Blog を開く →</a>
-          </div>
-        )
-      }
-    </section>
   </div>
 </TechLayout>

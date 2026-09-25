@@ -78,6 +78,15 @@ const isCurrent = (href: string) =>
       >
         <Icon name="x" size={16} />
       </a>
+      <a
+        href={SITE.note}
+        class="icon-button external note-button"
+        rel="me noopener"
+        target="_blank"
+        aria-label="note"
+      >
+        n
+      </a>
       <button
         id="menu-open"
         class="icon-button mobile-only"
@@ -128,6 +137,13 @@ const isCurrent = (href: string) =>
         rel="me noopener"
         target="_blank"
         aria-label="X (Twitter)"><Icon name="x" size={18} /></a
+      >
+      <a
+        href={SITE.note}
+        rel="me noopener"
+        target="_blank"
+        aria-label="note"
+        >note ↗</a
       >
     </div>
   </nav>
