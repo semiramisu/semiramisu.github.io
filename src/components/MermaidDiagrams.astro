@@ -1,0 +1,58 @@
+<script>
+  const codeBlocks = Array.from(
+    document.querySelectorAll<HTMLElement>('pre[data-language="mermaid"]'),
+  );
+
+  if (codeBlocks.length > 0) {
+    const { default: mermaid } = await import("mermaid");
+    const isDark =
+      document.body.classList.contains("tech-site") ||
+      document.documentElement.dataset.theme === "dark";
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: isDark ? "dark" : "default",
+      flowchart: { useMaxWidth: true },
+    });
+
+    await Promise.all(
+      codeBlocks.map(async (pre, index) => {
+        const code = pre.querySelector("code");
+        const source = Array.from(pre.querySelectorAll(".line"))
+          .map((line) => line.textContent ?? "")
+          .join("\n");
+        const definition = source || code?.textContent || "";
+
+        try {
+          const { svg, bindFunctions } = await mermaid.render(
+            `mermaid-diagram-${Date.now()}-${index}`,
+            definition,
+          );
+          const figure = document.createElement("figure");
+          figure.className = "mermaid-diagram";
+          figure.innerHTML = svg;
+          pre.replaceWith(figure);
+          bindFunctions?.(figure);
+        } catch {
+          // Keep the original code block visible if this diagram has invalid syntax.
+        }
+      }),
+    );
+  }
+</script>
+
+<style is:global>
+  .mermaid-diagram {
+    max-width: 100%;
+    margin-block: 1.5rem;
+    overflow-x: auto;
+    text-align: center;
+  }
+
+  .mermaid-diagram svg {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+  }
+</style>

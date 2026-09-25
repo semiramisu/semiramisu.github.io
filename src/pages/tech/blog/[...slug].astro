@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import TechLayout from "../../../layouts/TechLayout.astro";
+import MermaidDiagrams from "../../../components/MermaidDiagrams.astro";
 import { getTechPosts, formatDate, type Post } from "../../../utils/content";
 import { SITE, TECH_PROFILE } from "../../../site.config";
 
@@ -66,6 +67,7 @@ const jsonLd = {
       </header>
       <div class="tech-prose">
         <Content />
+        <MermaidDiagrams />
       </div>
       <footer class="tech-article-footer">
         <a class="tech-back-link" href="/tech/blog/">← Tech Blog に戻る</a>
