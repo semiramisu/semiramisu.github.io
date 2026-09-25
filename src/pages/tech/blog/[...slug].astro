@@ -20,7 +20,8 @@ interface Props {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const description = post.data.description ?? TECH_PROFILE.bio;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const siteBase = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, siteBase);
 
 const jsonLd = {
   "@context": "https://schema.org",

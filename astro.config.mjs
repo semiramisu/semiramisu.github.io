@@ -13,7 +13,7 @@ import { remarkDemoteHeadings } from "./src/plugins/remark-demote-headings.mjs";
 
 import { SITE } from "./src/site.config.ts";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   site: SITE.url,
 
   integrations: [sitemap(), pagefind()],
@@ -42,5 +42,7 @@ export default defineConfig({
     ],
   },
 
-  adapter: netlify(),
-});
+  // The Netlify adapter is required for production, but its local Edge
+  // Functions server is not needed for this static content preview.
+  adapter: command === "build" ? netlify() : undefined,
+}));

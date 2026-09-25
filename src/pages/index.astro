@@ -20,6 +20,7 @@ const featuredPosts = posts.slice(1, 3);
 const latestPosts = posts.slice(3, 6);
 
 const categories = countCategories(posts);
+const siteBase = Astro.site ?? new URL(SITE.url);
 
 // Magazine sections: the four big categories plus the aggregated tech cluster.
 // Category URLs and labels stay raw; only the section curation is grouped.
@@ -46,7 +47,7 @@ const jsonLd = {
   "@type": "WebSite",
   name: SITE.title,
   description: SITE.description,
-  url: new URL("/", Astro.site).toString(),
+  url: new URL("/", siteBase).toString(),
   author: { "@type": "Person", name: SITE.author },
   inLanguage: "ja",
 };
