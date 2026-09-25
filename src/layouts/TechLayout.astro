@@ -20,8 +20,9 @@ const {
 const pageTitle = title
   ? `${title} | ${TECH_PROFILE.title}`
   : `${TECH_PROFILE.title} — ${TECH_PROFILE.role}`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL("/icon.jpg", Astro.site);
+const siteBase = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, siteBase);
+const ogImage = new URL("/icon.jpg", siteBase);
 ---
 
 <!doctype html>

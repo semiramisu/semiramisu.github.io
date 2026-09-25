@@ -6,13 +6,14 @@ import { getTechPosts } from "../../utils/content";
 
 const techPosts = await getTechPosts();
 const latestPosts = techPosts.slice(0, 3);
+const siteBase = Astro.site ?? new URL(SITE.url);
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfilePage",
   name: TECH_PROFILE.title,
   description: TECH_PROFILE.bio,
-  url: new URL("/tech/", Astro.site).toString(),
+  url: new URL("/tech/", siteBase).toString(),
   mainEntity: {
     "@type": "Person",
     name: SITE.author,
@@ -94,8 +95,22 @@ const jsonLd = {
       <div class="tech-skill-grid">
         {
           TECH_PROFILE.skills.map((group) => (
-            <article class="tech-skill-card">
-              <h3>{group.title}</h3>
+            <article class="tech-skill-card" style={`--skill-progress: ${group.progress}%`}>
+              <div class="tech-skill-card-topline">
+                <span class="tech-skill-icon" aria-hidden="true">{group.icon}</span>
+                <span class="tech-skill-class">{group.className}</span>
+                <span class="tech-skill-rank" aria-label={`ランク ${group.rank}`}>
+                  {group.rank}
+                </span>
+              </div>
+              <div class="tech-skill-title-row">
+                <h3>{group.title}</h3>
+                <span class="tech-skill-level">Lv.{String(group.level).padStart(2, "0")}</span>
+              </div>
+              <div class="tech-skill-meter" role="progressbar" aria-label={`${group.title}の熟練度`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={group.progress}>
+                <span></span>
+              </div>
+              <p class="tech-skill-meter-label">NEXT LEVEL <strong>{group.progress}%</strong></p>
               <ul class="tech-pill-list">
                 {group.items.map((item) => <li class="tech-pill">{item}</li>)}
               </ul>
