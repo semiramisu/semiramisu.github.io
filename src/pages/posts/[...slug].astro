@@ -10,6 +10,7 @@ import DonationBox from "../../components/DonationBox.astro";
 import RelatedPosts from "../../components/RelatedPosts.astro";
 import NewsletterForm from "../../components/NewsletterForm.astro";
 import Comments from "../../components/Comments.astro";
+import MermaidDiagrams from "../../components/MermaidDiagrams.astro";
 import { SITE } from "../../site.config";
 import {
   getPublishedPosts,
@@ -130,6 +131,7 @@ const jsonLd = {
 
           <div class="prose">
             <Content />
+            <MermaidDiagrams />
           </div>
         </article>
 
