@@ -1,5 +1,5 @@
 ---
-import { TECH_PROFILE } from "../site.config";
+import { SITE, TECH_PROFILE } from "../site.config";
 
 const pathname = Astro.url.pathname;
 const isTechHome = pathname === "/tech/";
@@ -14,6 +14,7 @@ const isTechBlog = pathname.startsWith("/tech/blog");
     <nav class="tech-nav" aria-label="テックブログナビゲーション">
       <a href="/tech/" aria-current={isTechHome ? "page" : undefined}>Home</a>
       <a href="/tech/blog/" aria-current={isTechBlog ? "page" : undefined}>Blog</a>
+      <a href={SITE.note} target="_blank" rel="noopener noreferrer">note ↗</a>
       <a href="/" class="tech-personal-link">Personal Blog ↗</a>
     </nav>
   </div>
