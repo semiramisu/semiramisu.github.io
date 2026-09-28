@@ -28,7 +28,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: SITE.title,
     description: SITE.description,
-    site: context.site!,
+    site: context.site ?? new URL(SITE.url),
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description || getExcerpt(post.body ?? ""),

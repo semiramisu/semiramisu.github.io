@@ -47,7 +47,8 @@ const { Content, headings, remarkPluginFrontmatter } = await render(post);
 const allPosts = await getPublishedPosts();
 const related = getRelatedPosts(post, allPosts);
 const readingTime = remarkPluginFrontmatter.readingMetadata?.time ?? 1;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const siteBase = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, siteBase);
 const cat = getCategoryGroup(post.data.category);
 // the deck (standfirst): description shown as the lead-in, unless it just repeats the title
 const deck =
@@ -66,7 +67,7 @@ const jsonLd = {
   author: {
     "@type": "Person",
     name: SITE.author,
-    url: new URL("/about/", Astro.site).toString(),
+    url: new URL("/about/", siteBase).toString(),
   },
 };
 ---

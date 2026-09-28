@@ -11,6 +11,7 @@ interface Props {
 }
 
 const { segments } = Astro.props;
+const siteBase = Astro.site ?? new URL(SITE.url);
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -20,14 +21,14 @@ const jsonLd = {
       "@type": "ListItem",
       position: 1,
       name: SITE.title,
-      item: new URL("/", Astro.site).toString(),
+      item: new URL("/", siteBase).toString(),
     },
     ...segments.map((seg, i) => ({
       "@type": "ListItem",
       position: i + 2,
       name: seg.label,
       ...(seg.href
-        ? { item: new URL(seg.href, Astro.site).toString() }
+        ? { item: new URL(seg.href, siteBase).toString() }
         : {}),
     })),
   ],

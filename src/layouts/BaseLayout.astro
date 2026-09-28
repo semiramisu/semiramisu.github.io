@@ -25,8 +25,9 @@ const {
 } = Astro.props;
 
 const pageTitle = title ? `${title} | ${SITE.title}` : `${SITE.title} - ${SITE.subtitle}`;
-const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = new URL("/icon.jpg", Astro.site);
+const siteBase = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, siteBase);
+const ogImage = new URL("/icon.jpg", siteBase);
 const adsenseClient = import.meta.env.PUBLIC_GOOGLE_ADSENSE_CLIENT;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 ---
@@ -50,7 +51,7 @@ const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
       rel="alternate"
       type="application/rss+xml"
       title={SITE.title}
-      href={new URL("rss.xml", Astro.site)}
+      href={new URL("rss.xml", siteBase)}
     />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
