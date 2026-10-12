@@ -1,0 +1,36 @@
+---
+import TechLayout from "../../../layouts/TechLayout.astro";
+import TechArticleCard from "../../../components/TechArticleCard.astro";
+import { TECH_PROFILE } from "../../../site.config";
+import { getTechPosts } from "../../../utils/content";
+
+const posts = await getTechPosts();
+---
+
+<TechLayout
+  title="Tech Blog"
+  description={`${TECH_PROFILE.title}の技術記事。実務、研究、個人開発の記録。`}
+>
+  <div class="tech-shell tech-list-page">
+    <header class="tech-list-header">
+      <p class="tech-section-kicker">Notes and Practice</p>
+      <h1>Tech Blog</h1>
+      <p>
+        実務や研究、個人開発で試したことを、あとから読み返せる形で残しています。
+      </p>
+    </header>
+
+    {
+      posts.length > 0 ? (
+        <div class="tech-post-grid">
+          {posts.map((post) => <TechArticleCard post={post} />)}
+        </div>
+      ) : (
+        <div class="tech-empty">
+          <p>技術記事を準備中です。</p>
+          <a class="tech-back-link" href="/tech/">プロフィールに戻る →</a>
+        </div>
+      )
+    }
+  </div>
+</TechLayout>

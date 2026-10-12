@@ -1,0 +1,31 @@
+---
+import type { Post } from "../utils/content";
+import { formatDate } from "../utils/content";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+---
+
+<a class="tech-post-card" href={`/tech/blog/${post.id}/`}>
+  <div class="tech-post-meta">
+    <time datetime={post.data.published.toISOString()}>{formatDate(post.data.published)}</time>
+    <span aria-hidden="true"> · </span>
+    Technical Article
+  </div>
+  <h2>{post.data.title}</h2>
+  {
+    post.data.description && (
+      <p class="tech-post-description">{post.data.description}</p>
+    )
+  }
+  {
+    post.data.tags.length > 0 && (
+      <div class="tech-tag-list" aria-label="タグ">
+        {post.data.tags.map((tag) => <span class="tech-tag">{tag}</span>)}
+      </div>
+    )
+  }
+</a>

@@ -1,420 +1,569 @@
 ---
-import MainLayout from "../layouts/MainLayout.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import PostCard from "../components/PostCard.astro";
-import MobilePostCard from "../components/MobilePostCard.astro";
-import AnimatedHeading from "../components/widgets/AnimatedHeading.astro";
-import FeaturedPostsCarousel from "../components/FeaturedPostsCarousel.astro";
-import TagCloud from "../components/widgets/TagCloud.astro";
-import SearchBar from "../components/widgets/SearchBar.astro";
-import Archive from "../components/Archive.astro";
-import { GetSortedPosts, GetAllTags } from "../utils/content";
-import { i18n } from "../locales/translation";
-import I18nKeys from "../locales/keys";
+import SectionHeader from "../components/SectionHeader.astro";
+import NewsletterForm from "../components/NewsletterForm.astro";
+import { SITE } from "../site.config";
+import { getPublishedPosts, countCategories } from "../utils/content";
+import {
+  getCategoryGroup,
+  filterByGroup,
+  type CatKey,
+} from "../utils/categories";
 
-// Get language from URL parameter
-const url = new URL(Astro.request.url);
-const lang = (url.searchParams.get('lang') === 'en' ? 'en' : 'ja') as "ja" | "en";
+const posts = await getPublishedPosts();
 
-// Get all posts and tags
-const allPosts = await GetSortedPosts(lang);
-const recentPosts = allPosts.slice(0, 8);
-const popularPosts = allPosts.filter(post => 
-  post.data.tags?.includes(lang === 'ja' ? "仕事" : "Work") || 
-  post.data.tags?.includes(lang === 'ja' ? "AI" : "AI")
-).slice(0, 5);
-const featuredPosts = allPosts.filter(post => post.data.tags?.includes(lang === 'ja' ? "仕事" : "Work")).slice(0, 5);
-const allTags = await GetAllTags(lang);
+// The front page covers exactly the first 6 posts (feature 3 + latest 3),
+// matching the old page-1 range so /2/ continues seamlessly from here.
+const heroPost = posts[0];
+const featuredPosts = posts.slice(1, 3);
+const latestPosts = posts.slice(3, 6);
+
+const categories = countCategories(posts);
+const siteBase = Astro.site ?? new URL(SITE.url);
+
+// Magazine sections: the four big categories plus the aggregated tech cluster.
+// Category URLs and labels stay raw; only the section curation is grouped.
+const exactSections = ["仕事", "雑談", "読書", "休日"] as const;
+const sections = [
+  ...exactSections.map((name) => ({
+    name,
+    catKey: getCategoryGroup(name),
+    href: `/categories/${name}/`,
+    posts: posts.filter((p) => p.data.category === name).slice(0, 4),
+    count: categories.get(name) ?? 0,
+  })),
+  {
+    name: "テック",
+    catKey: "tech" as CatKey,
+    href: "/categories/",
+    posts: filterByGroup(posts, "tech").slice(0, 4),
+    count: filterByGroup(posts, "tech").length,
+  },
+].filter((section) => section.posts.length > 0);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.title,
+  description: SITE.description,
+  url: new URL("/", siteBase).toString(),
+  author: { "@type": "Person", name: SITE.author },
+  inLanguage: "ja",
+};
 ---
 
-<MainLayout isHome={true}>
-  <meta name="page-type" content="home" slot="head" />
-  
-  <!-- Hero Section -->
-  <div class="hero-section-simple mb-2">
-    <div class="fade-in-up flex flex-col items-center justify-center space-y-4 text-center py-3">
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gradient">
-        <AnimatedHeading text={lang === 'ja' ? "ようこそ！私のブログへ" : "Welcome to My Blog!"} />
-      </h1>
-    </div>
+<BaseLayout>
+  <script
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+    is:inline
+  />
+
+  <div class="container">
+    <section class="masthead">
+      <div class="masthead-copy">
+        <p class="kicker masthead-sub">Semiramis Garden — {SITE.sign}</p>
+        <h1 class="masthead-title">{SITE.title}</h1>
+        <p class="masthead-intro" data-i18n="hero.intro">
+          セミラミスです。データサイエンスの仕事、読んだ本、日々考えたことを、親友に話すみたいに書いています。
+        </p>
+        <div class="masthead-actions">
+          <a href="/archive/" class="hero-action">記事を読む →</a>
+          <a href="/about/" class="hero-action secondary">About</a>
+        </div>
+      </div>
+      <div class="masthead-art" data-hero-art>
+        <span class="motion-mark mark-star" aria-hidden="true">✦</span>
+        <span class="motion-mark mark-code display" aria-hidden="true"
+          >{"{ }"}</span
+        >
+        <span class="motion-mark mark-note" aria-hidden="true">♪</span>
+        <div class="hero-parallax" data-hero-parallax>
+          <img
+            src="/images/kairo-hero.webp"
+            alt="ノートにブログを書いているKairo"
+            width="1448"
+            height="1086"
+            fetchpriority="high"
+          />
+        </div>
+        <div class="art-label" aria-hidden="true">
+          <div class="art-label-track display">
+            <span>WRITE / THINK / SHARE /</span>
+            <span>WRITE / THINK / SHARE /</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature" aria-label="特集">
+      <hr class="rule-heavy" />
+      <p class="kicker feature-kicker">Feature</p>
+      <div class="feature-grid">
+        <PostCard post={heroPost} variant="hero" />
+        <div class="feature-rail">
+          {
+            featuredPosts.map((post) => (
+              <PostCard post={post} variant="featured" />
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="latest">
+      <SectionHeader
+        kicker="Latest"
+        title="最新の記事"
+        titleI18n="home.latest"
+      />
+      <div class="card-grid">
+        {latestPosts.map((post) => <PostCard post={post} variant="standard" />)}
+      </div>
+      <p class="latest-more">
+        <a href="/2/" class="more-link"
+          ><span data-i18n="home.nextPage">続きの記事へ</span> →</a
+        >
+        <a href="/archive/" class="more-link secondary">
+          <span data-i18n="list.viewAll">すべての記事を見る</span> ({
+            posts.length
+          })
+        </a>
+      </p>
+    </section>
   </div>
 
-  <div class="space-y-8">
-    <!-- Featured Posts Carousel -->
-    <section class="featured-posts">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.featured_posts)}</h2>
-      <FeaturedPostsCarousel posts={featuredPosts} lang={lang} />
-    </section>
-
-    <!-- Recent Posts -->
-    <section class="recent-posts">
-      <h2 class="section-title mb-6">{i18n(I18nKeys.recent_posts)}</h2>
-      <!-- Desktop Grid -->
-      <div class="posts-grid desktop-only">
-        {recentPosts.slice(0, 6).map((entry, index) => (
-          <div 
-            class="post-card-animation"
-            style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
-          >
-            <PostCard
-              id={entry.id}
-              title={entry.data.title}
-              published={entry.data.published}
-              category={entry.data.category}
-              tags={entry.data.tags}
-              description={entry.data.description}
-              image={entry.data.cover}
-              readingMetadata={entry.readingMetadata}
-              lang={lang}
+  <div class="section-band">
+    <div class="container">
+      {
+        sections.map((section) => (
+          <section class="cat-section">
+            <SectionHeader
+              kicker="Category"
+              title={section.name}
+              count={section.count}
+              href={section.href}
+              catKey={section.catKey}
             />
-          </div>
-        ))}
-      </div>
-      <div class="mt-8 text-center">
-        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all transform hover:scale-105">
-          {lang === 'ja' ? 'すべての記事を見る' : 'View All Posts'}
-        </a>
-      </div>
-    </section>
-
-    <!-- Three Column Layout for Additional Content -->
-    <div class="three-column-layout desktop-only">
-    <!-- Left Column: Popular Posts -->
-    <div class="column-left">
-      <!-- Popular Posts Section -->
-      <div class="popular-section mb-8">
-        <h2 class="column-title mb-4">
-          <span class="title-icon">🔥</span>
-          {lang === 'ja' ? '人気記事' : 'Popular Articles'}
-        </h2>
-        <div class="popular-posts">
-          {popularPosts.map((entry, index) => (
-            <div class="popular-post-card">
-              <span class="rank-badge">{index + 1}</span>
-              <div class="popular-post-content">
-                <h3 class="popular-post-title">
-                  <a href={`/posts/${entry.id}${lang === 'en' ? '?lang=en' : ''}`}>
-                    {entry.data.title}
-                  </a>
-                </h3>
-                <div class="popular-post-meta">
-                  <span class="category-badge">{entry.data.category}</span>
-                  <span class="read-time">
-                    {entry.readingMetadata?.time
-                      ? `${entry.readingMetadata.time}${lang === 'ja' ? '分' : ' min'}`
-                      : lang === 'ja'
-                        ? '約5分'
-                        : '5 min'}
-                  </span>
-                </div>
+            <div class="cat-grid">
+              <PostCard post={section.posts[0]} variant="standard" />
+              <div class="cat-rail">
+                {section.posts.slice(1).map((post) => (
+                  <PostCard post={post} variant="compact" />
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Center Column: Tags & Categories -->
-    <div class="column-center">
-      <!-- Tag Cloud -->
-      <div class="sidebar-section mb-8">
-        <h2 class="column-title mb-4">
-          <span class="title-icon">🏷️</span>
-          {lang === 'ja' ? 'タグ' : 'Tags'}
-        </h2>
-        <div class="tag-cloud-container">
-          <TagCloud tags={allTags} />
-        </div>
-      </div>
-
-      <!-- Categories -->
-      <div class="sidebar-section mb-8">
-        <h2 class="column-title mb-4">
-          <span class="title-icon">📂</span>
-          {lang === 'ja' ? 'カテゴリー' : 'Categories'}
-        </h2>
-        <div class="categories-list">
-          {Array.from(new Set(allPosts.map(p => p.data.category))).filter(Boolean).slice(0, 8).map(category => (
-            <a href={`/categories/${category}${lang === 'en' ? '?lang=en' : ''}`} class="category-item">
-              <span class="category-name">{category}</span>
-              <span class="category-count">
-                {allPosts.filter(p => p.data.category === category).length}
-              </span>
-            </a>
-          ))}
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Right Column: Archive -->
-    <div class="column-right">
-      <div class="sidebar-section">
-        <h2 class="column-title mb-4">
-          <span class="title-icon">📅</span>
-          {lang === 'ja' ? 'アーカイブ' : 'Archive'}
-        </h2>
-        <div class="archive-mini">
-          <Archive posts={allPosts} lang={lang} />
-        </div>
-        <a href={`/archive${lang === 'en' ? '?lang=en' : ''}`} class="view-all-link mt-4">
-          {lang === 'ja' ? 'すべて見る →' : 'View All →'}
-        </a>
-      </div>
+          </section>
+        ))
+      }
     </div>
   </div>
 
-  <!-- Mobile Layout -->
-  <div class="mobile-layout mobile-only">
-    <!-- Recent Posts -->
-    <section class="recent-posts mb-8">
-      <h2 class="section-title mb-4">{i18n(I18nKeys.recent_posts)}</h2>
-      <div class="mobile-posts-list">
-        {recentPosts.slice(0, 6).map((entry, index) => (
-          <div 
-            class="post-card-animation"
-            style={`animation-delay: ${index * 0.1}s;`}
-          >
-            <MobilePostCard
-              id={entry.id}
-              title={entry.data.title}
-              published={entry.data.published}
-              category={entry.data.category}
-              tags={entry.data.tags}
-              description={entry.data.description}
-              image={entry.data.cover}
-              readingMetadata={entry.readingMetadata}
-              lang={lang}
-              isCompact={index > 0}
-            />
-          </div>
-        ))}
-      </div>
-      <div class="mt-6 text-center">
-        <a href={`/all-posts${lang === 'en' ? '?lang=en' : ''}`} class="inline-block py-2 px-6 rounded-full bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--primary-color-darken)] transition-all">
-          {lang === 'ja' ? 'すべての記事を見る' : 'View All Posts'}
-        </a>
-      </div>
+  <div class="container">
+    <section class="all-categories">
+      <SectionHeader
+        kicker="Index"
+        title="カテゴリから探す"
+        titleI18n="home.byCategory"
+      />
+      <ul class="category-chips">
+        {
+          [...categories].map(([name, count]) => (
+            <li data-cat={getCategoryGroup(name)}>
+              <a href={`/categories/${name}/`} class="chip chip--cat">
+                {name} <span class="chip-count">{count}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
-    <!-- Tag Cloud -->
-    <section class="tag-section">
-      <h2 class="section-title mb-4">{i18n(I18nKeys.explore_tags)}</h2>
-      <TagCloud tags={allTags} />
+    <section class="newsletter-band">
+      <NewsletterForm />
     </section>
   </div>
-  </div>
-</MainLayout>
+</BaseLayout>
 
 <style>
-  /* Hero Section */
-  .hero-section-simple {
-    @apply px-4;
-  }
-
-  .text-gradient {
-    background: linear-gradient(90deg, var(--primary-color), var(--primary-color-darken));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Three Column Layout */
-  .three-column-layout {
+  /* ---------- masthead ---------- */
+  .masthead {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
     gap: 2rem;
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+    align-items: center;
+    margin-top: 2rem;
+    padding: clamp(1.5rem, 4vw, 3.5rem);
+    background: var(--bg-elevated);
+    border: 3px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
   }
 
-  /* Column Titles */
-  .column-title {
-    @apply text-xl font-bold text-[var(--text-color)] flex items-center gap-2;
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 0.5rem;
+  .masthead-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .masthead-sub {
+    color: var(--text-primary);
+  }
+
+  .masthead-title {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 1.5rem + 3vw, 4.4rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .masthead-intro {
+    margin-top: 1.5rem;
+    max-width: 32em;
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    line-height: 1.9;
+  }
+
+  .masthead-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .hero-action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.45rem 1.1rem;
+    border: 2px solid var(--rule-ink);
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    box-shadow: 3px 3px 0 var(--rule-ink);
+    color: var(--accent-text-on);
+    font-size: var(--text-sm);
+    font-weight: 800;
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease;
+  }
+
+  .hero-action.secondary {
+    background: var(--accent-alt);
+    color: #151515;
+  }
+
+  .hero-action:hover {
+    color: var(--accent-text-on);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--rule-ink);
+  }
+
+  .hero-action:active {
+    transform: translate(3px, 3px) scale(0.96);
+    box-shadow: none;
+  }
+
+  .masthead-art {
+    position: relative;
+    min-height: 18rem;
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(135deg, transparent 72%, var(--accent) 72%),
+      var(--accent-sun);
+    border: 3px solid var(--rule-ink);
+    border-radius: var(--radius-panel);
+    transform: rotate(1.5deg);
+    animation: panel-rock 8s ease-in-out infinite;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .hero-parallax {
+    --parallax-x: 0px;
+    --parallax-y: 0px;
+    --parallax-rotate: 0deg;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    transform: translate(var(--parallax-x), var(--parallax-y))
+      rotate(var(--parallax-rotate));
+    transition: transform 180ms ease-out;
+  }
+
+  .hero-parallax img {
+    width: min(100%, 32rem);
+    margin-top: -1rem;
+    filter: drop-shadow(6px 7px 0 rgb(0 0 0 / 0.18));
+    animation: hero-float 4.6s ease-in-out infinite;
+  }
+
+  .art-label {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 1;
+    overflow: hidden;
+    border-top: 2px solid var(--rule-ink);
+    background: var(--accent-alt);
+    color: #151515;
+    white-space: nowrap;
+  }
+
+  .art-label-track {
+    display: flex;
+    width: max-content;
+    gap: 1.5rem;
+    padding: 0.35rem 0;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    animation: label-marquee 9s linear infinite;
+  }
+
+  .motion-mark {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 2px solid var(--rule-ink);
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    color: #151515;
+    box-shadow: 2px 2px 0 var(--rule-ink);
+    font-weight: 800;
+  }
+
+  .mark-star {
+    top: 8%;
+    left: 7%;
+    background: var(--accent);
+    animation: mark-orbit 5s ease-in-out infinite;
+  }
+
+  .mark-code {
+    top: 16%;
+    right: 7%;
+    background: var(--accent-alt);
+    animation: mark-orbit 6.5s ease-in-out -2s infinite reverse;
+  }
+
+  .mark-note {
+    right: 11%;
+    bottom: 18%;
+    background: var(--bg-elevated);
+    animation: mark-orbit 4.5s ease-in-out -1s infinite;
+  }
+
+  @keyframes hero-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-0.5deg);
+    }
+    50% {
+      transform: translateY(-0.8rem) rotate(1deg);
+    }
+  }
+
+  @keyframes panel-rock {
+    0%,
+    100% {
+      transform: rotate(1.5deg);
+    }
+    50% {
+      transform: rotate(-0.4deg);
+    }
+  }
+
+  @keyframes mark-orbit {
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+      transform: translate(0.45rem, -0.65rem) rotate(18deg);
+    }
+  }
+
+  @keyframes label-marquee {
+    to {
+      transform: translateX(calc(-50% - 0.75rem));
+    }
+  }
+
+  @media (min-width: 800px) {
+    .masthead {
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.8fr);
+    }
+  }
+
+  /* ---------- feature ---------- */
+  .feature-kicker {
+    display: block;
+    padding-top: 0.8rem;
+  }
+
+  .feature-grid {
+    display: grid;
+    gap: 2rem;
+    margin-top: 1.25rem;
+  }
+
+  .feature-rail {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+
+  @media (min-width: 960px) {
+    .feature-grid {
+      grid-template-columns: 2fr 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  /* ---------- latest ---------- */
+  .latest {
+    margin-top: 3.5rem;
+  }
+
+  .card-grid {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .card-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .latest-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    font-size: var(--text-sm);
+  }
+
+  .more-link {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .more-link:hover {
+    color: var(--accent);
+  }
+
+  .more-link.secondary {
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+
+  /* ---------- category sections (surface band = reprint zone) ---------- */
+  .section-band {
+    margin-top: 4rem;
+    padding-block: 3rem 3.5rem;
+    background-color: color-mix(
+      in oklab,
+      var(--accent-alt) 16%,
+      var(--bg-surface)
+    );
+    border-block: 3px solid var(--rule-ink);
+  }
+
+  .cat-section {
+    margin-top: 3rem;
+  }
+
+  .cat-section:first-child {
+    margin-top: 0;
+  }
+
+  .cat-grid {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .cat-rail {
+    align-content: start;
+  }
+
+  @media (min-width: 768px) {
+    .cat-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  /* ---------- category chips ---------- */
+  .all-categories {
+    margin-top: 4rem;
+  }
+
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    list-style: none;
+    margin: 1.5rem 0 0;
+    padding: 0;
+  }
+
+  .chip-count {
+    opacity: 0.65;
+    font-size: var(--text-xs);
+  }
+
+  /* ---------- newsletter ---------- */
+  .newsletter-band {
+    margin-top: 3rem;
     margin-bottom: 1rem;
   }
-
-  .title-icon {
-    font-size: 1.2em;
-  }
-
-  .section-title {
-    @apply text-2xl md:text-3xl font-bold text-[var(--text-color)];
-  }
-
-  /* Column Styles */
-  .column-left, .column-center, .column-right {
-    @apply space-y-4;
-  }
-
-  /* Popular Posts */
-  .popular-posts {
-    @apply space-y-3;
-  }
-
-  .popular-post-card {
-    @apply flex items-start gap-3 p-3 rounded-lg border border-[var(--border-color)] hover:shadow-md transition-all;
-    background: var(--bg-color);
-  }
-
-  .popular-post-card:hover {
-    border-color: var(--primary-color);
-    transform: translateX(4px);
-  }
-
-  .rank-badge {
-    @apply flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[var(--primary-color)] to-[var(--primary-color-darken)] text-white font-bold flex items-center justify-center text-sm;
-  }
-
-  .popular-post-content {
-    @apply flex-1;
-  }
-
-  .popular-post-title {
-    @apply text-base font-medium mb-1;
-  }
-
-  .popular-post-title a {
-    @apply text-[var(--text-color)] hover:text-[var(--primary-color)] transition-colors;
-  }
-
-  .popular-post-meta {
-    @apply flex items-center gap-2 text-xs;
-  }
-
-  .category-badge {
-    @apply px-2 py-1 rounded bg-[var(--bg-color-darken)] text-[var(--text-color-lighten)];
-  }
-
-  .read-time {
-    @apply text-[var(--text-color-lighten)];
-  }
-
-  .sidebar-section {
-    @apply p-4 rounded-lg border border-[var(--border-color)];
-    background: var(--bg-color);
-  }
-
-  .categories-list {
-    @apply space-y-2;
-  }
-
-  .category-item {
-    @apply flex items-center justify-between p-2 rounded hover:bg-[var(--bg-color-darken)] transition-colors;
-  }
-
-  .category-name {
-    @apply text-sm font-medium text-[var(--text-color)];
-  }
-
-  .category-count {
-    @apply text-xs px-2 py-1 rounded-full bg-[var(--bg-color-darken)] text-[var(--text-color-lighten)];
-  }
-
-  .archive-mini {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  /* View All Links */
-  .view-all-link {
-    @apply inline-block text-[var(--primary-color)] hover:text-[var(--primary-color-darken)] font-medium transition-colors;
-  }
-
-  /* Animations */
-  .fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
-    opacity: 0;
-  }
-
-  .fade-in-up {
-    animation: fadeInUp 1s ease-out forwards;
-  }
-
-  .post-card-animation {
-    animation: fadeIn 0.6s ease-out forwards;
-    opacity: 0;
-  }
-
-  /* Responsive Design */
-  .desktop-only {
-    display: block;
-  }
-  
-  .mobile-only {
-    display: none;
-  }
-
-  @media (max-width: 1200px) {
-    .three-column-layout {
-      grid-template-columns: 1.2fr 1fr;
-    }
-    
-    .column-right {
-      display: none;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .desktop-only {
-      display: none;
-    }
-    
-    .mobile-only {
-      display: block;
-    }
-  }
-
-  .mobile-posts-list {
-    @apply space-y-0;
-  }
-
-  .posts-grid {
-    @apply grid grid-cols-1 gap-6;
-    @apply md:grid-cols-2 md:gap-6;
-    @apply lg:grid-cols-3 lg:gap-6;
-  }
-
-  .tag-chip {
-    @apply text-xs px-2 py-1 rounded-full bg-[var(--primary-color-lighten)] text-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white transition-all;
-  }
-
-  /* Animations */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* Scrollbar styling for archive */
-  .archive-mini::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .archive-mini::-webkit-scrollbar-track {
-    background: var(--bg-color-darken);
-    border-radius: 2px;
-  }
-
-  .archive-mini::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 2px;
-  }
 </style>
+
+<script>
+  const heroArt = document.querySelector<HTMLElement>("[data-hero-art]");
+  const heroParallax = document.querySelector<HTMLElement>(
+    "[data-hero-parallax]",
+  );
+  const canTrack =
+    matchMedia("(pointer: fine)").matches &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (heroArt && heroParallax && canTrack) {
+    let frame = 0;
+    heroArt.addEventListener("pointermove", (event) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const rect = heroArt.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        heroParallax.style.setProperty("--parallax-x", `${x * 18}px`);
+        heroParallax.style.setProperty("--parallax-y", `${y * 12}px`);
+        heroParallax.style.setProperty("--parallax-rotate", `${x * 2}deg`);
+      });
+    });
+    heroArt.addEventListener("pointerleave", () => {
+      heroParallax.style.removeProperty("--parallax-x");
+      heroParallax.style.removeProperty("--parallax-y");
+      heroParallax.style.removeProperty("--parallax-rotate");
+    });
+  }
+</script>
