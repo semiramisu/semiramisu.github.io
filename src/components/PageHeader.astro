@@ -1,0 +1,50 @@
+---
+import type { CatKey } from "../utils/categories";
+
+interface Props {
+  /** uppercase Latin label (ARCHIVE / CATEGORY / TAG …) — language-neutral */
+  kicker?: string;
+  title: string;
+  count?: number;
+  /** colors the heavy rule and kicker with the category color */
+  catKey?: CatKey;
+  /** i18n dictionary key applied to the title for the ?lang=en switcher */
+  titleI18n?: string;
+}
+
+const { kicker, title, count, catKey, titleI18n } = Astro.props;
+---
+
+<header class="page-header" data-cat={catKey}>
+  {kicker && <p class="kicker page-kicker">{kicker}</p>}
+  <h1 class="page-title"><span data-i18n={titleI18n}>{title}</span></h1>
+  {count !== undefined && <p class="meta-line page-count">{count} posts</p>}
+</header>
+
+<style>
+  .page-header {
+    position: relative;
+    padding: 1.25rem 1.4rem;
+    margin-top: 1.5rem;
+    background: var(--bg-elevated);
+    border: 3px solid var(--cat, var(--rule-ink));
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
+  }
+
+  .page-kicker {
+    color: var(--text-primary);
+  }
+
+  .page-title {
+    margin-top: 0.7rem;
+    font-size: var(--display-page);
+    font-weight: 800;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .page-count {
+    margin-top: 0.4rem;
+  }
+</style>

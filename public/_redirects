@@ -1,0 +1,6 @@
+# Pages removed in the 2026 rebuild
+/all-posts/* /archive/ 301
+/admin/* / 301
+
+# Tag spelling unified (obsidian -> Obsidian) during the rebuild
+/tags/obsidian/ /tags/Obsidian/ 301

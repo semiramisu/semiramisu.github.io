@@ -1,39 +1,39 @@
 ---
-import PostArchiveLayout from "../../layouts/PostArchiveLayout.astro";
-import I18nKeys from "../../locales/keys";
-import { i18n } from "../../locales/translation";
-import { GetTags, type Archive } from "../../utils/content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PathBreadcrumb from "../../components/PathBreadcrumb.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import PostList from "../../components/PostList.astro";
+import { getPublishedPosts, countTags } from "../../utils/content";
 
 export async function getStaticPaths() {
-  const tags = await GetTags();
-  const tagList = Array.from(tags.keys());
-  return tagList.map((tag) => ({
-    params: { tag: tag },
+  const posts = await getPublishedPosts();
+  // raw tag names (may contain spaces, e.g. "Claude Code") as in the old site
+  return [...countTags(posts).keys()].map((tag) => ({
+    params: { tag },
+    props: { posts: posts.filter((p) => p.data.tags.includes(tag)) },
   }));
 }
 
-const tags = await GetTags();
 const { tag } = Astro.params;
-
-async function FormatArchiveMap() {
-  const tagName = tags.get(tag)!.name;
-  const posts = tags.get(tag)!.posts;
-  const archiveMap = new Map<number, Array<Archive>>();
-  
-  // 年ごとにグループ化
-  posts.forEach((post) => {
-    const year = post.date.getFullYear();
-    if (archiveMap.has(year)) archiveMap.get(year)!.push(post);
-    else archiveMap.set(year, [post]);
-  });
-
-  return { archiveMap, tagName };
-}
-
-const { archiveMap, tagName } = await FormatArchiveMap();
+const { posts } = Astro.props;
 ---
 
-<PostArchiveLayout
-  archiveMap={archiveMap}
-  title={`${tagName} ${i18n(I18nKeys.pages_tags_archive)}`}
-/>
+<BaseLayout title={`タグ: ${tag}`}>
+  <div class="container list-page">
+    <PathBreadcrumb segments={[{ label: "tags", href: "/tags/" }, { label: tag! }]} />
+    <PageHeader kicker="Tag" title={tag!} count={posts.length} />
+    <div class="timeline-wrap">
+      <PostList posts={posts} variant="timeline" />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .list-page {
+    padding-block: 2rem 4rem;
+  }
+
+  .timeline-wrap {
+    margin-top: 2.5rem;
+  }
+</style>
