@@ -44,6 +44,9 @@ draft: false
 既存記事をテックブログにも掲載する場合は、frontmatter に `tech: true` を追加してください。
 プロフィール、スキル、職歴、論文・外部リンクは `src/site.config.ts` の `TECH_PROFILE` を編集します。
 
+勉強会などで案内する短い自己紹介・リンク集は `/me/` です。
+掲載する紹介文、公開記事、論文は `src/pages/me.astro` で管理します。
+
 ## 構成
 
 - ホスティング: Netlify(mainブランチへのpushで自動デプロイ)

@@ -1,0 +1,392 @@
+---
+import TechLayout from "../layouts/TechLayout.astro";
+import { SITE, TECH_PROFILE } from "../site.config";
+
+const description =
+  "関根 優介 / Yusuke Sekine。Data Engineer / Data Scientist。公開記事と、LLM・機械学習による感情推定、健康・活動データ分析に関する研究を紹介します。";
+
+// Public profile only. Keep private work and personal details out of this page.
+const selectedPapers = [
+  {
+    title:
+      "Weighted Consensus Framework for SNS Emotion Classification Based on LLM Reliability",
+    href: "https://doi.org/10.1109/CBD69312.2025.00036",
+    authors: "Yusuke Sekine, Kiichi Tago",
+    publication: "CBD 2025 · pp. 158–162 · 2025年11月",
+    authorship: "筆頭著者",
+  },
+  {
+    title:
+      "Improving emotion estimation through a combination of ChatGPT and deep learning",
+    href: "https://www.tandfonline.com/doi/abs/10.1080/12460125.2024.2440024",
+    authors: "Yusuke Sekine, Seiji Kasuya, Kiichi Tago",
+    publication:
+      "Journal of Decision Systems 34(1) · pp. 1–18 · 2025年1月15日オンライン公開",
+    authorship: "筆頭著者",
+  },
+];
+
+const morePapers = [
+  {
+    title:
+      "Analysing Relaxation Effects Through Natural Experiences Using Natural Sounds and VR Devices",
+    href: "https://ieeexplore.ieee.org/document/10935451",
+    authors: "Yukizi Suzuki, Yusuke Sekine, Kiichi Tago",
+    publication: "ITME 2024 · pp. 726–730",
+    authorship: "第2著者",
+  },
+  {
+    title:
+      "Comparative Analysis of Relaxation Effects through Natural Experiences Using a VR Device",
+    href: "https://doi.org/10.1109/ITME60234.2023.00088",
+    authors: "Yukizi Suzuki, Yusuke Sekine, Kiichi Tago",
+    publication: "ITME 2023 · pp. 413–417",
+    authorship: "第2著者",
+  },
+  {
+    title:
+      "Improving Emotion Classification by a Combination of Personal Texts and Social Big Data Based on Naive Bayes",
+    href: "https://ieeexplore.ieee.org/document/10086337",
+    authors: "Yusuke Sekine, Seiji Kasuya, Kiichi Tago",
+    publication: "ITME 2022 · pp. 370–374",
+    authorship: "筆頭著者",
+  },
+  {
+    title:
+      "Influence Analysis of the Screen Time on Daily Exercise Based on the Personal Activity Factor Model",
+    href: "https://doi.org/10.1109/R10-HTC54060.2022.9929542",
+    authors: "Yusuke Sekine, Seiji Kasuya, Kiichi Tago",
+    publication: "IEEE R10-HTC 2022 · pp. 275–280",
+    authorship: "筆頭著者",
+  },
+];
+
+const readingLinks = [
+  {
+    label: "Tech Blog",
+    title: "技術プロフィール・記事",
+    detail: "機械学習・データ分析・個人開発について。",
+    href: "/tech/",
+  },
+  {
+    label: "Selected Article · note",
+    title: "Codexの最小課金プランで個人Webアプリはどこまで作れるか",
+    detail: "Codexを使った個人開発の記録。",
+    href: "https://note.com/sekine_ds/n/nddc9777b0bf5",
+  },
+];
+---
+
+<TechLayout title="関根 優介 — 自己紹介・リンク集" description={description}>
+  <div class="tech-shell profile-page">
+    <header class="profile-intro">
+      <div class="identity">
+        <img src={TECH_PROFILE.avatar} alt="" width="72" height="72" />
+        <div>
+          <p class="tech-eyebrow" lang="en">Yusuke Sekine</p>
+          <h1>関根 優介</h1>
+        </div>
+      </div>
+      <p class="profile-role" lang="en">
+        <span>Data Engineer</span> / <span>Data Scientist</span>
+      </p>
+      <p class="profile-bio">
+        機械学習とデータ基盤に関わっています。研究では、LLM・機械学習による感情推定や、健康・活動データの分析に取り組んできました。
+      </p>
+      <a class="research-jump" href="#research">研究・論文を見る ↓</a>
+    </header>
+
+    <section class="profile-section" aria-labelledby="reading-title">
+      <h2 id="reading-title">記事を読む</h2>
+      <ul class="reading-links">
+        {
+          readingLinks.map((link) => (
+            <li>
+              <a class="reading-link" href={link.href}>
+                <span class="tech-section-kicker">{link.label}</span>
+                <span class="reading-title">{link.title}</span>
+                <span class="link-detail">{link.detail}</span>
+                <span class="link-arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <nav class="profile-socials" aria-label="公開プロフィール">
+        <a href={SITE.github}>GitHub <span aria-hidden="true">↗</span></a>
+        <a href={SITE.note}>note <span aria-hidden="true">↗</span></a>
+        <a href={SITE.x}
+          >X <span class="social-handle">@sekine_DS</span>
+          <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </section>
+
+    <section
+      class="profile-section"
+      id="research"
+      aria-labelledby="research-title"
+    >
+      <p class="tech-section-kicker">Research</p>
+      <h2 id="research-title">研究・論文</h2>
+      <p class="section-intro">
+        感情推定、健康・活動データ分析に関する論文です。
+      </p>
+      <ul class="paper-list">
+        {
+          selectedPapers.map((paper) => (
+            <li>
+              <span class="authorship">{paper.authorship}</span>
+              <h3>
+                <a href={paper.href} lang="en">
+                  {paper.title}
+                </a>
+              </h3>
+              <p class="paper-authors" lang="en">
+                {paper.authors}
+              </p>
+              <p class="paper-publication">{paper.publication}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <details class="more-papers">
+        <summary>ほかの論文を見る（4件）</summary>
+        <ul class="paper-list">
+          {
+            morePapers.map((paper) => (
+              <li>
+                <span class="authorship">{paper.authorship}</span>
+                <h3>
+                  <a href={paper.href} lang="en">
+                    {paper.title}
+                  </a>
+                </h3>
+                <p class="paper-authors" lang="en">
+                  {paper.authors}
+                </p>
+                <p class="paper-publication">{paper.publication}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </details>
+    </section>
+  </div>
+</TechLayout>
+
+<style>
+  .profile-page {
+    max-width: 42rem;
+    padding-block: 2.5rem 4rem;
+  }
+
+  .profile-intro {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #303a3d;
+  }
+
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .identity img {
+    flex-shrink: 0;
+    border: 1px solid #3e5055;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .identity .tech-eyebrow {
+    margin-top: 0;
+  }
+
+  h1 {
+    margin: 0.25rem 0 0;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    line-height: 1.3;
+    letter-spacing: 0.06em;
+  }
+
+  .profile-role {
+    margin: 1.25rem 0 0;
+    color: #b9c9cc;
+    font-size: 0.95rem;
+  }
+
+  .profile-role span {
+    white-space: nowrap;
+  }
+
+  .profile-bio {
+    margin: 0.75rem 0 1rem;
+    color: #d0d0d0;
+    line-height: 1.9;
+  }
+
+  .research-jump {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: #22d3ee;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .profile-section {
+    margin-top: 2rem;
+    scroll-margin-top: 1.5rem;
+  }
+
+  h2 {
+    margin: 0.25rem 0 1rem;
+    font-size: 1.25rem;
+  }
+
+  .reading-links,
+  .paper-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .reading-links {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .reading-link {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.25rem 2.75rem 1.25rem 1.25rem;
+    border: 1px solid #36525a;
+    border-radius: 0.75rem;
+    background: linear-gradient(
+      120deg,
+      rgb(12 43 50 / 0.65),
+      rgb(20 20 20 / 0.8)
+    );
+  }
+
+  .reading-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .link-detail {
+    color: #b3bfc2;
+    font-size: 0.875rem;
+  }
+
+  .link-arrow {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    color: #22d3ee;
+  }
+
+  .reading-link:hover {
+    border-color: #22d3ee;
+  }
+
+  .profile-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .profile-socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid #40484a;
+    border-radius: 0.5rem;
+    color: #c6cfd1;
+    font-size: 0.875rem;
+  }
+
+  .social-handle {
+    font-size: 0.8rem;
+  }
+
+  .profile-socials a:hover {
+    border-color: #22d3ee;
+    color: #22d3ee;
+  }
+
+  .section-intro {
+    margin: -0.5rem 0 1rem;
+    color: #b3bfc2;
+    font-size: 0.9rem;
+  }
+
+  .paper-list li {
+    padding: 1.25rem 0;
+    border-top: 1px solid #303a3d;
+    overflow-wrap: anywhere;
+  }
+
+  .authorship {
+    color: #b3bfc2;
+    font-size: 0.75rem;
+  }
+
+  h3 {
+    margin: 0.4rem 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.65;
+  }
+
+  h3 a {
+    display: block;
+    min-height: 44px;
+    text-decoration: underline;
+    text-decoration-color: #53767e;
+    text-underline-offset: 0.2em;
+  }
+
+  h3 a:hover {
+    color: #22d3ee;
+  }
+
+  .paper-authors,
+  .paper-publication {
+    margin: 0.25rem 0 0;
+    color: #b3bfc2;
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+
+  .more-papers {
+    border-block: 1px solid #303a3d;
+  }
+
+  summary {
+    min-height: 48px;
+    padding: 0.85rem 0.25rem;
+    color: #22d3ee;
+    cursor: pointer;
+  }
+
+  summary:focus-visible {
+    outline: 2px solid #22d3ee;
+    outline-offset: 4px;
+  }
+
+  @media (min-width: 640px) {
+    .profile-page {
+      padding-top: 4rem;
+    }
+  }
+</style>
